@@ -47,4 +47,4 @@ handler500 = login_render.error
 urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
-admin.site.site_header = "[智慧校园测评系统]"
+admin.site.site_header = "[感染科临床轮值考试系统]"
