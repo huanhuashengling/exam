@@ -40,9 +40,9 @@ urlpatterns += [
     path('auth/', include(('account.urls','account'), namespace='auth')),
 ]
 
-handler403 = login_render.error
-handler404 = login_render.error
-handler500 = login_render.error
+handler403 = login_render.error403
+handler404 = login_render.error404
+handler500 = login_render.error500
 
 urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

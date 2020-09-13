@@ -163,5 +163,11 @@ def reset_notify(request):
     })
 
 
-def error(request):
+def error403(request, exception):
+    return render(request, 'err.html', {"errtitle": "页面发生错误", "errmsg": "页面发生未知错误，请联系管理员解决~"})
+
+def error404(request, exception):
+    return render(request, 'err.html', {"errtitle": "页面发生错误", "errmsg": "页面发生未知错误，请联系管理员解决~"})
+
+def error500(request):
     return render(request, 'err.html', {"errtitle": "页面发生错误", "errmsg": "页面发生未知错误，请联系管理员解决~"})
