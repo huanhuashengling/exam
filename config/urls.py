@@ -28,7 +28,7 @@ urlpatterns = [
     path('index', login_render.web_index, name='web_index'),
     path('login', login_render.web_login, name='web_login'),
     path('logout', login_render.web_logout, name='web_logout'),
-] + static(settings.STATIC_URL,document_root = settings.STATIC_ROOT)
+]
 
 urlpatterns += [
     path('bs/', include(('competition.urls','competition'), namespace='bs')),  # 比赛
