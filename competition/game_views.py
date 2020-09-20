@@ -203,7 +203,7 @@ def games(request, s):
 
     elif s == 'tech':
         kinds = CompetitionKindInfo.objects.filter(
-            kind_type=CompetitionKindInfo.IT_ISSUE,
+            kind_type=CompetitionKindInfo.INFECTION,
             cop_finishat__gt=datetime.datetime.now(tz=datetime.timezone.utc)
         ).order_by('-total_partin_num').order_by('-created_at')
 

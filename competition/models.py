@@ -9,32 +9,26 @@ from utils.basemodels import CreateUpdateMixin, MediaMixin
 
 
 class CompetitionKindInfo(CreateUpdateMixin):
-    """比赛类别信息类"""
-
-    IT_ISSUE = 0
-    EDUCATION = 1
-    CULTURE = 2
-    GENERAL = 3
-    INTERVIEW = 4
-    REAR = 5
-    GEO = 6
-    SPORT = 7
+    """试题类型信息类"""
+    INFECTION = 0 #感染科
+    INTERNAL = 1 #内科
+    SURGICAL = 2 #外科
+    PEDIATRIC = 3 #儿科
+    GYNECOLOGY = 4 #妇科
 
     KIND_TYPES = (
-        (IT_ISSUE, u'技术类'),
-        (EDUCATION, u'教育类'),
-        (CULTURE, u'文化类'),
-        (GENERAL, u'常识类'),
-        (GEO, u'地理类'),
-        (SPORT, u'体育类'),
-        (INTERVIEW, u'面试题')
+        (INFECTION, u'感染科'),
+        (INTERNAL, u'内科'),
+        (SURGICAL, u'外科'),
+        (PEDIATRIC, u'儿科'),
+        (GYNECOLOGY, u'妇科'),
     )
 
     kind_id = ShortUUIDField(_(u'比赛id'), max_length=32, blank=True, null=True, help_text=u'比赛类别唯一标识', db_index=True)
     account_id = models.CharField(_(u'出题账户id'), max_length=32, blank=True, null=True, help_text=u'商家账户唯一标识', db_index=True)
     app_id = models.CharField(_(u'应用id'), max_length=32, blank=True, null=True, help_text=u'应用唯一标识', db_index=True)
     bank_id = models.CharField(_(u'题库id'), max_length=32, blank=True, null=True, help_text=u'题库唯一标识', db_index=True)
-    kind_type = models.IntegerField(_(u'比赛类型'), default=IT_ISSUE, choices=KIND_TYPES, help_text=u'比赛类型')
+    kind_type = models.IntegerField(_(u'比赛类型'), default=INFECTION, choices=KIND_TYPES, help_text=u'比赛类型')
     kind_name = models.CharField(_(u'比赛名称'), max_length=32, blank=True, null=True, help_text=u'竞赛类别名称')
 
     sponsor_name = models.CharField(_(u'赞助商名称'), max_length=60, blank=True, null=True, help_text=u'赞助商名称')
@@ -80,23 +74,18 @@ class BankInfo(CreateUpdateMixin):
     题库信息类
     """
 
-    IT_ISSUE = 0
-    EDUCATION = 1
-    CULTURE = 2
-    GENERAL = 3
-    INTERVIEW = 4
-    REAR = 5
-    GEO = 6
-    SPORT = 7
+    INFECTION = 0 #感染科
+    INTERNAL = 1 #内科
+    SURGICAL = 2 #外科
+    PEDIATRIC = 3 #儿科
+    GYNECOLOGY = 4 #妇科
 
     BANK_TYPES = (
-        (IT_ISSUE, u'技术类'),
-        (EDUCATION, u'教育类'),
-        (CULTURE, u'文化类'),
-        (GENERAL, u'常识类'),
-        (GEO, u'地理类'),
-        (SPORT, u'体育类'),
-        (INTERVIEW, u'面试题')
+        (INFECTION, u'感染科'),
+        (INTERNAL, u'内科'),
+        (SURGICAL, u'外科'),
+        (PEDIATRIC, u'儿科'),
+        (GYNECOLOGY, u'妇科'),
     )
 
     bank_id = ShortUUIDField(_(u'题库id'), max_length=32, blank=True, null=True, help_text=u'题库唯一标识', db_index=True)
@@ -106,7 +95,7 @@ class BankInfo(CreateUpdateMixin):
 
     choice_num = models.IntegerField(_(u'选择题数'), default=0, help_text=u'选择题数')
     fillinblank_num = models.IntegerField(_(u'填空题数'), default=0, help_text=u'填空题数')
-    bank_type = models.IntegerField(_(u'题库类型'), default=IT_ISSUE, choices=BANK_TYPES, help_text=u'题库类型')
+    bank_type = models.IntegerField(_(u'题库类型'), default=INFECTION, choices=BANK_TYPES, help_text=u'题库类型')
     kind_num = models.IntegerField(_(u'比赛使用次数'), default=0, help_text=u'比赛使用次数')
     partin_num = models.IntegerField(_(u'总答题人数'), default=0, help_text=u'总答题人数')
 

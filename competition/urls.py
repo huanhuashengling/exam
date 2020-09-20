@@ -20,7 +20,8 @@ urlpatterns = [
 
 # 配置比赛url
 urlpatterns += [
-    path('set', set_render.index, name='set_index'),
+    path('set_bank_index', set_render.bank_index, name='set_bank_index'),
+    path('set_game_index', set_render.game_index, name='set_game_index'),
     path('set/bank', set_render.set_bank, name='set_bank'),
     path('set/bank/tdownload', set_render.template_download, name='template_download'),
     path('set/bank/upbank', set_render.upload_bank, name='upload_bank'),

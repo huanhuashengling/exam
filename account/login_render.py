@@ -26,6 +26,11 @@ def web_index(request):
         profile = Profile.objects.get(uid=uid)
     except Profile.DoesNotExist:
         profile = None
+        return redirect(reverse("web_login"))
+        # return render(request, 'web/login.html', {
+        #     'login_info': settings.WXWEB_LOGIN_PARAMS or {},
+        #     'has_login': False
+        # })
 
     return render(request, 'web/index.html', {
         'user_info': profile and profile.data,

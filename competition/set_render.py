@@ -18,7 +18,7 @@ from utils.upload_questions import upload_questions
 
 
 @check_login
-def index(request):
+def game_index(request):
     """
     题库和比赛导航页
     :param request: 请求对象
@@ -35,6 +35,23 @@ def index(request):
     return render(request, 'setgames/index.html', {'user_info': profile.data})
 
 @check_login
+def bank_index(request):
+    """
+    题库和比赛导航页
+    :param request: 请求对象
+    :return: 渲染视图和user_info用户信息数据
+    """
+
+    uid = request.GET.get('uid', '')
+
+    try:
+        profile = Profile.objects.get(uid=uid)
+    except Profile.DoesNotExist:
+        return render(request, 'err.html', ProfileNotFound)
+
+    return render(request, 'setbanks/index.html', {'user_info': profile.data})
+
+@check_login
 def set_bank(request):
     """
     配置题库页面
@@ -49,7 +66,7 @@ def set_bank(request):
     bank_types = []
     for i, j in BankInfo.BANK_TYPES:  # 返回所有题库类型
         bank_types.append({'id': i, 'name': j})
-    return render(request, 'setgames/bank.html', {  # 渲染模板
+    return render(request, 'setbanks/bank.html', {  # 渲染模板
         'user_info': profile.data,
         'bank_types': bank_types
     })
@@ -96,7 +113,7 @@ def upload_bank(request):
     """
     uid = request.POST.get('uid', '')  # 获取uid
     bank_name = request.POST.get('bank_name', '')  # 获取题库名称
-    bank_type = request.POST.get('bank_type', BankInfo.IT_ISSUE)  # 获取题库类型
+    bank_type = request.POST.get('bank_type', BankInfo.INFECTION)  # 获取题库类型
     template = request.FILES.get('template', None)  # 获取模板文件
     for k, v in dict(BankInfo.BANK_TYPES).items():
         if v == bank_type:

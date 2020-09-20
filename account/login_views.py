@@ -113,8 +113,13 @@ def normal_login(request):
             profile.name = user.username
             profile.user_src = Profile.NORMAL_USER
             profile.save()
+        request.session.get("usertype")  #让session创建usertyp这个值
         request.session['uid'] = profile.uid  # 设置Profile uid的session
         request.session['username'] = profile.name  # 设置用户名的session
+        request.session['usertype'] = profile.user_src  # 设置用户类型session，普通用户，机构用户
+        # print("---------------profile.user_src")
+        # print(profile.user_src)
+        # print(request.session.get("usertype"))
         set_profile(profile.data)  # 将用户信息保存到redis，查用户信息从redis中查询
     else:
         return json_response(*UserError.PasswordError)  # 校验失败，返回错误码300002
