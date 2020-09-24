@@ -79,37 +79,37 @@ def games(request, s):
             cop_finishat__gt=datetime.datetime.now(tz=datetime.timezone.utc),
         ).order_by('-total_partin_num').order_by('-created_at')[:10]
 
-    elif s == 'tech':
+    elif s == 'infection':
         kinds = CompetitionKindInfo.objects.filter(
             kind_type=CompetitionKindInfo.INFECTION,
             cop_finishat__gt=datetime.datetime.now(tz=datetime.timezone.utc)
         ).order_by('-total_partin_num').order_by('-created_at')
 
-    elif s == 'edu':
+    elif s == 'internal':
         kinds = CompetitionKindInfo.objects.filter(
-            kind_type=CompetitionKindInfo.EDUCATION,
+            kind_type=CompetitionKindInfo.INTERNAL,
             cop_finishat__gt=datetime.datetime.now(tz=datetime.timezone.utc)
         ).order_by('-total_partin_num').order_by('-created_at')
 
-    elif s == 'culture':
+    elif s == 'surgical':
         kinds = CompetitionKindInfo.objects.filter(
-            kind_type=CompetitionKindInfo.CULTURE,
+            kind_type=CompetitionKindInfo.SURGICAL,
             cop_finishat__gt=datetime.datetime.now(tz=datetime.timezone.utc)
         ).order_by('-total_partin_num').order_by('-created_at')
 
-    elif s == 'sport':
+    elif s == 'gynecology':
         kinds = CompetitionKindInfo.objects.filter(
-            kind_type=CompetitionKindInfo.SPORT,
+            kind_type=CompetitionKindInfo.GYNECOLOGY,
+            cop_finishat__gt=datetime.datetime.now(tz=datetime.timezone.utc)
+        ).order_by('-total_partin_num').order_by('-created_at')
+
+    elif s == 'pediatric':
+        kinds = CompetitionKindInfo.objects.filter(
+            kind_type=CompetitionKindInfo.PEDIATRIC,
             cop_finishat__gt=datetime.datetime.now(tz=datetime.timezone.utc)
         ).order_by('-total_partin_num').order_by('-created_at')
 
     elif s == 'general':
-        kinds = CompetitionKindInfo.objects.filter(
-            kind_type=CompetitionKindInfo.GENERAL,
-            cop_finishat__gt=datetime.datetime.now(tz=datetime.timezone.utc)
-        ).order_by('-total_partin_num').order_by('-created_at')
-
-    elif s == 'interview':
         kinds = CompetitionKindInfo.objects.filter(
             kind_type=CompetitionKindInfo.INTERVIEW,
             cop_finishat__gt=datetime.datetime.now(tz=datetime.timezone.utc)

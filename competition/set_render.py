@@ -146,7 +146,10 @@ def upload_bank(request):
     with open(final_path, 'wb+') as f:  # 保存到目录
         f.write(template.read())
     choice_num, fillinblank_num = upload_questions(final_path, bank_info)  # 使用xlrd读取excel文件到数据库
-    return render(request, 'setgames/bank.html', {  # 渲染视图
+    if "subject not found" == choice_num and "subject not found" == fillinblank_num:
+        return render(request, 'err.html', SubjectNotFound)
+
+    return render(request, 'setbanks/bank.html', {  # 渲染视图
         'user_info': profile.data,
         'created': {
             'choice_num': choice_num,

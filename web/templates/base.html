@@ -47,9 +47,6 @@
                 <a class="nav-link" href="/bs/set_game_index{% if request.session.uid %}?uid={{ request.session.uid }}{% else %}{% endif %}">测试管理</a>
               </li>
               <li class="nav-item">
-                <a class="nav-link" href="/biz{% if request.session.uid %}?uid={{ request.session.uid }}{% else %}{% endif %}" tabindex="-1">测试管理</a>
-              </li>
-              <li class="nav-item">
                 <a class="nav-link" href="/biz{% if request.session.uid %}?uid={{ request.session.uid }}{% else %}{% endif %}" tabindex="-1">测试报告</a>
               </li>
             {% elif 22 == request.session.usertype  %}

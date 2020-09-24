@@ -142,13 +142,11 @@ class ChoiceInfo(CreateUpdateMixin, MediaMixin):
     )
 
     bank_id = models.CharField(_(u'题库id'), max_length=32, blank=True, null=True, help_text=u'题库唯一标识', db_index=True)
+    subject_id = models.CharField(_(u'科目id'), max_length=32, blank=True, null=True, help_text=u'科目唯一标识', db_index=True)
     ctype = models.IntegerField(_(u'题目类型'), choices=CONTENT_TYPE, default=TXT, help_text=u'题目类型')
-    question = models.CharField(_(u'问题'), max_length=255, blank=True, null=True, help_text=u'题目')
+    question = models.CharField(_(u'问题'), max_length=1000, blank=True, null=True, help_text=u'题目')
     answer = models.CharField(_(u'答案'), max_length=255, blank=True, null=True, help_text=u'答案')
-    item1 = models.CharField(_(u'选项1'), max_length=255, blank=True, null=True, help_text=u'选项一')
-    item2 = models.CharField(_(u'选项2'), max_length=255, blank=True, null=True, help_text=u'选项二')
-    item3 = models.CharField(_(u'选项3'), max_length=255, blank=True, null=True, help_text=u'选项三')
-    item4 = models.CharField(_(u'选项4'), max_length=255, blank=True, null=True, help_text=u'选项四')
+    select_items = models.CharField(_(u'选项'), max_length=2000, blank=True, null=True, help_text=u'选项文本')
     source = models.CharField(_(u'出处'), max_length=255, blank=True, null=True, help_text=u'出处')
 
     class Meta:
@@ -160,16 +158,17 @@ class ChoiceInfo(CreateUpdateMixin, MediaMixin):
 
     @property
     def items(self):
-        tmp = []
-        if self.item1:
-            tmp.append(self.item1)
-        if self.item2:
-            tmp.append(self.item2)
-        if self.item3:
-            tmp.append(self.item3)
-        if self.item4:
-            tmp.append(self.item4)
-        return tmp
+        # tmp = []
+        # if self.item1:
+        #     tmp.append(self.item1)
+        # if self.item2:
+        #     tmp.append(self.item2)
+        # if self.item3:
+        #     tmp.append(self.item3)
+        # if self.item4:
+        #     tmp.append(self.item4)
+        # return tmp
+        return self.select_items
 
     @property
     def data_without_answer(self):
@@ -179,7 +178,7 @@ class ChoiceInfo(CreateUpdateMixin, MediaMixin):
             'bank_id': self.bank_id,
             'ctype': self.ctype,
             'question': self.question,
-            'items': self.items,
+            'items': self.select_items,
             'source': self.source,
             'media': self.media,
         }
@@ -193,7 +192,7 @@ class ChoiceInfo(CreateUpdateMixin, MediaMixin):
             'ctype': self.ctype,
             'question': self.question,
             'answer': self.answer,
-            'items': self.items,
+            'items': self.select_items,
             'source': self.source,
             'media': self.media,
         }
@@ -217,8 +216,9 @@ class FillInBlankInfo(CreateUpdateMixin, MediaMixin):
     )
 
     bank_id = models.CharField(_(u'题库id'), max_length=32, blank=True, null=True, help_text=u'题库唯一标识', db_index=True)
+    subject_id = models.CharField(_(u'科目id'), max_length=32, blank=True, null=True, help_text=u'科目唯一标识', db_index=True)
     ctype = models.IntegerField(_(u'题目类型'), choices=CONTENT_TYPE, default=TXT, help_text=u'题目类型')
-    question = models.CharField(_(u'问题'), max_length=255, blank=True, null=True, help_text=u'题目')
+    question = models.CharField(_(u'问题'), max_length=1000, blank=True, null=True, help_text=u'题目')
     answer = models.CharField(_(u'答案'), max_length=255, blank=True, null=True, help_text=u'答案')
     source = models.CharField(_(u'出处'), max_length=255, blank=True, null=True, help_text=u'出处')
 
@@ -323,3 +323,41 @@ class CompetitionQAInfo(CreateUpdateMixin):
             'score': self.score,
             'time': self.expend_time / 1000.000,
         }
+
+class Department(CreateUpdateMixin):
+    INFECTION = 0 #感染科
+    INTERNAL = 1 #内科
+    SURGICAL = 2 #外科
+    PEDIATRIC = 3 #儿科
+    GYNECOLOGY = 4 #妇科
+
+    DEPARTMENT_CHOICES = (
+        (INFECTION, u'感染科'),
+        (INTERNAL, u'内科'),
+        (SURGICAL, u'外科'),
+        (PEDIATRIC, u'儿科'),
+        (GYNECOLOGY, u'妇科'),
+    )
+
+    department_name = models.IntegerField(_(u'科室类别'), choices=DEPARTMENT_CHOICES, default=0, help_text=u'科室类别')
+
+    class Meta:
+        verbose_name = _(u'科室')
+        verbose_name_plural = _(u'科室')
+
+    def __unicode__(self):
+        return str(self.pk)
+
+class Subject(CreateUpdateMixin):
+    department_id = models.CharField(_(u'科室id'), max_length=32, blank=True, null=True, help_text=u'科室唯一标识', db_index=True)
+    subject_name_abb = models.CharField(_(u'科目所属缩写'), max_length=255, blank=True, null=True, help_text=u'科目所属缩写')
+    subject_name = models.CharField(_(u'科目所属全称'), max_length=255, blank=True, null=True, help_text=u'科目所属全称')
+    index_order = models.IntegerField(_(u'索引编号'), default=0, help_text=u'索引编号')
+    item_order = models.IntegerField(_(u'单项编号'), default=0, help_text=u'单项编号')
+
+    class Meta:
+        verbose_name = _(u'科目')
+        verbose_name_plural = _(u'科目')
+
+    def __unicode__(self):
+        return str(self.pk)

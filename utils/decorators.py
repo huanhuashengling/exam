@@ -7,6 +7,7 @@ from functools import wraps
 from django.shortcuts import render
 from django.conf import settings
 from django.views.decorators.csrf import csrf_exempt
+from django.shortcuts import redirect, render, reverse
 
 from competition.models import CompetitionKindInfo
 from utils.errors import (CompetitionError, CompetitionHasEnded,
@@ -22,6 +23,7 @@ def check_login(func=None):
 
         if not uid:
             if request.path.startswith('/bs'):
+                return redirect(reverse("web_login"))
                 return render(request, 'err.html', ProfileNotFound)
             elif request.path.startswith('/api'):
                 return json_response(*ProfileError.ProfileNotFound)

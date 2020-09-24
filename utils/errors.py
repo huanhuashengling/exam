@@ -60,4 +60,5 @@ VerifyFailed = message("激活失败", "我们没有找到您的注册信息，�
 PasswordResetFailed = message("密码重置失败", "可能因为较长时间未得到确认，您的密码重置失败了!")
 TemplateNotFound = message("模板不存在", "题库模板没有找到，请联系管理员~")
 FileNotFound = message("文件不存在", "传入的模板为空")
+SubjectNotFound = message("科目不存在", "导入题库中科目分类在已有的分类中找不到，请确认创建")
 FileTypeError = message("文件类型错误", "传入的文件出错了")

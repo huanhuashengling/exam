@@ -27,25 +27,30 @@ def check_correct_num(rlist):
                         c = ChoiceInfo.objects.get(pk=pk)
                     except ChoiceInfo.DoesNotExist:
                         continue
-
-                    if "A" in v:
-                        if str(c.item1) == str(c.answer):
-                            correct += 1
-                            correct_list.append(i)
-                    elif "B" in v:
-                        if str(c.item2) == str(c.answer):
-                            correct_list.append(i)
-                            correct += 1
-                    elif "C" in v:
-                        if str(c.item3) == str(c.answer):
-                            correct += 1
-                            correct_list.append(i)
-                    elif "D" in v:
-                        if str(c.item4) == str(c.answer):
-                            correct += 1
-                            correct_list.append(i)
+                    if str(v) == str(c.answer):
+                        correct += 1
+                        correct_list.append(i)
                     else:
                         wrong_list.append(i)
+
+                    # if "A" in v:
+                    #     if str(c.item1) == str(c.answer):
+                    #         correct += 1
+                    #         correct_list.append(i)
+                    # elif "B" in v:
+                    #     if str(c.item2) == str(c.answer):
+                    #         correct_list.append(i)
+                    #         correct += 1
+                    # elif "C" in v:
+                    #     if str(c.item3) == str(c.answer):
+                    #         correct += 1
+                    #         correct_list.append(i)
+                    # elif "D" in v:
+                    #     if str(c.item4) == str(c.answer):
+                    #         correct += 1
+                    #         correct_list.append(i)
+                    # else:
+                    #     wrong_list.append(i)
 
                 if t == 'f':
                     try:

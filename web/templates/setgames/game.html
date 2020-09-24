@@ -19,34 +19,36 @@
     }
 
 </style>
-<div class="main-content container" style="background: url(/static/images/form-bg.jpg) no-repeat center top;">
-    <div class="inner-content" style="padding-top:50px;color: white;">
-        <div class="union-title-black" style="color:white">配置比赛</div>
-        <div class="col-md-2" style="margin-left: 60px">
+ <!-- style="background: url(/static/images/form-bg.jpg) no-repeat center top;" -->
+<div class="main-content container">
+    <div class="inner-content" style="padding-top:50px;">
+        <div class="alert alert-primary" role="alert">
+          创建测试
+        </div>
+        <h3>选择题库</h3>
         <div class="row">
-            <h3>选择题库</h3>
-            <label for="bankType">题库类型</label>
-            <div id="bankType" class="dropdown">
-                <input type="button" style="height: 40px;width: 80px" id="choicedValue" class="btn btn-info dropdown-toggle" data-toggle="dropdown" name="bank_type" value="热门题库" />
-                <ul class="dropdown-menu">
+            <div class="col-md-6">
+                <label for="bankType">选择轮岗科室: </label>
+                <div id="bankType" class="btn-group">
+                    <input type="button" id="choicedValue" class="btn btn-info dropdown-toggle" data-toggle="dropdown" name="bank_type" value="感染科" />
+                  <div class="dropdown-menu">
                     {% for t in bank_types %}
-                        <li class="btn btn-info" style="height: 40px;width: 80px" onclick="choiceBankType(this)">{{ t.name }}</li>
+                        <a class="dropdown-item" href="#"  onclick="choiceBankType(this)">{{ t.name }}</a>
                     {% endfor %}
-                    <li class="btn btn-info" style="height: 40px;width: 80px" onclick="choiceBankType(this)">热门题库</li>
-                </ul>
+                  </div>
+                </div>
             </div>
-        </div>
-        <div class="row" style="margin-top: 14px">
-            <label for="bankListGroup">选择题库</label>
-            <div id="bankListGroup" class="list-group">
-                {% for b in banks %}
-                    <div id="{{ b.bank_id }}" class="list-group-item btn btn-info" style="background-color: rgb(70, 184, 218);"
-                         onclick="getBankModal('{{ b.bank_id }}')">
-                        <span>{{ b.bank_name|truncatechars:15 }}  ({{ b.total_question_num }}题)</span>
-                    </div>
-                {% endfor %}
+            <div class="col-md-6">
+                <label for="bankListGroup" class="col-md-6">选择题库: </label>
+                <div id="bankListGroup" class="list-group">
+                    {% for b in banks %}
+                        <div id="{{ b.bank_id }}" class="list-group-item btn btn-info col-md-6" style="background-color: rgb(70, 184, 218);"
+                             onclick="getBankModal('{{ b.bank_id }}')">
+                            <span>{{ b.bank_name|truncatechars:15 }}  ({{ b.total_question_num }}题)</span>
+                        </div>
+                    {% endfor %}
+                </div>
             </div>
-        </div>
         </div>
         <div class="col-md-4" style="margin-left: 60px">
             <h3>配置比赛</h3>
@@ -103,8 +105,12 @@
             </form>
         </div>
     </div>
-    <div id="submitAll" class="save-button">保存到数据库</div>
-
+    <button id="submitAll" class="btn btn-primary bbsave-button">保存到数据库</button>
+<hr />
+<hr />
+<p />
+<hr />
+<hr />
     <div id="optionFieldsModal" class="modal">
         <div class="modal-dialog">
             <div class="modal-content">

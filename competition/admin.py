@@ -47,9 +47,9 @@ class ChoiceInfoAdmin(admin.ModelAdmin):
     选择题配置后台
     """
 
-    list_display = ('bank_id', 'question', 'answer', 'item1', 'item2', 'item3', 'item4', 'source', 'status', 'created_at', 'updated_at')
+    list_display = ('bank_id', 'question', 'answer', 'items', 'source', 'status', 'created_at', 'updated_at')
     list_filter = ('bank_id', 'status')
-    search_fields = ('bank_id', 'question', 'answer', 'item1', 'item2', 'item3', 'item4')
+    search_fields = ('bank_id', 'question', 'answer', 'items')
 
     def save_model(self, request, obj, form, change):
         obj.save()
