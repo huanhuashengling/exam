@@ -11,10 +11,11 @@ def check_correct_num(rlist):
         wrong_list = []
         for i in rlist:
             if isinstance(i, str):
-                i = i.split(',')
-                t = i[0][0]  # qtype
-                p = i[0][2:]  # pk
-                v = i[1]  # answer
+                m = i.split('|')[0]
+                n = i.split('|')[1]
+                t = m.split("_")[0]  # qtype
+                p = m.split("_")[1]  # pk
+                v = n.split(",")  # answer
 
                 # 转换类型
                 try:
@@ -27,7 +28,12 @@ def check_correct_num(rlist):
                         c = ChoiceInfo.objects.get(pk=pk)
                     except ChoiceInfo.DoesNotExist:
                         continue
-                    if str(v) == str(c.answer):
+
+                    tmpa = sorted(c.answer.split('|'))
+                    # print(v)
+                    # print(tmpa)
+
+                    if v == tmpa:
                         correct += 1
                         correct_list.append(i)
                     else:

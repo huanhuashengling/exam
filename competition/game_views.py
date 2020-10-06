@@ -30,6 +30,14 @@ def get_questions(request):
     """
     kind_id = request.GET.get('kind_id', '')  # 获取kind_id
     uid = request.GET.get('uid', '')  # 获取uid
+    #一次只有一条在测试的记录，提交之后的测试不会被删除
+    CompetitionQAInfo.objects.filter(
+        kind_id=kind_id,
+        uid=uid,
+        started=True,
+        finished=False,
+    ).delete()
+
     try:  # 获取比赛信息
         kind_info = CompetitionKindInfo.objects.select_for_update().get(kind_id=kind_id)
     except CompetitionKindInfo.DoesNotExist:  # 未获取到，返回错误码100001
@@ -64,7 +72,12 @@ def get_questions(request):
         started=True
     )
     for i in qs:  # 剔除答案信息
-        i.pop('answer')
+        tAnswers = i['answer'].split("|");
+        if len(tAnswers) > 1:
+            i['multiChoice'] = True
+        else:
+            i['multiChoice'] = False
+        # i.pop('answer')
     return json_response(200, 'OK', {  # 返回JSON数据，包括题目信息，答题log信息等
         'kind_info': kind_info.data,
         'user_info': profile.data,
@@ -87,6 +100,7 @@ def submit_answer(request):
     uid = request.POST.get('uid', '')  # 获取uid
     kind_id = request.POST.get('kind_id', '')  # 获取kind_id
     answer = request.POST.get('answer', '')  # 获取answer
+
     try:  # 获取比赛信息
         kind_info = CompetitionKindInfo.objects.get(kind_id=kind_id)
     except CompetitionKindInfo.DoesNotExist:  # 未获取到，返回错误码100001
@@ -106,7 +120,22 @@ def submit_answer(request):
 
     answer = answer.rstrip('#').split('#')  # 处理答案数据
     total, correct, wrong, correct_list, wrong_list= check_correct_num(answer)  # 检查答题情况
+    
+    # print(total)
+    # print(correct)
+    # print(wrong)
+    # print(correct_list)
+    # print(wrong_list)
+    
+    # return json_response(300, 'OK', {  # 返回JSON数据
+    #     'qa_id': qa_id,
+    #     'user_info': profile.data,
+    #     'kind_id': kind_id,
+    # })
+
     qa_info.aslogrecord = answer
+    qa_info.correct_list = correct_list
+    qa_info.wrong_list = wrong_list
     qa_info.finished_stamp = stop_stamp
     qa_info.expend_time = stop_stamp - qa_info.started_stamp
     qa_info.finished = True
@@ -129,7 +158,7 @@ def submit_answer(request):
         qa_info.status = CompetitionQAInfo.OVERTIME
         qa_info.save()
     else:  # 正常完成，加入排行榜
-        add_to_rank(uid, kind_id, qa_info.score, qa_info.expend_time)
+        add_to_rank(uid, kind_id, qa_info.score, qa_info.expend_time, qa_info.qa_id)
         qa_info.status = CompetitionQAInfo.COMPLETED
         qa_info.save()
     return json_response(200, 'OK', {  # 返回JSON数据

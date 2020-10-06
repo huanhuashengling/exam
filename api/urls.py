@@ -11,8 +11,8 @@ from django.urls import path,re_path
 urlpatterns = [
     path('login_normal', login_views.normal_login, name='normal_login'),
     path('login_redirect', login_views.login_redirect, name='index'),
-    path('login_vcode', login_views.login_vcode, name='login_qrcode'),
-    path('signup', login_views.signup, name='signup'),
+    path('login_vcode', login_views.login_vcode, name='login_vcode'),
+    path('signup_normal', login_views.signup, name='normal_signup'),
     path('sendmail', login_views.sendmail, name='sendmail'),
     path('resetpasswd', login_views.reset_password, name='reset_password'),
 ]

@@ -10,9 +10,9 @@ class ProfileAdmin(admin.ModelAdmin):
     用户信息后台配置
     """
 
-    list_display = ('uid', 'user_src', 'unionid', 'nickname', 'sex', 'country', 'province', 'city', 'is_upgrade', 'upgrade_time', 'expire_time', 'upgrade_count', 'status', 'created_at', 'updated_at')
+    list_display = ('uid', 'user_src', 'displayname', 'phone', 'sex', 'status', 'created_at', 'updated_at')
     list_filter = ('is_upgrade', 'sex', 'status')
-    search_fields = ('uid', 'nickname')
+    search_fields = ('uid', 'displayname')
     readonly_fields = ('uid',)
 
     def save_model(self, request, obj, form, change):

@@ -9,6 +9,7 @@
       <link rel="stylesheet" type="text/css" href="{% static 'css/bootstrap.min.css' %}">
       <!-- <link rel="stylesheet" type="text/css" href="{% static 'css/style.css' %}"> -->
       <script src="{% static 'js/jquery.min.js' %}"></script>
+      <script src="{% static 'js/jquery.PrintArea.js' %}"></script>
       <script src="//cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.1/umd/popper.min.js" integrity="sha256-/ijcOLwFf26xEYAjW75FizKVo5tnTYiQddPZoLUHHZ8=" crossorigin="anonymous"></script>
 
       <!--bootstrap核心js-->
@@ -47,14 +48,20 @@
                 <a class="nav-link" href="/bs/set_game_index{% if request.session.uid %}?uid={{ request.session.uid }}{% else %}{% endif %}">测试管理</a>
               </li>
               <li class="nav-item">
-                <a class="nav-link" href="/biz{% if request.session.uid %}?uid={{ request.session.uid }}{% else %}{% endif %}" tabindex="-1">测试报告</a>
+                <a class="nav-link" href="/bs/qa_history{% if request.session.uid %}?uid={{ request.session.uid }}{% else %}{% endif %}" tabindex="-1">测试历史</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="/normal_user_list{% if request.session.uid %}?uid={{ request.session.uid }}{% else %}{% endif %}" tabindex="-1">用户管理</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="/biz{% if request.session.uid %}?uid={{ request.session.uid }}{% else %}{% endif %}" tabindex="-1">测试历史</a>
               </li>
             {% elif 22 == request.session.usertype  %}
               <li class="nav-item active">
                 <a class="nav-link" href="/index{% if request.session.uid %}?uid={{ request.session.uid }}{% else %}{% endif %}">选择测试<span class="sr-only">(current)</span></a>
               </li>
               <li class="nav-item">
-                <a class="nav-link" href="/bs/set{% if request.session.uid %}?uid={{ request.session.uid }}{% else %}{% endif %}">测试历史</a>
+                <a class="nav-link" href="/bs/rank{% if request.session.uid %}?uid={{ request.session.uid }}{% else %}{% endif %}">测试历史</a>
               </li>
               <li class="nav-item">
                 <a class="nav-link" href="/biz{% if request.session.uid %}?uid={{ request.session.uid }}{% else %}{% endif %}" tabindex="-1">个人数据</a>
@@ -62,7 +69,7 @@
             {% endif %}
             {% if request.session.uid %}
             <li class="nav-item dropdown" class="my-2 my-lg-0">
-              <a class="nav-link dropdown-toggle" href="javascript:void(0);" id="dropdown07" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">{% if request.session.uid %}{{ request.session.username }}{% else %}登录{% endif %}</a>
+              <a class="nav-link dropdown-toggle" href="javascript:void(0);" id="dropdown07" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">{% if request.session.uid %}{{ request.session.displayname }}{% else %}登录{% endif %}</a>
               <div class="dropdown-menu" aria-labelledby="dropdown07">
                   <a class="dropdown-item" href="/logout">注销</a>
                   <a class="dropdown-item" id="resetPassword">修改密码</a>
@@ -149,44 +156,6 @@
   </div>
   </div> -->
 
-  <div class="modal" id="signUpModal" tabindex="-1" role="dialog" aria-labelledby="signUpModalLabel">
-  <div class="modal-dialog" role="document">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="exampleModalLabel">注册</h5>
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
-        </button>
-      </div>
-      <div class="modal-body">
-        <form>
-            <div class="form-group">
-                <label for="signUpId" >邮箱</label>
-                <input type="text" class="form-control" id="signUpId" placeholder="hugo.zhang@example.com">
-            </div>
-            <div class="form-group">
-                <label for="signUpPassword" >密码</label>
-                <input type="password" class="form-control" id="signUpPassword" placeholder="#p@ssw0d123">
-            </div>
-            <div class="form-group">
-                <label for="signUpPasswordAgain" >确认密码</label>
-                <input type="password" class="form-control" id="signUpPasswordAgain" placeholder="#p@ssw0d123">
-            </div>
-            <div class="form-group">
-                <label for="signUpVcode" >验证码</label>
-                <input type="text" class="form-control" id="signUpVcode" placeholder="">
-                <img id="signUpVcodeImg" src="" style="height: 50px;width: 150px;" />
-            </div>
-        </form>
-      </div>
-      <div class="modal-footer">
-          <a href="#" id="signIn" style="margin-right: 30px;" >已有账户，去登录</a>
-          <button type="button" class="btn btn-primary" id="signUpPost">注册</button>
-      </div>
-    </div>
-  </div>
-  </div>
-
   <div class="modal" id="resetPasswordModal" tabindex="-1" role="dialog" aria-labelledby="resetPasswordModal">
   <div class="modal-dialog" role="document">
     <div class="modal-content">
@@ -235,9 +204,9 @@
         </div>
     </div>
     {% block content %} {% endblock %}
-    <nav class="navbar fixed-bottom navbar-expand-sm navbar-dark bg-dark" style="margin-top: 20px">
-      <a class="navbar-brand" href="#">技术支持： shengling_2005@163.com</a>
-    </nav>
+    <!-- <nav class="navbar fixed-bottom navbar-expand-sm navbar-dark bg-dark" style="margin-top: 20px"> -->
+      <!-- <a class="navbar-brand" href="#" style="font-size: 16px;"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24"><path fill-rule="evenodd" d="M1.75 3A1.75 1.75 0 000 4.75v14c0 .966.784 1.75 1.75 1.75h20.5A1.75 1.75 0 0024 18.75v-14A1.75 1.75 0 0022.25 3H1.75zM1.5 4.75a.25.25 0 01.25-.25h20.5a.25.25 0 01.25.25v.852l-10.36 7a.25.25 0 01-.28 0l-10.36-7V4.75zm0 2.662V18.75c0 .138.112.25.25.25h20.5a.25.25 0 00.25-.25V7.412l-9.52 6.433c-.592.4-1.368.4-1.96 0L1.5 7.412z"></path></svg>&nbsp; &nbsp; shengling_2005@163.com</a> -->
+    <!-- </nav> -->
   </div>
   {% block js %} {% endblock %}
   <script type="text/javascript">

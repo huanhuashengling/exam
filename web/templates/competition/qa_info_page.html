@@ -1,0 +1,76 @@
+{% extends '../base.html' %}
+{% load static %}
+{% load getindex %}
+{% block title %}答卷情况{% endblock %}
+{% block content %}
+    <div class="main-content container">
+        <div class="position toInWhere">
+            <b>当前位置：</b><span>
+                <a onclick="canNav(2,0);">比赛结果</a>
+            </span>&nbsp;&gt;&nbsp;<span>答卷情况</span>
+        </div>
+        <div class="inner-content" id="printContent">
+            <div class="xxdj-report border zycs_text">
+                <div class="course-report">
+                    <div class="alert alert-primary" role="alert">
+                      {{user_info.nickname }} 医生参加”{{kind_info.kind_name}}“测试，答对{{qa_info.correct_num}}题，答错{{qa_info.incorrect_num}}题，得分{{qa_info.score}}分
+                    </div>
+                    {% for qaItem in questionAnswerData %}
+                      {% if qaItem.questionPk in correctQuestionPks %}
+                        <div class="card" style="color: green;">
+                          <div class="card-header">【正确】{{ forloop.counter }}. {{qaItem.question}}(
+                              {{selectLabel|getsplitindex:qaItem.answerInfo}}
+                          )</div>
+                          <div class="card-body">
+                            {% for selectItem in qaItem.selectItems %}
+                              <p>{{ selectLabel|getindex:forloop.counter0 }}. {{selectItem}}</p>
+                            {% endfor %}
+                          </div>
+                        </div>
+                      {% else %}
+                        <div class="card" style="color: red;">
+                          <div class="card-header">【错误】{{ forloop.counter }}. {{qaItem.question}}(
+                              {{selectLabel|getsplitindex:qaItem.answerInfo}}
+                          )</div>
+                          <div class="card-body">
+                            {% for selectItem in qaItem.selectItems %}
+                              <p>{{ selectLabel|getindex:forloop.counter0 }}. {{selectItem}}</p>
+                            {% endfor %}
+                          </div>
+                        </div>
+                      {% endif %}
+
+                    {% endfor %}
+                    <div class="center-p">
+                         <li id="goBack" class="btn btn-primary" style="margin-top: 36px;">回首页</li>
+                         <li id="tryAgain" class="btn btn-primary" style="margin: 36px 30px 0 30px">再试试</li>
+                         <li id="goRank" class="btn btn-success" style="margin-top: 36px; ">查看测试历史</li>
+                         <li id="print_btn" class="btn btn-success" style="margin-top: 36px; ">打印</li>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+<script type="text/javascript">
+      $(function(){
+          $("#print_btn").click(function(){
+            $("#printContent").printArea(); 
+          });
+      });
+      $('#goRank').click(function () {
+          window.location.href = '/bs/rank?uid={{ request.session.uid }}&kind_id={{ kind_info.kind_id }}';
+      });
+      $('#tryAgain').click(function () {
+          window.location.href = '/bs?uid={{ request.session.uid }}&kind_id={{ kind_info.kind_id }}';
+      });
+      $('#goHome').click(function () {
+          window.location.href = '/index{% if request.session.uid %}?uid={{ request.session.uid }}{% else %}{% endif %}';
+      });
+      $('#goBack').click(function () {
+          window.location.href = '/index{% if request.session.uid %}?uid={{ request.session.uid }}{% else %}{% endif %}';
+      });
+      $('#goQaInfoPage').click(function () {
+          window.location.href = '/bs/qa_info_page?uid={{ request.session.uid }}&qa_id={{ qa_info.qa_id }}';
+      })
+    </script>
+{% endblock %}

@@ -32,6 +32,16 @@ class Profile(CreateUpdateMixin):
         (FEMALE, u'女'),
     )
 
+    PRACTICE = 0
+    RESIDENT = 1
+    FURTHER = 2
+
+    TRAINEETYPE = (
+        (PRACTICE, u'实习医生'),
+        (RESIDENT, u'住院医师'),
+        (FURTHER, u'进修医生'),
+    )
+
     UNVERIFIED = 0
     ACTIVATED = 1
     DISABLED = 2
@@ -60,13 +70,15 @@ class Profile(CreateUpdateMixin):
     email = models.CharField(_(u'邮箱'), max_length=40, blank=True, null=True, help_text=u'用户邮箱', db_index=True)
     sex = models.IntegerField(_(u'性别'), choices=GENDER, default=MALE, help_text=u'用户性别')
     age = models.IntegerField(_(u'年龄'), default=0, help_text=u'用户年龄')
-    nickname = models.CharField(_(u'昵称'), max_length=32, blank=True, null=True, help_text=u'用户昵称')
+    displayname = models.CharField(_(u'显示姓名'), max_length=32, blank=True, null=True, help_text=u'显示姓名')
     avatar = models.CharField(_(u'头像地址'), max_length=60, blank=True, null=True, help_text=u'用户头像')
     phone = models.CharField(_(u'手机号'), max_length=11, blank=True, null=True, help_text=u'用户电话', db_index=True)
     country = models.CharField(_(u'国家'), max_length=32, blank=True, null=True, help_text=u'用户国家')
     province = models.CharField(_(u'省份'), max_length=32, blank=True, null=True, help_text=u'用户省份')
     city = models.CharField(_(u'城市'), max_length=32, blank=True, null=True, help_text=u'用户城市')
     location = models.CharField(_(u'地址'), max_length=60, blank=True, null=True, help_text=u'用户地址')
+
+    trainee_type = models.IntegerField(_(u'学员身份'), choices=TRAINEETYPE, default=PRACTICE, help_text=u'学员身份')
 
     # 会员相关
     is_upgrade = models.IntegerField(_(u'是否升级会员'), default=0, help_text=u'是否升级会员')
@@ -92,7 +104,8 @@ class Profile(CreateUpdateMixin):
             'uid': self.uid,
             'numid': self.numid,
             'name': self.name or '',
-            'nickname': self.nickname or self.name,
+            'displayname': self.displayname or self.name,
+            'trainee_type': self.trainee_type,
             'avatar': self.avatar or '',
         }
 

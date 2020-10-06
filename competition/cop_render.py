@@ -2,11 +2,11 @@
 
 import collections
 import json
-
+import datetime 
 from django.shortcuts import render
 
 from account.models import Profile
-from competition.models import BankInfo, CompetitionKindInfo, CompetitionQAInfo
+from competition.models import BankInfo, CompetitionKindInfo, CompetitionQAInfo, ChoiceInfo
 from utils.decorators import check_copstatus, check_login
 from utils.errors import (BankInfoNotFound, CompetitionNotFound,
                           ProfileNotFound, QuestionLogNotFound,
@@ -17,6 +17,8 @@ from utils.redis.rrank import get_rank, get_rank_data
 
 import datetime
 
+
+@check_login
 def home(request):
     """
     比赛首页首页视图
@@ -64,7 +66,7 @@ def home(request):
         'created': created
     })
 
-
+@check_login
 def games(request, s):
     """
     获取所有比赛接口
@@ -189,6 +191,112 @@ def result(request):
         'rank': get_rank(kind_id, uid)
     })
 
+@check_login
+def qa_info_page(request):
+    """
+    排行榜数据视图
+    :param request: 请求对象
+    :return: 渲染视图: user_info: 用户信息;kind_info: 比赛信息; rank: 所有比赛排名;
+    """
+
+    uid = request.GET.get('uid', '')
+    qa_id = request.GET.get('qa_id', '')
+    kind_id = request.GET.get('kind_id', '')
+
+    try:
+        profile = Profile.objects.get(uid=uid)
+    except Profile.DoesNotExist:
+        return render(request, 'err.html', ProfileNotFound)
+
+    try:
+        qa_info = CompetitionQAInfo.objects.get(qa_id=qa_id)
+    except CompetitionQAInfo.DoesNotExist:
+        return render(request, 'err.html', CompetitionNotFound)
+
+    try:
+        kind_info = CompetitionKindInfo.objects.get(kind_id=kind_id)
+    except CompetitionKindInfo.DoesNotExist:
+        return render(request, 'err.html', CompetitionNotFound)
+
+    questionAnswerData = []
+    correctQuestionPks = []
+    # answerslogrecord = json.load(qa_info.detail['aslog'])
+    answerslogrecord = qa_info.detail['aslog'].strip('[\'').strip('\']').split("', '")
+    correctList = qa_info.detail['correct_list'].strip('[\'').strip('\']').split("', '")
+    for correctAnswer in correctList:
+        if correctAnswer.split("|")[0] :
+            correctQuestionPks.append(correctAnswer.split("|")[0].split("_")[1])
+
+    # print(answerslogrecord)
+
+    for x in answerslogrecord:
+        questionInfo = x.split("|")[0]
+        answerInfo = x.split("|")[1]
+
+        questionType = questionInfo.split("_")[0]
+        questionPk = questionInfo.split("_")[1]
+        # questionAnswerItem = []
+        if "c" == questionType:
+            choiceItem = ChoiceInfo.objects.get(id=questionPk)
+            selectItems = choiceItem.select_items.split("|")
+            questionAnswerData.append({"question": choiceItem.question, "selectItems": selectItems, "answerInfo": answerInfo, "questionPk": questionPk})
+
+    # print(questionAnswerData)
+    return render(request, 'competition/qa_info_page.html', {
+        'user_info': profile.data,
+        'qa_info': qa_info.detail,
+        'kind_info': kind_info.data,
+        'questionAnswerData': questionAnswerData,
+        'correctQuestionPks': correctQuestionPks,
+        'selectLabel': ["A", "B", "C", "D", "E", "F", "G", "H", "I"]
+    })
+
+@check_login
+def qa_history(request):
+    """
+    排行榜数据视图
+    :param request: 请求对象
+    :return: 渲染视图: user_info: 用户信息;kind_info: 比赛信息; rank: 所有比赛排名;
+    """
+
+    uid = request.GET.get('uid', '')
+    qaData = []
+    try:
+        profile = Profile.objects.get(uid=uid)
+    except Profile.DoesNotExist:
+        return render(request, 'err.html', ProfileNotFound)
+
+    try:
+        qaInfos = CompetitionQAInfo.objects.all()
+    except CompetitionQAInfo.DoesNotExist:
+        return render(request, 'err.html', CompetitionNotFound)
+
+    for qainfo in qaInfos:
+        finished_time = datetime.datetime.fromtimestamp(qainfo.finished_stamp / 1e3).strftime("%Y/%m/%d %H:%M:%S")
+
+        try:
+            kind_info = CompetitionKindInfo.objects.get(kind_id=qainfo.data["kind_id"])
+            profile = Profile.objects.get(uid=qainfo.data["uid"])
+
+            qaData.append({"name": profile.data["displayname"],
+                "uid": profile.data["uid"],
+                "kind_name" : kind_info.data["kind_name"], 
+                "kind_id": kind_info.data["kind_id"], 
+                "qa_id": qainfo.data["qa_id"], 
+                "sponsor_name": kind_info.data["sponsor_name"], 
+                "total_num": qainfo.detail["total_num"], 
+                "correct_num": qainfo.detail["correct_num"],
+                "incorrect_num": qainfo.detail["incorrect_num"],
+                "score": qainfo.detail["score"],
+                "time": qainfo.detail["time"],
+                "finished_time": finished_time,
+                })
+        except CompetitionKindInfo.DoesNotExist:
+            return render(request, 'err.html', CompetitionNotFound)
+    # print(qaData)
+    return render(request, 'competition/history.html', {
+        'qaData': qaData,
+    })
 
 @check_login
 def rank(request):
@@ -199,27 +307,40 @@ def rank(request):
     """
 
     uid = request.GET.get('uid', '')
-    kind_id = request.GET.get('kind_id', '')
-
+    qaData = []
     try:
         profile = Profile.objects.get(uid=uid)
     except Profile.DoesNotExist:
         return render(request, 'err.html', ProfileNotFound)
 
     try:
-        kind_info = CompetitionKindInfo.objects.get(kind_id=kind_id)
-    except CompetitionKindInfo.DoesNotExist:
+        qaInfos = CompetitionQAInfo.objects.filter(uid=uid)
+    except CompetitionQAInfo.DoesNotExist:
         return render(request, 'err.html', CompetitionNotFound)
 
-    ranks, rank_data = get_rank_data(kind_id)
-    for i in range(len(rank_data)):
-        rank_data[i].update({'rank': i + 1})
-        rank_data[i]['time'] = rank_data[i]['time'] / 1000.000
+    for qainfo in qaInfos:
+        finished_time = datetime.datetime.fromtimestamp(qainfo.finished_stamp / 1e3).strftime("%Y/%m/%d %H:%M:%S")
+        # print(tt)
+        try:
+            kind_info = CompetitionKindInfo.objects.get(kind_id=qainfo.data["kind_id"])
 
+            qaData.append({"kind_name" : kind_info.data["kind_name"], 
+                "kind_id": kind_info.data["kind_id"], 
+                "qa_id": qainfo.data["qa_id"], 
+                "sponsor_name": kind_info.data["sponsor_name"], 
+                "total_num": qainfo.detail["total_num"], 
+                "correct_num": qainfo.detail["correct_num"],
+                "incorrect_num": qainfo.detail["incorrect_num"],
+                "score": qainfo.detail["score"],
+                "time": qainfo.detail["time"],
+                "finished_time": finished_time,
+                })
+        except CompetitionKindInfo.DoesNotExist:
+            return render(request, 'err.html', CompetitionNotFound)
+    # print(qaData)
     return render(request, 'competition/rank.html', {
         'user_info': profile.data,
-        'kind_info': kind_info.data,
-        'rank': rank_data
+        'qaData': qaData,
     })
 
 

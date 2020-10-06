@@ -6,50 +6,57 @@
         <div class="position toInWhere">
             <b>当前位置：</b><span>
                 <a onclick="canNav(2,0);">测试结果</a>
-            </span>&nbsp;&gt;&nbsp;<span>排行榜</span>
+            </span>&nbsp;&gt;&nbsp;<span>测试历史</span>
         </div>
         <div class="row">
-            <div class="card text-center col-8">
+            <div class="card text-center col-12">
               <div class="card-header">
-                排行榜
+                测试历史
               </div>
               <div class="card-body">
                 <table style="margin-top: 15px;" class="table table-hover">
                     <tr>
-                        <th>排名</th>
-                        <th>昵称</th>
+                        <th>编号</th>
+                        <th>所属科室</th>
+                        <th>测试名称</th>
+                        <th>题目数量</th>
+                        <th>正确/错误</th>
                         <th>得分</th>
-                        <th>用时</th>
+                        <th>耗时(秒)</th>
+                        <th>完成时间</th>
+                        <th>操作</th>
                     </tr>
-                    {% for r in rank %}
+                    {% for qa in qaData %}
                     <tr>
-                        <td>{% if r.rank %}<b style="color:red">{{ r.rank }}</b>{% else %}暂无{% endif %}</td>
-                        <td>{% if r.nickname %}{{ r.nickname }}{% else %}暂无{% endif %}</td>
-                        <td>{% if r.score %}{{ r.score }}{% else %}0{% endif %}</td>
-                        <td>{% if r.time %}{{ r.time }}{% else %}暂无{% endif %}s</td>
+                        <td>{{forloop.counter}}</td>
+                        <td>{{qa.sponsor_name}}</td>
+                        <td>{{qa.kind_name}}</td>
+                        <td>{{qa.total_num}}</td>
+                        <td>{{qa.correct_num}}/{{qa.incorrect_num}}</td>
+                        <td>{{qa.score}}</td>
+                        <td>{{qa.time}}</td>
+                        <td>{{qa.finished_time}}</td>
+                        <td><button class="btn btn-primary qa_item" value="{{qa.qa_id}}_{{qa.kind_id}}">查看答卷</button></td>
                     </tr>
                     {% endfor %}
                 </table>
               </div>
               
             </div>
-            <div class="card text-center col-4">
-              <div class="card-header">
-                历史最佳排名
-              </div>
-              <div class="card-body">
-                <div id="myResult"></div>
-              </div>
-              <div class="card-footer text-muted">
-                <a class="btn btn-info" href="/index{% if request.session.uid %}?uid={{ request.session.uid }}{% else %}{% endif %}">回首页</a>
-                <a class="btn btn-info" href="/bs{% if request.session.uid %}?uid={{ request.session.uid }}{% else %}{% endif %}&kind_id={{ kind_info.kind_id }}" style="margin-left: 20px;">去答题</a>
-              </div>
-            </div>
         </div>
     </div>
 </div>
     <script>
         $(document).ready(function () {
+            $(".qa_item").click(function(e) {
+
+                qa_id = $(this).val().split("_")[0];
+                kind_id = $(this).val().split("_")[1];
+                console.log(qa_id)
+                console.log(kind_id)
+                window.location.href = '/bs/qa_info_page?uid={{ request.session.uid }}&qa_id='+qa_id+'&kind_id='+kind_id;
+            });
+
             $.ajax({
                 url: '/api/myrank',
                 data: {

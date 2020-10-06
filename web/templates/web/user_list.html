@@ -1,0 +1,95 @@
+{% extends '../base.html' %}
+{% block title %}用户列表{% endblock %}
+{% block content %}
+    <div class="main-content container">
+        <div class="position toInWhere">
+            <b>当前位置：</b><span>
+                <a>用户管理</a>
+        </div>
+        <div class="row">
+            <div class="card text-center col-12">
+              <div class="card-header">
+                用户列表
+              </div>
+              <div class="card-body">
+                <table style="margin-top: 15px;" class="table table-hover">
+                    <tr>
+                        <th>编号</th>
+                        <th>显示名称</th>
+                        <th>用户名</th>
+                        <th>邮箱</th>
+                        <th>是否员工</th>
+                        <th>是否激活</th>
+                        <th>操作</th>
+                    </tr>
+                    {% for user in userData %}
+                    <tr>
+                        <td>{{forloop.counter}}</td>
+                        <td>{{user.displayname}}</td>
+                        <td>{{user.username}}</td>
+                        <td>{{user.email}}</td>
+                        <td>{{user.is_staff}}</td>
+                        <td>{{user.is_active}}</td>
+                        <td><button class="btn btn-primary active_user_item" value="{{user.uid}}_{{user.username}}">激活</button>
+                          <button class="btn btn-warning deactive_user_item" value="{{user.uid}}_{{user.username}}">锁定</button></td>
+                    </tr>
+                    {% endfor %}
+                </table>
+              </div>
+              
+            </div>
+        </div>
+    </div>
+
+
+<script type="text/javascript">
+    $.ajaxSetup({
+        data: {csrfmiddlewaretoken: '{{ csrf_token }}' }
+    });
+    $('.active_user_item').click(function () {
+        var activeUserId = $(this).val().split("_")[0];
+        var activeUsername = $(this).val().split("_")[1];
+        $.ajax({
+            url: "/active_normal_user",
+            data: {
+                'activeUserId': activeUserId,
+                'activeUsername': activeUsername,
+            },
+            type: 'post',
+            dataType: 'json',
+            success: function (res) {
+                if (res.status === 200) {
+                    alert("用户（" + activeUsername + '）激活成功');
+                    window.location.href = "/normal_user_list";
+                } else {
+                    alert("用户（" + activeUsername + '）激活失败');
+                }
+            }
+        });
+    });
+
+    $('.deactive_user_item').click(function () {
+        var activeUserId = $(this).val().split("_")[0];
+        var activeUsername = $(this).val().split("_")[1];
+        $.ajax({
+            url: "/deactive_normal_user",
+            data: {
+                'activeUserId': activeUserId,
+                'activeUsername': activeUsername,
+            },
+            type: 'post',
+            dataType: 'json',
+            success: function (res) {
+                if (res.status === 200) {
+                    alert("用户（" + activeUsername + '）锁定成功');
+                    window.location.href = "/normal_user_list";
+                } else {
+                    alert("用户（" + activeUsername + '）锁定失败');
+                }
+            }
+        });
+    });
+    
+</script>
+{% endblock %}
+

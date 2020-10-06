@@ -59,7 +59,7 @@ def login_redirect(request):
         'openid': userinfo.get('openid', ''),
         'user_src': 1,
         'sex': userinfo.get('sex', 0),
-        'nickname': userinfo.get('nickname', ''),
+        'displayname': userinfo.get('displayname', ''),
         'avatar': userinfo.get('headimgurl', ''),
         'country': userinfo.get('country', ''),
         'province': userinfo.get('province', ''),
@@ -92,7 +92,7 @@ def normal_login(request):
     :param request: 请求对象
     :return: 返回json数据: user_info: 用户信息;has_login: 用户是否已登录
     """
-    email = request.POST.get('email', '')  # 获取email
+    phone = request.POST.get('phone', '')  # 获取phone
     password = request.POST.get('password', '')  # 获取password
     sign = request.POST.get('sign', '')  # 获取登录验证码的sign
     vcode = request.POST.get('vcode', '')  # 获取用户输入的验证码
@@ -100,14 +100,16 @@ def normal_login(request):
     if not (result and (result.decode('utf-8') == vcode.lower())):
         return json_response(*UserError.VeriCodeError)  # 校验失败返回错误码300003
     try:
-        user = User.objects.get(email=email)  # 使用email获取Django用户
+        user = User.objects.get(username=phone)  # 使用phone获取Django用户
     except User.DoesNotExist:
         return json_response(*UserError.UserNotFound)  # 获取失败返回错误码300001
+    # print(user.username)
+    # print(password)
     user = authenticate(request, username=user.username, password=password)  # 授权校验
     if user is not None:  # 校验成功，获得返回用户信息
         login(request, user)  # 登录用户，设置登录session
         profile, created = Profile.objects.select_for_update().get_or_create(  # 获取或创建Profile数据
-            email=user.email,
+            name=user.username,
         )
         if profile.user_src != Profile.COMPANY_USER:
             profile.name = user.username
@@ -116,6 +118,7 @@ def normal_login(request):
         request.session.get("usertype")  #让session创建usertyp这个值
         request.session['uid'] = profile.uid  # 设置Profile uid的session
         request.session['username'] = profile.name  # 设置用户名的session
+        request.session['displayname'] = profile.displayname  # 设置用户名的session
         request.session['usertype'] = profile.user_src  # 设置用户类型session，普通用户，机构用户
         # print("---------------profile.user_src")
         # print(profile.user_src)
@@ -153,7 +156,8 @@ def login_vcode(request):
 @csrf_exempt
 @transaction.atomic
 def signup(request):
-    email = request.POST.get('email', '')  # 邮箱
+    phone = request.POST.get('phone', '')  # 电话
+    displayname = request.POST.get('displayname', '')  # 显示姓名
     password = request.POST.get('password', '')  # 密码
     password_again = request.POST.get('password_again', '')  # 确认密码
     vcode = request.POST.get('vcode', '')  # 注册验证码
@@ -163,26 +167,26 @@ def signup(request):
     result = get_vcode(sign)  # 校验vcode，逻辑和登录视图相同
     if not (result and (result.decode('utf-8') == vcode.lower())):
         return json_response(*UserError.VeriCodeError)
-    if User.objects.filter(email__exact=email).exists():  # 检查数据库是否存在该用户
+    if User.objects.filter(username=phone).exists():  # 检查数据库是否存在该用户
         return json_response(*UserError.UserHasExists)  # 返回错误码300004
-    username = email.split('@')[0]  # 生成一个默认的用户名
+    username = phone  # 生成一个默认的用户名
     if User.objects.filter(username__exact=username).exists():
-        username = email  # 默认用户名已存在，使用邮箱作为用户名
+        username = phone  # 默认用户名已存在，使用邮箱作为用户名
     User.objects.create_user(  # 创建用户，并设置为不可登录
         is_active=False,
         is_staff=False,
         username=username,
-        email=email,
         password=password,
     )
     Profile.objects.create(  # 创建用户信息
         name=username,
-        email=email
+        phone=phone,
+        displayname=displayname,
     )
     sign = str(uuid.uuid1())  # 生成邮箱校验码
-    set_signcode(sign, email)  # 在redis设置30min时限的验证周期
+    set_signcode(sign, phone)  # 在redis设置30min时限的验证周期
     return json_response(200, 'OK', {  # 返回JSON数据
-        'email': email,
+        'phone': phone,
         'sign': sign
     })
 

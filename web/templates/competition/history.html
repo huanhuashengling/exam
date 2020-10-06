@@ -1,0 +1,84 @@
+{% extends 'base.html' %}
+{% block title %}排行榜{% endblock %}
+{% block content %}
+
+<div class="main-content container">
+        <div class="position toInWhere">
+            <b>当前位置：</b><span>
+                <a onclick="canNav(2,0);">测试结果</a>
+            </span>&nbsp;&gt;&nbsp;<span>测试历史</span>
+        </div>
+        <div class="row">
+            <div class="card text-center col-12">
+              <div class="card-header">
+                测试历史
+              </div>
+              <div class="card-body">
+                <table style="margin-top: 15px;" class="table table-hover">
+                    <tr>
+                        <th>编号</th>
+                        <th>参测人</th>
+                        <th>所属科室</th>
+                        <th>测试名称</th>
+                        <th>题目数量</th>
+                        <th>正确/错误</th>
+                        <th>得分</th>
+                        <th>耗时(秒)</th>
+                        <th>完成时间</th>
+                        <th>操作</th>
+                    </tr>
+                    {% for qa in qaData %}
+                    <tr>
+                        <td>{{forloop.counter}}</td>
+                        <td>{{qa.name}}</td>
+                        <td>{{qa.sponsor_name}}</td>
+                        <td>{{qa.kind_name}}</td>
+                        <td>{{qa.total_num}}</td>
+                        <td>{{qa.correct_num}}/{{qa.incorrect_num}}</td>
+                        <td>{{qa.score}}</td>
+                        <td>{{qa.time}}</td>
+                        <td>{{qa.finished_time}}</td>
+                        <td><button class="btn btn-primary qa_item" value="{{qa.uid}}_{{qa.qa_id}}_{{qa.kind_id}}">查看答卷</button></td>
+                    </tr>
+                    {% endfor %}
+                </table>
+              </div>
+              
+            </div>
+        </div>
+    </div>
+</div>
+    <script>
+        $(document).ready(function () {
+            $(".qa_item").click(function(e) {
+                uid = $(this).val().split("_")[0];
+                qa_id = $(this).val().split("_")[1];
+                kind_id = $(this).val().split("_")[2];
+                window.location.href = '/bs/qa_info_page?uid='+uid+'&qa_id='+qa_id+'&kind_id='+kind_id;
+            });
+
+            $.ajax({
+                url: '/api/myrank',
+                data: {
+                    uid: '{{ request.session.uid|safe }}',
+                    kind_id: '{{ kind_info.kind_id|safe }}'
+                },
+                dataType: 'json',
+                type: 'get',
+                success: function (res) {
+                    if(res.status === 200) {
+                        var rank  = res.data.rank;
+                        var timer = res.data.time / 1000 ;
+                        if (rank){
+                            var myResult = '<label><h4><b>我的排名:</b>&nbsp;&nbsp; 第<span class="rank" style="color:red">'+ rank + '</span>名</h4></label>'
+                                            + '<label><h4><b>我的用时:</b>&nbsp;&nbsp; <span class="timer" style="color:red">' + timer + '</span>秒</h4></label>'
+                        }else {
+                            var myResult = '<label><h4>您还没有参加比赛哦！<label><h4>'
+                        }
+                        $('#myResult').html(myResult)
+                    }
+                }
+            })
+        })
+    </script>
+{% endblock %}

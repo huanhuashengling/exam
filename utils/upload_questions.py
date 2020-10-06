@@ -48,14 +48,14 @@ def upload_questions(file_path=None, bank_info=None):
                 bank_id=bank_info.bank_id,
                 subject_id=check_subject_vals(rvalues[0]),
                 question=check_vals(rvalues[1]),
-                answer=check_vals(rvalues[2]),
-                select_items=check_vals(rvalues[3]),
+                answer=check_vals(rvalues[3]),
+                select_items=check_vals(rvalues[4]),
                 # item1=check_vals(rvalues[2]),
                 # item2=check_vals(rvalues[3]),
                 # item3=check_vals(rvalues[4]),
                 # item4=check_vals(rvalues[5]),
-                image_url=rvalues[4],
-                source=rvalues[5]
+                image_url=rvalues[5],
+                source=rvalues[6]
             )
             choice_num += 1  # 选择题数加1
     bank_info.choice_num = choice_num

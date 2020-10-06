@@ -20,14 +20,18 @@ from django.contrib import admin
 from django.views.generic import TemplateView
 from django.urls import path
 
-from account import login_render
+from account import login_render, views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', login_render.web_index, name='web_index'),
     path('index', login_render.web_index, name='web_index'),
     path('login', login_render.web_login, name='web_login'),
+    path('signup', login_render.web_signup, name='web_signup'),
     path('logout', login_render.web_logout, name='web_logout'),
+    path('normal_user_list', views.normal_user_list, name='normal_user_list'),
+    path('active_normal_user', views.active_normal_user, name='active_normal_user'),
+    path('deactive_normal_user', views.deactive_normal_user, name='deactive_normal_user'),
 ]
 
 urlpatterns += [

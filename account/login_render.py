@@ -71,6 +71,37 @@ def web_login(request):
         'has_login': False
     })
 
+def web_signup(request):
+    """
+    登录页面渲染视图
+    :param request: 请求对象
+    :return: 渲染视图并返回: login_info: 用户登录所需配置信息;has_login:是否已经登录;user_info:用户信息;upgrade_info: 用户会员信息
+    """
+
+    uid = request.session.get('uid', '')
+
+    if uid:
+        try:
+            profile = Profile.objects.get(uid=uid)
+        except Profile.DoesNotExist:
+            profile = None
+
+        if profile:
+            return render(request, 'web/index.html', {
+                'user_info': profile and profile.data,
+                'upgrade_info': profile and profile.upgrade_data,
+                'has_login': bool(uid)
+            })
+        else:
+            try:
+                del request.session['uid']
+            except KeyError:
+                pass
+
+    return render(request, 'web/signup.html', {
+        'login_info': settings.WXWEB_LOGIN_PARAMS or {},
+        'has_login': False
+    })
 
 def web_logout(request):
     """

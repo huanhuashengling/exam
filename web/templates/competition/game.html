@@ -1,25 +1,27 @@
 {% extends '../base.html' %}
 {% block title %}开始答题{% endblock %}
 {% block content %}
-    <div class="main-content container">
-        <div class="position toInWhere">
+    <div class="main-content container" style="margin-bottom: 50px; padding: 0px;">
+        <!-- <div class="position toInWhere">
             <b>当前位置：</b><span>
                 <a onclick="history.back(-1)">测试信息</a>
             </span>&nbsp;&gt;&nbsp;<span>{{ kind_name }}</span>
-        </div>
-        <div class="card">
+        </div> -->
+        <div class="card" style="margin-top: 10px;">
           <div class="card-header">
-            <span style="font-size: 20px;">{{ kind_name }}</span>
+            <span style="font-size: 15px;">{{ kind_name }}</span>
             <div class="process" style="float: right">
-                <span class="n2">倒计时：</span>
+                <!-- <span class="n2">倒计时：</span> -->
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24"><path fill-rule="evenodd" d="M10.25 0a.75.75 0 000 1.5h1v1.278a9.955 9.955 0 00-5.635 2.276L4.28 3.72a.75.75 0 00-1.06 1.06l1.315 1.316A9.962 9.962 0 002 12.75c0 5.523 4.477 10 10 10s10-4.477 10-10a9.962 9.962 0 00-2.535-6.654L20.78 4.78a.75.75 0 00-1.06-1.06l-1.334 1.334a9.955 9.955 0 00-5.636-2.276V1.5h1a.75.75 0 000-1.5h-3.5zM12 21.25a8.5 8.5 0 100-17 8.5 8.5 0 000 17zm4.03-12.53a.75.75 0 010 1.06l-2.381 2.382a1.75 1.75 0 11-1.06-1.06l2.38-2.382a.75.75 0 011.061 0z"></path></svg>
                 <span class="n2" style="color:#e4653d" id="timetext">{% if period_time %}{{ period_time }}分00秒{% else %}无限制{% endif %}</span>
             </div>
           </div>
           <div class="card-body">
+            <input type="hidden" id="questionPk">
             <p class="lead">
-                <label id="question"></label>
+                <label id="question" style="font-size: 15px;"></label>
             </p>
-            <div id="choiceBox" class="checkbox" style="border: #31b0d5; font-size:16px;">
+            <div id="choiceBox" class="checkbox" style="border: #31b0d5; font-size:15px;">
             </div>
             <div id="fullinBox" class="form-inline" style="text-align:center">
                 <input type="text" class="form-control" id="answerF" placeholder="请输入答案"  style="width:400px" />
@@ -34,89 +36,7 @@
             </div>
           </div>
         </div>
-        <!-- <div class="inner-content">
-            <div class="border teston mb-15 zycs_ceshi" style="display: block;">
-                    <div class="teston-top">
-                        <span style="font-size: 20px;">{{ kind_name }}</span>
-                        <div class="process" style="float: right">
-                            <span class="n2">倒计时：</span>
-                            <span class="n2" style="color:#e4653d" id="timetext">{% if period_time %}{{ period_time }}分00秒{% else %}无限制{% endif %}</span>
-                        </div>
-                    </div>
-            <p class="lead">
-                <label id="question"></label>
-            </p> -->
-            <!-- <div id="choiceBox" class="checkbox" style="border: #31b0d5; font-size:18px;"> -->
-                <!-- <div class="radio">
-                    <label id="item1Answer">
-                        <input type="radio" name="itemRadios" id="itemRadio1" value="item1">
-                        <label id="item1" for="itemRadio1"></label>
-                    </label>
-                </div>
-                <br />
-                <div class="radio">
-                    <label>
-                        <input type="radio" name="itemRadios" id="itemRadio2" value="item2">
-                        <label id="item2" for="itemRadio2"></label>
-                    </label>
-                </div>
-                <br />
-                <div class="radio">
-                    <label>
-                        <input type="radio" name="itemRadios" id="itemRadio3" value="item3">
-                        <label id="item3" for="itemRadio3"></label>
-                    </label>
-                </div>
-                <br />
-                <div class="radio">
-                    <label>
-                        <input type="radio" name="itemRadios" id="itemRadio4" value="item4">
-                        <label id="item4" for="itemRadio4"></label>
-                    </label>
-                </div>
-                <div class="hidden">
-                    <label>
-                        <input type="radio" name="itemRadios" id="itemRadioPk" value="pk">
-                        <label id="itemPk"></label>
-                    </label>
-                </div> -->
-            <!-- </div> -->
-            <!-- <div id="fullinBox" class="form-inline" style="text-align:center">
-                <input type="text" class="form-control" id="answerF" placeholder="请输入答案"  style="width:400px" />
-                <input type="hidden" id="answerPk" />
-            </div> -->
-            
-            <!-- </div> -->
         </div>
-    <!-- loading -->
-    <div class="modal fade" id="loadingModal1" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" data-backdrop='static'>
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h4 class="modal-title" id="myModalLabel">提示</h4>
-                </div>
-                <div class="modal-body">
-                    <h1>正在准备题库...</h1>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div class="modal fade" id="loadingModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="exampleModalLabel">提示</h5>
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
-        </button>
-      </div>
-      <div class="modal-body">
-        <h1>正在准备题库...</h1>
-      </div>
-    </div>
-  </div>
-</div>
 </div>
     <script type="text/javascript">
     $.ajaxSetup({
@@ -128,11 +48,12 @@
     var questionNum = 0;
     var response;
     var answerDict;
+    var questionPkArr = [];
       $(document).ready(function () {
           if({{ period_time|safe }}) {
               startTimer1();
           }
-          $('#loadingModal').modal('show');
+          // $('#loadingModal').modal('show');
           uid = '{{ user_info.uid|safe }}';
           kind_id = '{{ kind_id|safe }}';
           $.ajax({
@@ -156,16 +77,21 @@
                   }
                   // 取答案中的第一个值
                   if(res.data.questions[0].qtype === 'choice') {            // 选择题的情况
-                      $('#question').html("第"+currentPage+"题：" + res.data.questions[0].question);  // currentPage - 1
+                      multiChoiceStr = "";
+                      multiChoice = res.data.questions[0].multiChoice;
                       tItems = res.data.questions[0].items.split("|");
-                      tHtml = buildRadioSelectHtml(tItems, res.data.questions[0].pk);
+                      questionPkArr[currentPage-1] = res.data.questions[0].pk;
+                      if(!multiChoice) {
+                        tHtml = buildRadioSelectHtml(tItems, res.data.questions[0].pk);
+                        $("#questionPk").val("itemRadios_" + res.data.questions[0].pk);
+                      } else {
+                        multiChoiceStr = "【多选题】"
+                        tHtml = buildCheckboxSelectHtml(tItems, res.data.questions[0].pk);
+                        $("#questionPk").val("itemCheckboxs_" + res.data.questions[0].pk);
+                      }
+                      $('#question').html("第"+currentPage+"题：" + res.data.questions[0].question + multiChoiceStr);  // currentPage - 1
                       $('#choiceBox').html(tHtml);
                       
-                      // $('#item1').html(res.data.questions[0].items[0]);
-                      // $('#item2').html(res.data.questions[0].items[1]);
-                      // $('#item3').html(res.data.questions[0].items[2]);
-                      // $('#item4').html(res.data.questions[0].items[3]);
-                      // $('#itemPk').html('c_' + res.data.questions[0].pk);
                       hasNext = (currentPage < questionNum);
                       $('#fullinBox').hide();
                   } else{                                                    // 填空题的情况
@@ -174,44 +100,45 @@
                       hasNext = (currentPage < questionNum);
                       $('#choiceBox').hide();
                   }
-                  console.log("asasasasas");
-                  $('#loadingModal').modal('hide');
               }
           });
           // 点击前一个的情况
           $('#preQuestion').click(function () {
               if(hasPrevious){
+                var selectVal = [];
+                $("input[name='" + $("#questionPk").val() + "']:checked").each(function(e) {
+                    selectVal.push($(this).val());
+                });
+                answerDict["c_"+$("#questionPk").val().split("_")[1]] = selectVal;
+                console.log(answerDict);
+
                   removeChecked();
                   clearInputData();
                   currentPage = currentPage - 1;
+
+                  console.log(answerDict["c_" + questionPkArr[currentPage-1]]);
+
                   if(response.data.questions[currentPage - 1].qtype === 'choice') {
+
                       $('#choiceBox').show();
+                      multiChoiceStr = "";
+                      multiChoice = response.data.questions[currentPage - 1].multiChoice;
+
                       var pk = response.data.questions[currentPage - 1].pk;
-                      $('#question').html("第"+currentPage+"题：" + response.data.questions[currentPage - 1].question);
+                      questionPkArr[currentPage-1] = pk;
+
                       tItems = response.data.questions[currentPage - 1].items.split("|");
-                      tHtml = buildRadioSelectHtml(tItems, pk);
+                      if(!multiChoice) {
+                        tHtml = buildRadioSelectHtml(tItems, pk, answerDict["c_" + questionPkArr[currentPage-1]]);
+                        $("#questionPk").val("itemRadios_" + pk);
+                      } else {
+                        multiChoiceStr = "【多选题】"
+                        tHtml = buildCheckboxSelectHtml(tItems, pk, answerDict["c_" + questionPkArr[currentPage-1]]);
+                        $("#questionPk").val("itemCheckboxs_" + pk);
+                      }
+                      $('#question').html("第"+currentPage+"题：" + response.data.questions[currentPage - 1].question + multiChoiceStr);
                       $('#choiceBox').html(tHtml);
 
-                      // $('#item1').html(response.data.questions[currentPage - 1].items[0]);
-                      // $('#item2').html(response.data.questions[currentPage - 1].items[1]);
-                      // $('#item3').html(response.data.questions[currentPage - 1].items[2]);
-                      // $('#item4').html(response.data.questions[currentPage - 1].items[3]);
-                      // $('#itemPk').html('c_' + response.data.questions[currentPage - 1].pk);
-                      // 记住之前的选项
-                      // if (answerDict['c_' + pk]) {
-                      //     if (answerDict['c_' + pk] === "A") {
-                      //         $('#itemRadio1').prop('checked', true);
-                      //     }
-                      //     if (answerDict['c_' + pk] === "B") {
-                      //         $('#itemRadio2').prop('checked', true);
-                      //     }
-                      //     if (answerDict['c_' + pk] === "C") {
-                      //         $('#itemRadio3').prop('checked', true);
-                      //     }
-                      //     if (answerDict['c_' + pk] === "D") {
-                      //         $('#itemRadio4').prop('checked', true);
-                      //     }
-                      // }
                       $('#fullinBox').hide();
                       hasPrevious = currentPage > 1;
                       hasNext = currentPage < questionNum
@@ -234,35 +161,38 @@
           // 点击后一个的情况
           $('#nextQuestion').click(function () {
               if(hasNext){
+                var selectVal = [];
+                $("input[name='" + $("#questionPk").val() + "']:checked").each(function(e) {
+                    selectVal.push($(this).val());
+                });
+                answerDict["c_"+$("#questionPk").val().split("_")[1]] = selectVal;
+                console.log(answerDict);
+
                   removeChecked();
                   clearInputData();
                   currentPage = currentPage + 1;
+                  console.log(answerDict["c_" + questionPkArr[currentPage]]);
+
                   if(response.data.questions[currentPage - 1].qtype === 'choice') {
                       $('#choiceBox').show();
+                      multiChoiceStr = "";
+                      multiChoice = response.data.questions[currentPage - 1].multiChoice;
+                      // console.log(response.data.questions[currentPage - 1].answer);
                       var pk = response.data.questions[currentPage - 1].pk;
-                      $('#question').html("第"+currentPage+"题：" + response.data.questions[currentPage - 1].question);
+                      questionPkArr[currentPage-1] = pk;
+
                       tItems = response.data.questions[currentPage - 1].items.split("|");
-                      tHtml = buildRadioSelectHtml(tItems, pk);
+
+                      if(!multiChoice) {
+                        tHtml = buildRadioSelectHtml(tItems, pk, answerDict["c_" + questionPkArr[currentPage-1]]);
+                        $("#questionPk").val("itemRadios_" + pk);
+                      } else {
+                        multiChoiceStr = "【多选题】"
+                        tHtml = buildCheckboxSelectHtml(tItems, pk, answerDict["c_" + questionPkArr[currentPage-1]]);
+                        $("#questionPk").val("itemCheckboxs_" + pk);
+                      }
+                      $('#question').html("第"+currentPage+"题：" + response.data.questions[currentPage - 1].question + multiChoiceStr);
                       $('#choiceBox').html(tHtml);
-                      // $('#item1').html(response.data.questions[currentPage - 1].items[0]);
-                      // $('#item2').html(response.data.questions[currentPage - 1].items[1]);
-                      // $('#item3').html(response.data.questions[currentPage - 1].items[2]);
-                      // $('#item4').html(response.data.questions[currentPage - 1].items[3]);
-                      // $('#itemPk').html('c_' + response.data.questions[currentPage - 1].pk);
-                      // if (answerDict['c_' + pk]) {
-                      //     if (answerDict['c_' + pk] === "A") {
-                      //         $('#itemRadio1').prop('checked', true);
-                      //     }
-                      //     if (answerDict['c_' + pk] === "B") {
-                      //         $('#itemRadio2').prop('checked', true);
-                      //     }
-                      //     if (answerDict['c_' + pk] === "C") {
-                      //         $('#itemRadio3').prop('checked', true);
-                      //     }
-                      //     if (answerDict['c_' + pk] === "D") {
-                      //         $('#itemRadio4').prop('checked', true);
-                      //     }
-                      // }
                       $('#fullinBox').hide();
                       hasPrevious = currentPage > 1;
                       hasNext = currentPage < questionNum
@@ -292,6 +222,13 @@
           });
           // 提交答案
          $('#answerSubmit').click(function () {
+            var selectVal = [];
+            $("input[name='" + $("#questionPk").val() + "']:checked").each(function(e) {
+                selectVal.push($(this).val());
+            });
+            answerDict["c_"+$("#questionPk").val().split("_")[1]] = selectVal;
+            console.log(answerDict);
+
              if(window.confirm("确认提交答案吗?")) {
                  if({{ period_time|safe }}) {
                      stopTimer1();
@@ -299,9 +236,9 @@
                  var answer = "";
                  for (var key in answerDict) {
                      if (!answer) {
-                         answer = String(key) + "," + answerDict[key] + "#";
+                         answer = String(key) + "|" + answerDict[key] + "#";
                      }else{
-                         answer += String(key) + "," + answerDict[key] + "#";
+                         answer += String(key) + "|" + answerDict[key] + "#";
                      }
                  }
                  $.ajax({
@@ -326,13 +263,27 @@
          });
 
         $(document)
-          .on('click', '.choiceItemRadio', function (e) {
-            console.log($(this).attr("id"));
-            var tdata = $(this).attr("id").split("_");
-            // var pk = $('#itemRadioPk').html();
-            answerDict["c_"+tdata[1]] = $(this).val();
-            console.log(answerDict);
-          });
+          // .on('click', '.choiceItemRadio', function (e) {
+          //   console.log($(this).attr("id"));
+          //   var tdata = $(this).attr("id").split("_");
+          //   // var pk = $('#itemRadioPk').html();
+          //   answerDict["c_"+tdata[1]] = $(this).val();
+          //   console.log(answerDict);
+          // })
+          // .on('click', '.choiceItemCheckbox', function (e) {
+          //   console.log($(this).attr("id"));
+          //   var tdata = $(this).attr("id").split("_");
+          //   var tCheckAnswer = answerDict["c_"+tdata[1]];
+          //   if(tCheckAnswer.indexOf($(this).val()) !== -1) {
+
+          //   }
+          //   if(answerDict["c_"+tdata[1]] == "") {
+          //     answerDict["c_"+tdata[1]] = $(this).val()
+          //   } else {
+          //     answerDict["c_"+tdata[1]] += "|" + $(this).val();
+          //   }
+          //   console.log(answerDict);
+          // });
       });
 
     function clearInputData() {
@@ -346,18 +297,34 @@
         $('#itemRadio4').prop('checked', false);
     }
 
-    function buildRadioSelectHtml(tItems, pk) {
+    function buildRadioSelectHtml(tItems, pk, selectArr="") {
       tHtml = "";
-      var anArr = ["A", "B", "C", "E", "F", "G", "H", "I"]
+      var anArr = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q"]
       for (var i = 0; i < tItems.length; i++) {
-        // tItems[i]
-        tHtml += "<div class='radio'>";
-        tHtml += "<label id='item" + i + "Answer'> &nbsp;&nbsp";
-            tHtml += "<input type='radio' name='itemRadios' class='choiceItemRadio' id='itemRadio_" + pk + "_"+i+"' value='"+tItems[i]+"'>";
-            tHtml += anArr[i]+". <label id='item"+pk+"_"+i+"' for='itemRadio_"+pk+"_"+i+"'>"+tItems[i]+"</label>";
-        tHtml += "</label></div><br />";
+        var sel = (i == selectArr[0])?"checked":"";
+        tHtml += "<div class='form-check'><label class='form-check-label'>";
+            tHtml += "<input type='radio' class='form-check-input choiceItemRadio' name='itemRadios_" + pk + "' id='itemRadio_" + pk + "_"+i+"' value='"+i+"' " + sel + ">";
+            tHtml += "&nbsp;" + anArr[i]+". "+tItems[i];
+        tHtml += "</label></div>";
       }
-      tHtml += "<input type='hidden' name='itemRadios' id='itemRadio_"+pk+"' value='"+pk+"'>";
+      return tHtml;
+    }
+
+    function buildCheckboxSelectHtml(tItems, pk, selectArr="") {
+      tHtml = "";
+      var anArr = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q"]
+      for (var i = 0; i < tItems.length; i++) {
+        var sel = "";
+        for (var j = 0; j < selectArr.length; j++) {
+          if (i == selectArr[j]) {
+            sel = "checked";
+          }
+        }
+        tHtml += "<div class='form-check'><label class='form-check-label'>";
+            tHtml += "<input type='checkbox' class='form-check-input choiceItemCheckbox' name='itemCheckboxs_" + pk + "' class='choiceItemCheckbox' id='itemCheckbox_" + pk + "_"+i+"' value='"+i+"' " + sel + ">";
+            tHtml += "&nbsp;"+anArr[i]+". "+tItems[i];
+        tHtml += "</label></div>";
+      }
       return tHtml;
     }
 
