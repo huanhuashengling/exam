@@ -167,7 +167,7 @@ def set_game(request):
         return render(request, 'err.html', ProfileNotFound)
 
     try:
-        biz = BusinessAccountInfo.objects.get(email=profile.email)
+        biz = BusinessAccountInfo.objects.get(company_phone=profile.phone)
     except BusinessAccountInfo.DoesNotExist:
         return render(request, 'err.html', BizAccountNotFound)
 

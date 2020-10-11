@@ -10,12 +10,12 @@
             </span>&nbsp;&gt;&nbsp;<span>答卷情况</span>
         </div>
         <div class="inner-content" id="printContent">
-            <div class="xxdj-report border zycs_text">
-                <div class="course-report">
-                    <div class="alert alert-primary" role="alert">
-                      <h4 class="text-center">感染科出科测试</h4>
-                     [{{user.get_trainee_type_display }}] {{user_info.displayname }}医生参加”{{kind_info.kind_name}}“测试，答对{{qa_info.correct_num}}题，答错{{qa_info.incorrect_num}}题，得分{{qa_info.score}}分
-                    </div>
+            <div class="card">
+              <div class="card-header">
+                  <h4 class="text-center">感染科出科测试</h4>
+                  <p>[{{user.get_trainee_type_display }}] {{user_info.displayname }}医生参加”{{kind_info.kind_name}}“测试，答对{{qa_info.correct_num}}题，答错{{qa_info.incorrect_num}}题，得分{{qa_info.score}}分</p>
+              </div>
+              <div class="card-body">
                     {% for qaItem in questionAnswerData %}
                       {% if qaItem.questionPk in correctQuestionPks %}
                         <div class="card">
@@ -48,9 +48,12 @@
                          <li id="goRank" class="btn btn-success" style="margin-top: 36px; ">查看测试历史</li>
                          <li id="print_btn" class="btn btn-success" style="margin-top: 36px; ">打印</li>
                     </div> -->
-                </div>
+            </div>
+            <div class="card-footer">
+            <li id="print_btn" class="btn btn-success" style="margin-top: 36px; ">打印</li>
             </div>
         </div>
+    </div>
     </div>
 <script type="text/javascript">
       $(function(){
