@@ -7,7 +7,7 @@
         <h5>请填写注册信息</h5>
             <div class="form-group">
                 <label for="phoneNumber" class="sr-only">手机号</label>
-                <input type="text" class="form-control" id="phoneNumber" placeholder="11位手机号" value="18073100720">
+                <input type="text" class="form-control" id="phoneNumber" placeholder="11位手机号" value="">
             </div>
             <div class="form-group">
                 <label for="displayname" class="sr-only">医生姓名</label>
@@ -33,11 +33,11 @@
             </div>
             <div class="form-group">
                 <label for="signUpPassword" class="sr-only">密码</label>
-                <input type="password" class="form-control" id="signUpPassword" placeholder="#p@ssw0d123" value="123456">
+                <input type="password" class="form-control" id="signUpPassword" placeholder="输入密码" value="">
             </div>
             <div class="form-group">
                 <label for="signUpPasswordAgain" class="sr-only">确认密码</label>
-                <input type="password" class="form-control" id="signUpPasswordAgain" placeholder="#p@ssw0d123" value="123456">
+                <input type="password" class="form-control" id="signUpPasswordAgain" placeholder="再次输入密码" value="">
             </div>
             <div class="form-group">
                 <label for="signUpVcode" class="sr-only">验证码</label>
@@ -45,7 +45,7 @@
                 <input type="text" class="form-control" id="signUpVcode" placeholder="输入上方验证码">
             </div>
             <div class="form-group">
-              <button type="button" class="btn btn-default btn-sm" id="signIn">已有账户，去登录</button>
+              <button type="button" class="btn btn-default btn-sm" id="gotoLogin">已有账户，去登录</button>
               <button type="button" class="btn btn-primary" id="signUpPost">注册</button>
             </div>
       </form>
@@ -61,7 +61,7 @@
       $('#signUpVcodeImg').click(function () {
           refreshVcode();
       });
-      $('#signIn').click(function () {
+      $('#gotoLogin').click(function () {
           window.location.href = '/login';
       });
       $('#signUpPost').click(function () {
@@ -109,14 +109,14 @@
                       phone = res.data.phone;
                       alert("注册成功，请联系管理员审核！");
                       window.location.href = '/login';
-                  }
-                  else if(res.status === 300002) {
+                  } else if(res.status === 300002) {
+                      refreshVcode()
                       alert('两次输入密码不一致');
-                  }
-                  else if(res.status === 300003) {
+                  } else if(res.status === 300003) {
+                      refreshVcode()
                       alert('验证码错误');
-                  }
-                  else if(res.status === 300004) {
+                  } else if(res.status === 300004) {
+                      refreshVcode()
                       alert('用户名已存在');
                   }
               }

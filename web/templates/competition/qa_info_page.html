@@ -6,18 +6,19 @@
     <div class="main-content container">
         <div class="position toInWhere">
             <b>当前位置：</b><span>
-                <a onclick="canNav(2,0);">比赛结果</a>
+                <a onclick="history.back(-1)">测试历史</a>
             </span>&nbsp;&gt;&nbsp;<span>答卷情况</span>
         </div>
         <div class="inner-content" id="printContent">
             <div class="xxdj-report border zycs_text">
                 <div class="course-report">
                     <div class="alert alert-primary" role="alert">
-                      {{user_info.nickname }} 医生参加”{{kind_info.kind_name}}“测试，答对{{qa_info.correct_num}}题，答错{{qa_info.incorrect_num}}题，得分{{qa_info.score}}分
+                      <h4 class="text-center">感染科出科测试</h4>
+                      {{user_info.trainee_type }} {{user_info.displayname }}医生参加”{{kind_info.kind_name}}“测试，答对{{qa_info.correct_num}}题，答错{{qa_info.incorrect_num}}题，得分{{qa_info.score}}分
                     </div>
                     {% for qaItem in questionAnswerData %}
                       {% if qaItem.questionPk in correctQuestionPks %}
-                        <div class="card" style="color: green;">
+                        <div class="card">
                           <div class="card-header">【正确】{{ forloop.counter }}. {{qaItem.question}}(
                               {{selectLabel|getsplitindex:qaItem.answerInfo}}
                           )</div>
@@ -28,8 +29,8 @@
                           </div>
                         </div>
                       {% else %}
-                        <div class="card" style="color: red;">
-                          <div class="card-header">【错误】{{ forloop.counter }}. {{qaItem.question}}(
+                        <div class="card">
+                          <div class="card-header"><span style="color: red;">【错误】</span>{{ forloop.counter }}. {{qaItem.question}}(
                               {{selectLabel|getsplitindex:qaItem.answerInfo}}
                           )</div>
                           <div class="card-body">
@@ -41,12 +42,12 @@
                       {% endif %}
 
                     {% endfor %}
-                    <div class="center-p">
+                    <!-- <div class="center-p">
                          <li id="goBack" class="btn btn-primary" style="margin-top: 36px;">回首页</li>
                          <li id="tryAgain" class="btn btn-primary" style="margin: 36px 30px 0 30px">再试试</li>
                          <li id="goRank" class="btn btn-success" style="margin-top: 36px; ">查看测试历史</li>
                          <li id="print_btn" class="btn btn-success" style="margin-top: 36px; ">打印</li>
-                    </div>
+                    </div> -->
                 </div>
             </div>
         </div>

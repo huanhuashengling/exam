@@ -7,12 +7,12 @@
         <h5>请登录</h5>
         <div class="form-group">
           <label for="signInId" class="sr-only">电话号码</label>
-          <input type="email" id="signInId" class="form-control" placeholder="11位手机号" required="" autofocus="" value="18073100720">
+          <input type="email" id="signInId" class="form-control" placeholder="11位手机号" required="" autofocus="" value="">
         </div>
 
         <div class="form-group">
           <label for="signInPassword" class="sr-only">密码</label>
-          <input type="password" id="signInPassword" class="form-control" placeholder="wjamdin" required="" value="123456">
+          <input type="password" id="signInPassword" class="form-control" placeholder="输入密码" required="" value="">
         </div>
 
         <div class="form-group">
@@ -22,7 +22,7 @@
         </div>
         
         <div class="form-group">
-          <button type="button" class="btn btn-default btn-sm" id="gotoSignIn">没有账户，去注册</button>
+          <button type="button" class="btn btn-default btn-sm" id="gotoSignUp">没有账户，去注册</button>
           <button type="button" class="btn btn-primary" id="signInPost">登录</button>
         </div>
       </form>
@@ -31,153 +31,68 @@
 {% endblock %}
 {% block js %}
     <script type="text/javascript">
+        $.ajaxSetup({
+            data: {csrfmiddlewaretoken: '{{ csrf_token }}' }
+        });
+        var loginSign;
+        refreshVcode();
+        $('#signInVcodeImg').click(function () {
+            refreshVcode();
+        });
 
-      $.ajaxSetup({
-          data: {csrfmiddlewaretoken: '{{ csrf_token }}' }
-      });
-      var loginSign;
-      // {% if not has_login %}
-          // 点击登录
-          // $('#signInNormal').click(function () {
-              refreshVcode('signin');
-              // $('#signInModalNormal').modal('show');
-              $('#signInVcodeImg').click(function () {
-                  refreshVcode('signin');
-              });
+        $('#gotoSignUp').click(function () {
+            window.location.href = '/signup';
+        });
 
-              $('#gotoSignIn').click(function () {
-                  window.location.href = '/signup';
-              });
+        $('#signInPost').click(function () {
+            var phone = $('#signInId').val();
+            var password = $('#signInPassword').val();
+            var vcode = $('#signInVcode').val();
+            // if(!checkEmail(phone)){
+            //     $('#signInId').val('');
+            //     $('#signInId').attr('placeholder', '邮件格式错误');
+            //     $('#signInId').css('border', '1px solid red');
+            //     return false;
+            // }else{
+            //     $('#signInId').css('border', '1px solid #C1FFC1');
+            // }
+            if(!password){
+                $('#signInPassword').attr('placeholder', '请填写密码');
+                $('#signInPassword').css('border', '1px solid red');
+            }else{
+                $('#signInPassword').css('border', '1px solid #C1FFC1');
+            }
+            $.ajax({
+                url: '/api/login_normal',
+                data: {
+                    'phone': phone,
+                    'password': password,
+                    'sign': loginSign,
+                    'vcode': vcode
+                },
+                type: 'post',
+                dataType: 'json',
+                success: function(res){
+                    if (res.status === 200){
+                        window.location.href = '/index';
+                    } else if(res.status === 300001) {
+                        refreshVcode();
+                        alert('用户名错误');
+                    } else if(res.status === 300002) {
+                        refreshVcode();
+                        alert('密码错误');
+                    } else if(res.status === 300003) {
+                        refreshVcode();
+                        alert('验证码错误');
+                    } else {
+                        refreshVcode();
+                        alert('登录错误');
+                    }
+                }
+            })
+        });
 
-              $('#signInPost').click(function () {
-                  var phone = $('#signInId').val();
-                  var password = $('#signInPassword').val();
-                  var vcode = $('#signInVcode').val();
-                  // if(!checkEmail(phone)){
-                  //     $('#signInId').val('');
-                  //     $('#signInId').attr('placeholder', '邮件格式错误');
-                  //     $('#signInId').css('border', '1px solid red');
-                  //     return false;
-                  // }else{
-                  //     $('#signInId').css('border', '1px solid #C1FFC1');
-                  // }
-                  if(!password){
-                      $('#signInPassword').attr('placeholder', '请填写密码');
-                      $('#signInPassword').css('border', '1px solid red');
-                  }else{
-                      $('#signInPassword').css('border', '1px solid #C1FFC1');
-                  }
-                  $.ajax({
-                  url: '/api/login_normal',
-                  data: {
-                      'phone': phone,
-                      'password': password,
-                      'sign': loginSign,
-                      'vcode': vcode
-                  },
-                  type: 'post',
-                  dataType: 'json',
-                  success: function(res){
-                      if (res.status === 200){
-                          $('#signInModalNormal').modal('hide');
-                          window.location.href = '/index';
-                      }
-                      else if(res.status === 300001) {
-                          alert('用户名错误');
-                      }
-                      else if(res.status === 300002) {
-                          alert('密码错误');
-                      }
-                      else if(res.status === 300003) {
-                          alert('验证码错误');
-                      }
-                      else {
-                          alert('登录错误');
-                      }
-                  }
-              })
-              });
-              $('#signUp').click(function () {
-                  refreshVcode('signup');
-                  $('#signInModalNormal').modal('hide');
-                  $('#signUpModal').modal('show');
-                  $('#signInVcodeImg').click(function () {
-                      refreshVcode('signup');
-                  });
-              });
-              $('#signIn').click(function () {
-                  refreshVcode('signin');
-                  $('#signUpModal').modal('hide');
-                  $('#signInModalNormal').modal('show');
-                  $('#signInVcodeImg').click(function () {
-                      refreshVcode('signup');
-                  });
-              });
-              $('#signUpPost').click(function () {
-                  var email = $('#signUpId').val();
-                  var password = $('#signUpPassword').val();
-                  var passwordAgain = $('#signUpPasswordAgain').val();
-                  var vcode = $('#signUpVcode').val();
-                  if(!checkEmail(email)) {
-                      $('#signUpId').val('');
-                      $('#signUpId').attr('placeholder', '邮箱格式错误');
-                      $('#signUpId').css('border', '1px solid red');
-                      return false;
-                  }else{
-                      $('#signUpId').css('border', '1px solid #C1FFC1');
-                  }
-                  if(!(password === passwordAgain)) {
-                      $('#signUpPasswordAgain').val('');
-                      $('#signUpPasswordAgain').attr('placeholder', '两次密码输入不一致');
-                      $('#signUpPassword').css('border', '1px solid red');
-                      $('#signUpPasswordAgain').css('border', '1px solid red');
-                      return false;
-                  }else{
-                      $('#signUpPassword').css('border', '1px solid #C1FFC1');
-                      $('#signUpPasswordAgain').css('border', '1px solid #C1FFC1');
-                  }
-                  $.ajax({
-                      url: '/api/signup',
-                      type: 'post',
-                      data: {
-                          'email': email,
-                          'password': password,
-                          'password_again': passwordAgain,
-                          'sign': loginSign,
-                          'vcode': vcode
-                      },
-                      dataType: 'json',
-                      success: function (res) {
-                          if(res.status === 200) {
-                              sign = res.data.sign;
-                              email = res.data.email;
-                              window.location.href = '/auth/signup_redirect?email=' + email + '&sign=' + sign;
-                          }
-                          else if(res.status === 300002) {
-                              alert('两次输入密码不一致');
-                          }
-                          else if(res.status === 300003) {
-                              alert('验证码错误');
-                          }
-                          else if(res.status === 300004) {
-                              alert('用户名已存在');
-                          }
-                      }
-                  })
-              });
-              $('#resetPassword').click(function () {
-                  resetPassword();
-              })
-          // });
-      // {% else %}
-      //     var userId = {% if request.session.uid %}'{{ request.session.username|safe }}'{% else %}"登录"{% endif %}
-      //     $('#signInButton').html(userId);
-      //     strHTML = "<li><a href=\"/logout\">注销</a></li><li id=\"resetPassword\"><a href=\"#\">修改密码</a></li>";
-      //     $('#signInDropdownMenu').html(strHTML);
-      // {% endif %}
-
-
-      function refreshVcode(label) {
+      function refreshVcode() {
           $.ajax({
               url: '/api/login_vcode',
               data: {},
@@ -186,12 +101,7 @@
               success: function (res) {
                   if (res.status === 200) {
                       loginSign = res.data.sign;
-                      if(label === 'signin') {
-                          $('#signInVcodeImg').attr('src', "data:image/png;base64," + res.data.vcode);
-                      }
-                      if(label === 'signup') {
-                          $('#signUpVcodeImg').attr('src', "data:image/png;base64," + res.data.vcode);
-                      }
+                      $('#signInVcodeImg').attr('src', "data:image/png;base64," + res.data.vcode);
                   }
               }
           });
