@@ -14,7 +14,7 @@
                 <div class="course-report">
                     <div class="alert alert-primary" role="alert">
                       <h4 class="text-center">感染科出科测试</h4>
-                      {{user_info.trainee_type }} {{user_info.displayname }}医生参加”{{kind_info.kind_name}}“测试，答对{{qa_info.correct_num}}题，答错{{qa_info.incorrect_num}}题，得分{{qa_info.score}}分
+                     [{{user.get_trainee_type_display }}] {{user_info.displayname }}医生参加”{{kind_info.kind_name}}“测试，答对{{qa_info.correct_num}}题，答错{{qa_info.incorrect_num}}题，得分{{qa_info.score}}分
                     </div>
                     {% for qaItem in questionAnswerData %}
                       {% if qaItem.questionPk in correctQuestionPks %}

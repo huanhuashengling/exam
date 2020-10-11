@@ -244,6 +244,7 @@ def qa_info_page(request):
     # print(questionAnswerData)
     return render(request, 'competition/qa_info_page.html', {
         'user_info': profile.data,
+        'user': profile,
         'qa_info': qa_info.detail,
         'kind_info': kind_info.data,
         'questionAnswerData': questionAnswerData,
