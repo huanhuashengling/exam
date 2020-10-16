@@ -29,7 +29,7 @@
     <p>{{request.session.uid}}</p> -->
     <nav class="navbar navbar-expand-lg navbar-light bg-light">
       <div class="container">
-        <a class="navbar-brand" href="#">科室轮训测试</a>
+        <a class="navbar-brand" href="#">感染小教室</a>
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarsExample07" aria-controls="navbarsExample07" aria-expanded="false" aria-label="Toggle navigation">
           <span class="navbar-toggler-icon"></span>
         </button>
@@ -71,8 +71,8 @@
             <li class="nav-item dropdown" class="my-2 my-lg-0">
               <a class="nav-link dropdown-toggle" href="javascript:void(0);" id="dropdown07" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">{% if request.session.uid %}{{ request.session.displayname }}医生{% else %}登录{% endif %}</a>
               <div class="dropdown-menu" aria-labelledby="dropdown07">
+                  <!-- <a class="dropdown-item" href="/reset_password{% if request.session.uid %}?uid={{ request.session.uid }}{% else %}{% endif %}">修改密码</a> -->
                   <a class="dropdown-item" href="/logout">注销</a>
-                  <!-- <a class="dropdown-item" id="resetPassword">修改密码</a> -->
               </div>
             </li>
             {% endif %}
@@ -191,60 +191,6 @@
           return password.match('^\\w{6,18}$');
       }
 
-      function  resetPassword() {
-          $('#signInModalNormal').modal('hide');
-                  $('#resetPasswordModal').modal('show');
-                  $('#resetPost').click(function () {
-                      var email = $('#resetId').val();
-                      var newPassword = $('#resetNewPassword').val();
-                      var newPasswordAgain = $('#resetNewPasswordAgain').val();
-                      if(!checkEmail(email)) {
-                          $('#resetId').val('');
-                          $('#resetId').attr('placeholder', '邮件格式错误');
-                          $('#resetId').css('border', '1px solid red');
-                          return false;
-                      }else{
-                          $('#resetId').css('border', '1px solid #C1FFC1');
-                      }
-                      if(!(newPassword === newPasswordAgain)){
-                          $('#resetNewPasswordAgain').val('');
-                          $('#resetNewPasswordAgain').attr('placeholder', '两次输入密码不一致');
-                          $('#resetNewPassword').css('border', '1px solid red');
-                          $('#resetNewPasswordAgain').css('border', '1px solid red');
-                          return false;
-                      }else{
-                          $('#resetNewPassword').css('border', '1px solid #C1FFC1');
-                          $('#resetNewPasswordAgain').css('border', '1px solid #C1FFC1');
-                      }
-                      $('#resetPasswordLoading').modal('show');
-                      $.ajax({
-                          url: '/api/resetpasswd',
-                          type: 'post',
-                          data: {
-                              'email': email,
-                              'new_password': newPassword,
-                              'new_password_again': newPasswordAgain
-                          },
-                          dataType: 'json',
-                          success: function (res) {
-                              if(res.status === 200) {
-                                  alert('发送成功!');
-                                  window.location.href = '/index' + {% if request.session.uid %} '?uid={{ request.session.uid|safe }}'{% else %} '' {% endif %}
-                              }
-                              else if(res.status === 300005) {
-                                  $('#sendMailLoading').modal('hide');
-                                  alert('您已发送过邮件，请稍后再试');
-                                  window.location.href = '/index' + {% if request.session.uid %} '?uid={{ request.session.uid|safe }}'{% else %} '' {% endif %}
-                              }
-                              else if(res.status === 300006) {
-                                  alert('邮件发送失败');
-                                  window.location.href = '/index' + {% if request.session.uid %} '?uid={{ request.session.uid|safe }}'{% else %} '' {% endif %}
-                              }
-                          }
-                      });
-                      return false;
-                  })
-      };
       $('#home').click(function () {
           window.location.href = '/index{% if request.session.uid %}?uid={{ request.session.uid }}{% else %}{% endif %}';
       })
