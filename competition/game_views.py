@@ -158,7 +158,7 @@ def submit_answer(request):
         qa_info.status = CompetitionQAInfo.OVERTIME
         qa_info.save()
     else:  # 正常完成，加入排行榜
-        add_to_rank(uid, kind_id, qa_info.score, qa_info.expend_time, qa_info.qa_id)
+        # add_to_rank(uid, kind_id, qa_info.score, qa_info.expend_time, qa_info.qa_id)
         qa_info.status = CompetitionQAInfo.COMPLETED
         qa_info.save()
     return json_response(200, 'OK', {  # 返回JSON数据
