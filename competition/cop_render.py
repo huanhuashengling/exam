@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-
+import os
 import collections
 import json
 import datetime 
@@ -273,7 +273,9 @@ def qa_history(request):
         return render(request, 'err.html', CompetitionNotFound)
 
     for qainfo in qaInfos:
-        finished_time = datetime.datetime.fromtimestamp(qainfo.finished_stamp / 1e3).strftime("%Y/%m/%d %H:%M:%S")
+        os.environ["TZ"] = "UTC"
+        # finished_time = datetime.datetime.fromtimestamp(qainfo.finished_stamp / 1e3).strftime("%Y/%m/%d %H:%M:%S")
+        finished_time = datetime.datetime.fromtimestamp(qainfo.finished_stamp / 1e3).strftime("%Y/%m/%d %H:%M")
 
         try:
             kind_info = CompetitionKindInfo.objects.get(kind_id=qainfo.data["kind_id"])
@@ -288,6 +290,7 @@ def qa_history(request):
                 "total_num": qainfo.detail["total_num"], 
                 "correct_num": qainfo.detail["correct_num"],
                 "incorrect_num": qainfo.detail["incorrect_num"],
+                'trainee_type': profile.get_trainee_type_display,
                 "score": qainfo.detail["score"],
                 "time": qainfo.detail["time"],
                 "finished_time": finished_time,

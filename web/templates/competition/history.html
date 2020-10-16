@@ -17,8 +17,9 @@
                 <table style="margin-top: 15px;" class="table table-hover">
                     <tr>
                         <th>编号</th>
-                        <th>参测人</th>
                         <th>所属科室</th>
+                        <th>学员姓名</th>
+                        <th>学员类型</th>
                         <th>测试名称</th>
                         <th>题目数量</th>
                         <th>正确/错误</th>
@@ -30,8 +31,9 @@
                     {% for qa in qaData %}
                     <tr>
                         <td>{{forloop.counter}}</td>
-                        <td>{{qa.name}}</td>
                         <td>{{qa.sponsor_name}}</td>
+                        <td>{{qa.name}}</td>
+                        <td>{{qa.trainee_type}}</td>
                         <td>{{qa.kind_name}}</td>
                         <td>{{qa.total_num}}</td>
                         <td>{{qa.correct_num}}/{{qa.incorrect_num}}</td>
