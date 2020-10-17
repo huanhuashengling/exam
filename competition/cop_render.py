@@ -268,7 +268,7 @@ def qa_history(request):
         return render(request, 'err.html', ProfileNotFound)
 
     try:
-        qaInfos = CompetitionQAInfo.objects.all()
+        qaInfos = CompetitionQAInfo.objects.filter(finished = 1)
     except CompetitionQAInfo.DoesNotExist:
         return render(request, 'err.html', CompetitionNotFound)
 
@@ -280,6 +280,11 @@ def qa_history(request):
         try:
             kind_info = CompetitionKindInfo.objects.get(kind_id=qainfo.data["kind_id"])
             profile = Profile.objects.get(uid=qainfo.data["uid"])
+            tTime = int(round(qainfo.detail["time"]))
+            if tTime < 60:
+                tTime = str(tTime) + "s"
+            else:
+                tTime = str(int(tTime / 60)) + "min"
 
             qaData.append({"name": profile.data["displayname"],
                 "uid": profile.data["uid"],
@@ -292,7 +297,8 @@ def qa_history(request):
                 "incorrect_num": qainfo.detail["incorrect_num"],
                 'trainee_type': profile.get_trainee_type_display,
                 "score": qainfo.detail["score"],
-                "time": qainfo.detail["time"],
+                "time": tTime,
+                # "time1": qainfo.detail["time"],
                 "finished_time": finished_time,
                 })
         except CompetitionKindInfo.DoesNotExist:

@@ -29,9 +29,11 @@ urlpatterns = [
     path('login', login_render.web_login, name='web_login'),
     path('signup', login_render.web_signup, name='web_signup'),
     path('logout', login_render.web_logout, name='web_logout'),
+    path('reset_password', login_render.reset_password, name='reset_password'),
     path('normal_user_list', views.normal_user_list, name='normal_user_list'),
     path('active_normal_user', views.active_normal_user, name='active_normal_user'),
     path('deactive_normal_user', views.deactive_normal_user, name='deactive_normal_user'),
+    path('normal_user_list_data', views.normal_user_list_data, name='normal_user_list_data'),
 ]
 
 urlpatterns += [

@@ -23,6 +23,7 @@ urlpatterns += [
     path('answer', game_views.submit_answer, name='submit_answer'),
     path('entry', game_views.userinfo_entry, name='userinfo_entry'),
     # re_path('games/s/(\w+)', game_views.games, name='query_games'),
+    path('qa_history_data', game_views.qa_history_data, name='qa_history_data'),
 ]
 
 # set

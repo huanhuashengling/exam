@@ -4,83 +4,117 @@
 
 <div class="main-content container">
         <div class="position toInWhere">
-            <b>当前位置：</b><span>
-                <a onclick="canNav(2,0);">测试结果</a>
-            </span>&nbsp;&gt;&nbsp;<span>测试历史</span>
+            <b>当前位置：</b><span>测试历史</span>
         </div>
         <div class="row">
-            <div class="card text-center col-12">
-              <div class="card-header">
-                测试历史
-              </div>
-              <div class="card-body">
-                <table style="margin-top: 15px;" class="table table-hover">
-                    <tr>
-                        <th>编号</th>
-                        <th>所属科室</th>
-                        <th>学员姓名</th>
-                        <th>学员类型</th>
-                        <th>测试名称</th>
-                        <th>题目数量</th>
-                        <th>正确/错误</th>
-                        <th>得分</th>
-                        <th>耗时(秒)</th>
-                        <th>完成时间</th>
-                        <th>操作</th>
-                    </tr>
-                    {% for qa in qaData %}
-                    <tr>
-                        <td>{{forloop.counter}}</td>
-                        <td>{{qa.sponsor_name}}</td>
-                        <td>{{qa.name}}</td>
-                        <td>{{qa.trainee_type}}</td>
-                        <td>{{qa.kind_name}}</td>
-                        <td>{{qa.total_num}}</td>
-                        <td>{{qa.correct_num}}/{{qa.incorrect_num}}</td>
-                        <td>{{qa.score}}</td>
-                        <td>{{qa.time}}</td>
-                        <td>{{qa.finished_time}}</td>
-                        <td><button class="btn btn-primary qa_item" value="{{qa.uid}}_{{qa.qa_id}}_{{qa.kind_id}}">查看答卷</button></td>
-                    </tr>
-                    {% endfor %}
-                </table>
-              </div>
-              
+            <div id="toolbar">
+                <button class="btn btn-success" id="export-score-report-btn">导出测试情况</button>
             </div>
+            <table id="test-history-list" class="table table-condensed table-responsive">
+                <thead>
+                    <tr>
+                        <th data-field="" checkbox="true">
+
+                        </th>
+                        <th data-field="">
+                            序号
+                        </th>
+                        <th data-field="sponsor_name" data-sortable="true">
+                            科室
+                        </th>
+                        <th data-field="name" data-sortable="true">
+                            学员姓名
+                        </th>
+                        <th data-field="trainee_type" data-sortable="true">
+                            学员类型
+                        </th>
+                        <th data-field="kind_name" data-sortable="true">
+                            测试名称
+                        </th>
+                        <th data-field="result_filed" data-sortable="true" data-formatter="resultFormatter">
+                            答题情况
+                        </th>
+                        <th data-field="score" data-sortable="true">
+                            得分
+                        </th>
+                        <th data-field="time" data-sortable="true">
+                            耗时
+                        </th>
+                        <th data-field="finished_time" data-sortable="true">
+                            完成时间
+                        </th>
+                      <th data-field="uid" data-formatter="actionCol" data-events="actionEvents">
+                          操作
+                      </th>
+                    </tr>
+                </thead>
+            </table>
         </div>
     </div>
 </div>
-    <script>
-        $(document).ready(function () {
-            $(".qa_item").click(function(e) {
-                uid = $(this).val().split("_")[0];
-                qa_id = $(this).val().split("_")[1];
-                kind_id = $(this).val().split("_")[2];
-                window.location.href = '/bs/qa_info_page?uid='+uid+'&qa_id='+qa_id+'&kind_id='+kind_id;
-            });
+<script>
+    $(document).ready(function () {
+        $.ajaxSetup({
+            data: {csrfmiddlewaretoken: '{{ csrf_token }}' },
+        });
+        $(".qa_item").click(function(e) {
+            uid = $(this).val().split("_")[0];
+            qa_id = $(this).val().split("_")[1];
+            kind_id = $(this).val().split("_")[2];
+            window.location.href = '/bs/qa_info_page?uid='+uid+'&qa_id='+qa_id+'&kind_id='+kind_id;
+        });
 
-            $.ajax({
-                url: '/api/myrank',
-                data: {
-                    uid: '{{ request.session.uid|safe }}',
-                    kind_id: '{{ kind_info.kind_id|safe }}'
-                },
-                dataType: 'json',
-                type: 'get',
-                success: function (res) {
-                    if(res.status === 200) {
-                        var rank  = res.data.rank;
-                        var timer = res.data.time / 1000 ;
-                        if (rank){
-                            var myResult = '<label><h4><b>我的排名:</b>&nbsp;&nbsp; 第<span class="rank" style="color:red">'+ rank + '</span>名</h4></label>'
-                                            + '<label><h4><b>我的用时:</b>&nbsp;&nbsp; <span class="timer" style="color:red">' + timer + '</span>秒</h4></label>'
-                        }else {
-                            var myResult = '<label><h4>您还没有参加比赛哦！<label><h4>'
-                        }
-                        $('#myResult').html(myResult)
-                    }
-                }
-            })
-        })
-    </script>
+        $('#test-history-list').bootstrapTable({
+            method: 'get', 
+            dataType: "json",
+            search: "true",
+            url: "/api/qa_history_data",
+            pagination:"true",
+            pageList: [10, 20], 
+            pageSize: 10,
+            pageNumber: 1,
+            toolbar:"#toolbar",
+            showExport: true,          //是否显示导出
+            showColumns: "true",           
+            exportDataType: "basic",              //basic', 'all', 'selected'.
+            queryParams: function(params) {
+                var temp = {
+                    csrfmiddlewaretoken: '{{ csrf_token }}'
+                };
+                return temp;
+            },
+            // clickToSelect: true,
+            columns: [{  
+                        checkbox: true  
+                    },{  
+                        title: '序号',
+                        formatter: function (value, row, index) {  
+                            return index+1;  
+                        }  
+                    }],
+            responseHandler: function (res) {
+                // console.log(res.data.qaData);
+                return res.data.qaData;
+            },
+        });
+    })
+    function resultFormatter(value, row, index) {
+        return [
+            row.total_num+'题/对'+row.correct_num+'/错'+row.incorrect_num
+        ].join('');
+    }
+
+    function actionCol(value, row, index) {
+        return [
+            "<a class='btn btn-primary btn-sm qa_item'>查看答卷</a>"
+        ].join('');
+    }
+
+    window.actionEvents = {
+        'click .qa_item': function(e, value, row, index) {
+            window.location.href = '/bs/qa_info_page?uid='+row.uid+'&qa_id='+row.qa_id+'&kind_id='+row.kind_id;
+        },
+    }
+
+</script>
 {% endblock %}

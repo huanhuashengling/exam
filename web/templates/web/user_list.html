@@ -6,89 +6,143 @@
             <b>当前位置：</b><span>
                 <a>用户管理</a>
         </div>
-        <div class="row">
-            <div class="card text-center col-12">
-              <div class="card-header">
-                用户列表
-              </div>
-              <div class="card-body">
-                <table style="margin-top: 15px;" class="table table-hover">
-                    <tr>
-                        <th>编号</th>
-                        <th>姓名</th>
-                        <th>用户名</th>
-                        <th>邮箱</th>
-                        <th>是否员工</th>
-                        <th>是否激活</th>
-                        <th>操作</th>
-                    </tr>
-                    {% for user in userData %}
-                    <tr>
-                        <td>{{forloop.counter}}</td>
-                        <td>{{user.displayname}}</td>
-                        <td>{{user.username}}</td>
-                        <td>{{user.email}}</td>
-                        <td>{{user.is_staff}}</td>
-                        <td>{{user.is_active}}</td>
-                        <td><button class="btn btn-primary active_user_item" value="{{user.uid}}_{{user.username}}">激活</button>
-                          <button class="btn btn-warning deactive_user_item" value="{{user.uid}}_{{user.username}}">锁定</button></td>
-                    </tr>
-                    {% endfor %}
-                </table>
-              </div>
-              
+        <div class="row text-center">
+            <div id="toolbar">
+                <button class="btn btn-success" id="export-score-report-btn">导出用户信息</button>
             </div>
+            <table id="normal-user-list" class="table table-condensed table-responsive">
+                <thead>
+                    <tr>
+                        <th data-field="" checkbox="true">
+
+                        </th>
+                        <th data-field="">
+                            序号
+                        </th>
+                        <th data-field="displayname" data-sortable="true">
+                            姓名
+                        </th>
+                        <th data-field="username" data-sortable="true">
+                            用户名
+                        </th>
+                        <th data-field="user_src" data-sortable="true">
+                            权限类别
+                        </th>
+                        <th data-field="trainee_type" data-sortable="true">
+                            学员类型
+                        </th>
+                        <th data-field="is_active" data-sortable="true" data-formatter="activeFormatter">
+                            是否激活
+                        </th>
+                        <th data-field="uid" data-formatter="actionCol" data-events="actionEvents">
+                            操作
+                        </th>
+                    </tr>
+                </thead>
+            </table>
         </div>
     </div>
 
 
 <script type="text/javascript">
-    $.ajaxSetup({
-        data: {csrfmiddlewaretoken: '{{ csrf_token }}' }
-    });
-    $('.active_user_item').click(function () {
-        var activeUserId = $(this).val().split("_")[0];
-        var activeUsername = $(this).val().split("_")[1];
-        $.ajax({
-            url: "/active_normal_user",
-            data: {
-                'activeUserId': activeUserId,
-                'activeUsername': activeUsername,
-            },
-            type: 'post',
-            dataType: 'json',
-            success: function (res) {
-                if (res.status === 200) {
-                    alert("用户（" + activeUsername + '）激活成功');
-                    window.location.href = "/normal_user_list";
-                } else {
-                    alert("用户（" + activeUsername + '）激活失败');
-                }
-            }
+    $(document).ready(function () {
+        $.ajaxSetup({
+            data: {csrfmiddlewaretoken: '{{ csrf_token }}' }
         });
-    });
 
-    $('.deactive_user_item').click(function () {
-        var activeUserId = $(this).val().split("_")[0];
-        var activeUsername = $(this).val().split("_")[1];
-        $.ajax({
-            url: "/deactive_normal_user",
-            data: {
-                'activeUserId': activeUserId,
-                'activeUsername': activeUsername,
+        $('#normal-user-list').bootstrapTable({
+            method: 'get', 
+            dataType: "json",
+            search: "true",
+            url: "/normal_user_list_data",
+            pagination:"true",
+            pageList: [10, 20], 
+            pageSize: 10,
+            pageNumber: 1,
+            toolbar:"#toolbar",
+            showExport: true,          //是否显示导出
+            showColumns: "true",           
+            exportDataType: "basic",              //basic', 'all', 'selected'.
+            queryParams: function(params) {
+                var temp = {
+                    csrfmiddlewaretoken: '{{ csrf_token }}'
+                };
+                return temp;
             },
-            type: 'post',
-            dataType: 'json',
-            success: function (res) {
-                if (res.status === 200) {
-                    alert("用户（" + activeUsername + '）锁定成功');
-                    window.location.href = "/normal_user_list";
-                } else {
-                    alert("用户（" + activeUsername + '）锁定失败');
-                }
-            }
+            // clickToSelect: true,
+            columns: [{  
+                        checkbox: true  
+                    },{  
+                        title: '序号',
+                        formatter: function (value, row, index) {  
+                            return index+1;  
+                        }  
+                    }],
+            responseHandler: function (res) {
+                // console.log(res.data.userData);
+                return res.data.userData;
+            },
         });
-    });
+    })
+    function activeFormatter(value, row, index) {
+        if (row.is_active) {
+            return [
+                '是'
+            ].join('');
+        } else {
+            return [
+                '否'
+            ].join('');
+        }
+    }
+
+    function actionCol(value, row, index) {
+        return [
+            "<button class='btn btn-primary btn-sm active_user_item'>激活</button> "+
+            " <button class='btn btn-warning btn-sm deactive_user_item'>锁定</button>"
+        ].join('');
+    }
+
+    window.actionEvents = {
+        'click .active_user_item': function(e, value, row, index) {
+            $.ajax({
+                url: "/active_normal_user",
+                data: {
+                    'activeUserId': row.uid,
+                    'activeUsername': row.username,
+                },
+                type: 'post',
+                dataType: 'json',
+                success: function (res) {
+                    if (res.status === 200) {
+                        alert("用户（" + activeUsername + '）激活成功');
+                        window.location.href = "/normal_user_list";
+                    } else {
+                        alert("用户（" + activeUsername + '）激活失败');
+                    }
+                }
+            });
+        },
+        'click .deactive_user_item': function(e, value, row, index) {
+            $.ajax({
+                url: "/deactive_normal_user",
+                data: {
+                    'activeUserId': row.uid,
+                    'activeUsername': row.username,
+                },
+                type: 'post',
+                dataType: 'json',
+                success: function (res) {
+                    if (res.status === 200) {
+                        alert("用户（" + activeUsername + '）锁定成功');
+                        window.location.href = "/normal_user_list";
+                    } else {
+                        alert("用户（" + activeUsername + '）锁定失败');
+                    }
+                }
+            });
+        },
+    }
     
 </script>
 {% endblock %}

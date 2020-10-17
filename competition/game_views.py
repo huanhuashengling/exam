@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-
+import os
 import datetime
 import random
 
@@ -273,4 +273,46 @@ def games(request, s):
     return json_response(200, 'OK', {
         'kinds': [i.data for i in kinds],
         'uid'  : uid
+    })
+
+@check_login
+def qa_history_data(request):
+    qaData = []
+    try:
+        qaInfos = CompetitionQAInfo.objects.filter(finished = 1)
+    except CompetitionQAInfo.DoesNotExist:
+        return render(request, 'err.html', CompetitionNotFound)
+
+    for qainfo in qaInfos:
+        os.environ["TZ"] = "UTC"
+        finished_time = datetime.datetime.fromtimestamp(qainfo.finished_stamp / 1e3).strftime("%Y/%m/%d %H:%M")
+        try:
+            kind_info = CompetitionKindInfo.objects.get(kind_id=qainfo.data["kind_id"])
+            profile = Profile.objects.get(uid=qainfo.data["uid"])
+            tTime = int(round(qainfo.detail["time"]))
+            if tTime < 60:
+                tTime = str(tTime) + "s"
+            else:
+                tTime = str(int(tTime / 60)) + "min"
+
+            qaData.append({"name": profile.data["displayname"],
+                "uid": profile.data["uid"],
+                "kind_name" : kind_info.data["kind_name"], 
+                "kind_id": kind_info.data["kind_id"], 
+                "qa_id": qainfo.data["qa_id"], 
+                "sponsor_name": kind_info.data["sponsor_name"], 
+                "total_num": qainfo.detail["total_num"], 
+                "correct_num": qainfo.detail["correct_num"],
+                "incorrect_num": qainfo.detail["incorrect_num"],
+                'trainee_type': profile.get_trainee_type_display(),
+                "score": qainfo.detail["score"],
+                "time": tTime,
+                # "time1": qainfo.detail["time"],
+                "finished_time": finished_time,
+                })
+        except CompetitionKindInfo.DoesNotExist:
+            return render(request, 'err.html', CompetitionNotFound)
+    # print(qaData)
+    return json_response(200, 'OK', {
+        'qaData': qaData,
     })
