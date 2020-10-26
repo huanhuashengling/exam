@@ -18,6 +18,7 @@ urlpatterns = [
     path('search', cop_render.search, name='search'),
     path('contact', cop_render.contact, name='contact'),
     path('donate', cop_render.donate, name='donate'),
+    path('exportpdf', cop_render.exportpdf, name='exportpdf'),
 ]
 
 # 配置比赛url

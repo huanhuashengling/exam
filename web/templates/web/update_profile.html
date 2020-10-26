@@ -1,0 +1,72 @@
+{% extends '../base.html' %}
+{% block title %}首页{% endblock %}
+{% block content %}
+<div class="container" style="padding-top: 20px;">
+  <div class="row justify-content-center">
+      <form class="form-reset">
+        <h5>修改个人信息</h5>
+        <p for="phone">用户名: {{phone}}</p>
+        <p for="displayname">姓名: {{displayname}}</p>
+        <p for="trainee_type">学员类型: {{trainee_type}}</p>
+        <input type="hidden" id="trainee_type_data" value="{{trainee_type_data}}">
+        <input type="hidden" id="phoneNumber" value="{{phone}}">
+            <div class="form-group">
+                <label for="classname">班级名称:</label>
+                <input type="text" class="form-control" id="classname" value="{{classname}}">
+            </div>
+            <div class="form-group">
+              <button type="button" class="btn btn-primary" id="update_btn">提交修改</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+{% block js %}
+    <script type="text/javascript">
+      $.ajaxSetup({
+          data: {csrfmiddlewaretoken: '{{ csrf_token }}' }
+      });
+
+      $(document).ready(function () {
+          refreshClassnamePlaceholder();
+          $('#update_btn').click(function () {
+              var classname = $('#classname').val();
+
+              if(!$('#classname').val()) {
+                  $('#classname').attr('placeholder', '班级名称不能为空');
+                  $('#classname').css('border', '1px solid red');
+                  return false;
+              }else{
+                  $('#classname').css('border', '1px solid #C1FFC1');
+              }
+
+              $.ajax({
+                  url: '/api/updateprofile',
+                  type: 'post',
+                  data: {
+                      'classname': $('#classname').val(),
+                      'phone': $('#phoneNumber').val(),
+                  },
+                  dataType: 'json',
+                  success: function (res) {
+                      if(res.status === 200) {
+                          alert('个人信息修改成功！');
+                      } else {
+                          alert('个人信息修改失败！');
+                      }
+                  }
+              });
+          })
+      });
+      
+      function refreshClassnamePlaceholder() {
+         if(0 == $("#trainee_type_data").val()) {
+            $("#classname").attr("placeholder", "例：15级临床五年制 或 外校人员");
+         } else if(1 == $("#trainee_type_data").val()) {
+            $("#classname").attr("placeholder", "例：20级住院医师 或 外校人员");
+         } else if(2 == $("#trainee_type_data").val()) {
+            $("#classname").attr("placeholder", "例：20级进修医师 或 外校人员");
+         }
+      }
+    </script>
+{% endblock %}

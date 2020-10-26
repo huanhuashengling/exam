@@ -10,49 +10,36 @@
             </span>&nbsp;&gt;&nbsp;<span>答卷情况</span>
         </div>
         <div class="inner-content" id="printContent">
-            <div class="card">
-              <div class="card-header">
-                  <h4 class="text-center">感染科出科测试</h4><h5 style="float: right">测试成绩：{{qa_info.score}}分</h5>
-                  <p>[{{user.get_trainee_type_display }}] {{user_info.displayname }}医生参加”{{kind_info.kind_name}}“测试，答对{{qa_info.correct_num}}题，答错{{qa_info.incorrect_num}}题，得分{{qa_info.score}}分</p>
-              </div>
-              <div class="card-body">
-                    {% for qaItem in questionAnswerData %}
-                      {% if qaItem.questionPk in correctQuestionPks %}
-                        <div class="card" style="font-size: 14px;">
-                          <div class="card-header"><span style="color: blue;">【正确】</span>{{ forloop.counter }}. {{qaItem.question}}(
-                              {{selectLabel|getsplitindex:qaItem.answerInfo}}
-                          )</div>
-                          <div class="card-body">
-                            <div class="row">
-                            {% for selectItem in qaItem.selectItems %}
-                              <div class="col" style="font-size: 13px;">{{ selectLabel|getindex:forloop.counter0 }}. {{selectItem}}</div>
-                            {% endfor %}
-                            </div>
-                          </div>
-                        </div>
-                      {% else %}
-                        <div class="card" style="font-size: 14px;">
-                          <div class="card-header"><span style="color: red;">【错误】</span>{{ forloop.counter }}. {{qaItem.question}}(
-                              {{selectLabel|getsplitindex:qaItem.answerInfo}}
-                          )</div>
-                          <div class="card-body">
-                            <div class="row">
-                            {% for selectItem in qaItem.selectItems %}
-                              <div class="col" style="font-size: 12px;">{{ selectLabel|getindex:forloop.counter0 }}. {{selectItem}}</div>
-                            {% endfor %}
-                          </div>
-                          </div>
-                        </div>
-                      {% endif %}
-
+          <div class="alert alert-primary" role="alert">
+            <p><small>[{{user.get_trainee_type_display }}] {{user_info.displayname }}医生，{{finished_time}} 参加”{{kind_info.kind_name}}“测试，答对{{qa_info.correct_num}}题，答错{{qa_info.incorrect_num}}题，得分{{qa_info.score}}分</small></p>
+          </div>
+            {% for qaItem in questionAnswerData %}
+              {% if qaItem.questionPk in correctQuestionPks %}
+                <div class="card" style="font-size: 13px;">
+                  <div class="card-header"><span style="color: blue;">【正确】</span>{{ forloop.counter }}. {{qaItem.question}}(
+                      {{selectLabel|getsplitindex:qaItem.answerInfo}}
+                  )</div>
+                  <div class="card-body" style="padding-top: 5px; padding-bottom: 5px;">
+                    {% for selectItem in qaItem.selectItems %}
+                      <p class="col" style="font-size: 12px; margin-bottom: 5px;">{{ selectLabel|getindex:forloop.counter0 }}. {{selectItem}}</p>
                     {% endfor %}
-            </div>
-            <div class="card-footer">
-            <h5 style="float: right;">阅卷老师：___________</h5>
-            </div>
-        </div>
+                  </div>
+                </div>
+              {% else %}
+                <div class="card" style="font-size: 13px;">
+                  <div class="card-header"><span style="color: red;">【错误】</span>{{ forloop.counter }}. {{qaItem.question}}(
+                      {{selectLabel|getsplitindex:qaItem.answerInfo}}
+                  )</div>
+                  <div class="card-body" style="padding-top: 5px; padding-bottom: 5px;">
+                    {% for selectItem in qaItem.selectItems %}
+                      <p style="font-size: 12px; margin-bottom: 5px;">{{ selectLabel|getindex:forloop.counter0 }}. {{selectItem}}</p>
+                    {% endfor %}
+
+                  </div>
+                </div>
+              {% endif %}
+            {% endfor %}
     </div>
-    <p><div id="print_btn" class="btn btn-success" style="float: right;">打印</div></p>
     </div>
 <script type="text/javascript">
       $(function(){

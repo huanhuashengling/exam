@@ -1,7 +1,11 @@
 # -*- coding: utf-8 -*-
 import os
+import io
 import datetime
 import random
+
+from django.http import FileResponse
+from reportlab.pdfgen import canvas
 
 from django.db import transaction
 from django.views.decorators.csrf import csrf_exempt
@@ -285,11 +289,13 @@ def qa_history_data(request):
 
     for qainfo in qaInfos:
         os.environ["TZ"] = "UTC"
-        finished_time = datetime.datetime.fromtimestamp(qainfo.finished_stamp / 1e3).strftime("%Y/%m/%d %H:%M")
+        # finished_time = datetime.datetime.fromtimestamp(qainfo.finished_stamp / 1e3).strftime("%Y/%m/%d %H:%M")
+        finished_time = datetime.datetime.fromtimestamp(qainfo.finished_stamp / 1e3).strftime("%Y/%m/%d")
         try:
             kind_info = CompetitionKindInfo.objects.get(kind_id=qainfo.data["kind_id"])
             profile = Profile.objects.get(uid=qainfo.data["uid"])
             tTime = int(round(qainfo.detail["time"]))
+            
             if tTime < 60:
                 tTime = str(tTime) + "s"
             else:
@@ -316,3 +322,4 @@ def qa_history_data(request):
     return json_response(200, 'OK', {
         'qaData': qaData,
     })
+

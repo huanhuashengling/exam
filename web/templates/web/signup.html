@@ -3,46 +3,60 @@
 {% block content %}
 <div class="container" style="padding-top: 20px;">
   <div class="row justify-content-center">
-      <form class="form-signin">
+      <form class="form-signin" id="signup-form">
         <h5>请填写注册信息</h5>
             <div class="form-group">
                 <label for="phoneNumber" class="sr-only">手机号</label>
-                <input type="text" class="form-control" id="phoneNumber" placeholder="11位手机号" value="">
+                <input type="text" class="form-control" id="phoneNumber" name="phoneNumber" placeholder="11位手机号" required value="">
             </div>
             <div class="form-group">
                 <label for="displayname" class="sr-only">医生姓名</label>
-                <input type="text" class="form-control" id="displayname" placeholder="医生姓名">
+                <input type="text" class="form-control" id="displayname" name="displayname" required placeholder="医生姓名">
             </div>
             <div class="form-group">
                 <label for="traineeType">学员身份</label></br>
                 <div class="form-check-inline">
                   <label class="form-check-label">
-                    <input type="radio" class="form-check-input" name="optradio" value="0">实习医生
+                    <input type="radio" class="form-check-input" id="doctor_type_1" name="optradio" value="0">实习医生
                   </label>
                 </div>
                 <div class="form-check-inline">
                   <label class="form-check-label">
-                    <input type="radio" class="form-check-input" name="optradio" value="1">住院医师
+                    <input type="radio" class="form-check-input" id="doctor_type_2" name="optradio" value="1">住院医师
                   </label>
                 </div>
                 <div class="form-check-inline">
                   <label class="form-check-label">
-                    <input type="radio" class="form-check-input" name="optradio" value="2">进修医生
+                    <input type="radio" class="form-check-input" id="doctor_type_3" name="optradio" value="2">进修医生
                   </label>
                 </div>
+            </div>
+            <div class="form-group">
+                <label for="classname">班级名称</label>
+                <input type="text" class="form-control" id="classname" required placeholder="例：15级临床五年制 或 外校人员">
+            </div>
+            <div class="form-group" id="traineeCodeGroup">
+                <label for="traineeCode">学号（实习医生填写）</label>
+                <input type="text" class="form-control" id="traineeCode" required placeholder="例：2202040307">
             </div>
             <div class="form-group">
                 <label for="signUpPassword" class="sr-only">密码</label>
-                <input type="password" class="form-control" id="signUpPassword" placeholder="输入密码" value="">
+                <input type="password" class="form-control" id="signUpPassword" required placeholder="输入密码" value="">
             </div>
             <div class="form-group">
                 <label for="signUpPasswordAgain" class="sr-only">确认密码</label>
-                <input type="password" class="form-control" id="signUpPasswordAgain" placeholder="再次输入密码" value="">
+                <input type="password" class="form-control" id="signUpPasswordAgain" required placeholder="再次输入密码" value="">
             </div>
             <div class="form-group">
                 <label for="signUpVcode" class="sr-only">验证码</label>
-                <img id="signUpVcodeImg" src="" style="height: 50px;width: 150px;" />
-                <input type="text" class="form-control" id="signUpVcode" placeholder="输入上方验证码">
+                <div class="row">
+                  <div class="col">
+                    <img id="signUpVcodeImg" src="" style="height: 40px;width: 120px;" />
+                  </div>
+                  <div class="col">
+                    <input type="text" class="form-control" id="signUpVcode" required placeholder="输入验证码">
+                  </div>
+                </div>
             </div>
             <div class="form-group">
               <button type="button" class="btn btn-default btn-sm" id="gotoLogin">已有账户，去登录</button>
@@ -58,6 +72,7 @@
           data: {csrfmiddlewaretoken: '{{ csrf_token }}' }
       });
       refreshVcode();
+      $("#traineeCodeGroup").hide();
       $('#signUpVcodeImg').click(function () {
           refreshVcode();
       });
@@ -65,22 +80,78 @@
           window.location.href = '/login';
       });
       $('#signUpPost').click(function () {
-          var phone = $('#phoneNumber').val();
-          var displayname = $('#displayname').val();
-          var password = $('#signUpPassword').val();
-          var passwordAgain = $('#signUpPasswordAgain').val();
-          var vcode = $('#signUpVcode').val();
           var traineeType = $("input[name='optradio']:checked").val();
-          
-          // if(!checkPhoneNumber(phone)) {
-          //     $('#phoneNumber').val('');
-          //     $('#phoneNumber').attr('placeholder', '电话号码错误');
-          //     $('#phoneNumber').css('border', '1px solid red');
-          //     return false;
-          // }else{
-          //     $('#signUpId').css('border', '1px solid #C1FFC1');
-          // }
-          if(!(password === passwordAgain)) {
+
+          if(!$('#phoneNumber').val()) {
+              $('#phoneNumber').val('');
+              $('#phoneNumber').attr('placeholder', '电话号码不能为空');
+              $('#phoneNumber').css('border', '1px solid red');
+              return false;
+          }else{
+              $('#phoneNumber').css('border', '1px solid #C1FFC1');
+          }
+
+          if(!checkPhoneNumber($('#phoneNumber').val())) {
+              $('#phoneNumber').val('');
+              $('#phoneNumber').attr('placeholder', '电话号码错误');
+              $('#phoneNumber').css('border', '1px solid red');
+              return false;
+          }else{
+              $('#phoneNumber').css('border', '1px solid #C1FFC1');
+          }
+
+          if(!$('#displayname').val()) {
+              $('#displayname').val('');
+              $('#displayname').attr('placeholder', '姓名不能为空');
+              $('#displayname').css('border', '1px solid red');
+              return false;
+          }else{
+              $('#displayname').css('border', '1px solid #C1FFC1');
+          }
+
+          if(!traineeType) {
+              alert("请选择学员身份！");
+              return false;
+          }
+
+          if(!$('#classname').val()) {
+              $('#classname').val('');
+              $('#classname').attr('placeholder', '班级名称不能为空');
+              $('#classname').css('border', '1px solid red');
+              return false;
+          }else{
+              $('#classname').css('border', '1px solid #C1FFC1');
+          }
+
+          if (0 == traineeType) {
+            if(!$('#traineeCode').val()) {
+                $('#traineeCode').attr('placeholder', '实习医生学号不能为空');
+                $('#traineeCode').css('border', '1px solid red');
+                return false;
+            }else{
+                $('#traineeCode').css('border', '1px solid #C1FFC1');
+            }
+          }
+
+          if(!$('#signUpPassword').val()) {
+              $('#signUpPassword').val('');
+              $('#signUpPassword').attr('placeholder', '密码不能为空');
+              $('#signUpPassword').css('border', '1px solid red');
+              return false;
+          }else{
+              $('#signUpPassword').css('border', '1px solid #C1FFC1');
+          }
+
+          if(!$('#signUpPasswordAgain').val()) {
+              $('#signUpPasswordAgain').val('');
+              $('#signUpPasswordAgain').attr('placeholder', '重复密码不能为空');
+              $('#signUpPasswordAgain').css('border', '1px solid red');
+              return false;
+          }else{
+              $('#signUpPasswordAgain').css('border', '1px solid #C1FFC1');
+          }
+
+          if(!($('#signUpPassword').val() === $('#signUpPasswordAgain').val())) {
               $('#signUpPasswordAgain').val('');
               $('#signUpPasswordAgain').attr('placeholder', '两次密码输入不一致');
               $('#signUpPassword').css('border', '1px solid red');
@@ -90,17 +161,29 @@
               $('#signUpPassword').css('border', '1px solid #C1FFC1');
               $('#signUpPasswordAgain').css('border', '1px solid #C1FFC1');
           }
+
+          if(!$('#signUpVcode').val()) {
+              $('#signUpVcode').val('');
+              $('#signUpVcode').attr('placeholder', '验证码不能为空');
+              $('#signUpVcode').css('border', '1px solid red');
+              return false;
+          }else{
+              $('#signUpVcode').css('border', '1px solid #C1FFC1');
+          }
+
           $.ajax({
               url: '/api/signup_normal',
               type: 'post',
               data: {
-                  'phone': phone,
-                  'password': password,
-                  'password_again': passwordAgain,
-                  'displayname': displayname,
+                  'phone': $('#phoneNumber').val(),
+                  'password': $('#signUpPassword').val(),
+                  'password_again': $('#signUpPasswordAgain').val(),
+                  'displayname': $('#displayname').val(),
                   'trainee_type': traineeType,
+                  'trainee_code': $("#traineeCode").val(),
+                  'classname': $("#classname").val(),
                   'sign': loginSign,
-                  'vcode': vcode
+                  'vcode': $('#signUpVcode').val()
               },
               dataType: 'json',
               success: function (res) {
@@ -117,14 +200,47 @@
                       alert('验证码错误');
                   } else if(res.status === 300004) {
                       refreshVcode()
-                      alert('用户名已存在');
+                      alert('用户名/手机号已被注册');
                   }
               }
           })
       });
 
+      $("#doctor_type_1").change(function(){
+        $("#classname").attr("placeholder", "例：15级临床五年制 或 外校人员");
+        $("#classname").val("");
+        $("#traineeCode").val("");
+        $("#traineeCode").attr("placeholder", "例：2202040307");
+      });
+
+      $("#doctor_type_1").click(function(){
+        $("#classname").attr("placeholder", "例：15级临床五年制 或 外校人员");
+        $("#traineeCodeGroup").show();
+      });
+
+      $("#doctor_type_2").change(function(){
+        $("#classname").attr("placeholder", "例：20级住院医师 或 外校人员");
+        $("#classname").val("");
+      });
+
+      $("#doctor_type_2").click(function(){
+        $("#classname").attr("placeholder", "例：20级住院医师 或 外校人员");
+        $("#traineeCodeGroup").hide();
+      });
+
+      $("#doctor_type_3").click(function(){
+        $("#classname").attr("placeholder", "例：20级进修医师 或 外校人员");
+        $("#traineeCodeGroup").hide();
+      });
+
+      $("#doctor_type_3").change(function(){
+        $("#classname").attr("placeholder", "例：20级进修医师 或 外校人员");
+        $("#classname").val("");
+      });
+
       function checkPhoneNumber(phoneNumber) {
-          return phoneNumber.match('^(?=\d{11}$)^1(?:3\d|4[57]|5[^4\D]|66|7[^249\D]|8\d|9[89])\d{8}$')
+          var pattern = /^1[34578]\d{9}$/;
+          return pattern.test(phoneNumber);
       }
 
       function refreshVcode() {

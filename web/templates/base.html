@@ -13,9 +13,19 @@
       <script src="//cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.1/umd/popper.min.js" integrity="sha256-/ijcOLwFf26xEYAjW75FizKVo5tnTYiQddPZoLUHHZ8=" crossorigin="anonymous"></script>
       <script src="{% static 'js/bootstrap-table.min.js' %}"></script>
       <script src="{% static 'js/locale/bootstrap-table-zh-CN.min.js' %}"></script>
+      <script src="https://cdn.bootcss.com/font-awesome/5.8.1/js/all.min.js"></script>
+
 
       <!--bootstrap核心js-->
       <script src="{% static 'js/bootstrap.min.js' %}"></script>
+
+      <script src="https://cdn.bootcss.com/bootstrap-table/1.14.2/extensions/export/bootstrap-table-export.min.js"></script>
+    <!--在客户端保存生成的导出文件-->
+    <script src="https://cdn.bootcss.com/FileSaver.js/2014-11-29/FileSaver.min.js"></script>
+    <!--以XLSX（Excel 2007+ XML格式）格式导出表（SheetJS）-->
+    <script src="https://cdn.bootcss.com/xlsx/0.14.2/xlsx.core.min.js"></script>
+    <script src="https://unpkg.com/tableexport.jquery.plugin/tableExport.min.js"></script>
+    <script type="text/javascript" src="{% static 'js/base64.min.js' %}"></script>
       <style>
         .cate {
             padding-bottom: 20px;
@@ -73,8 +83,9 @@
             <li class="nav-item dropdown" class="my-2 my-lg-0">
               <a class="nav-link dropdown-toggle" href="javascript:void(0);" id="dropdown07" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">{% if request.session.uid %}{{ request.session.displayname }}医生{% else %}登录{% endif %}</a>
               <div class="dropdown-menu" aria-labelledby="dropdown07">
-                  <!-- <a class="dropdown-item" href="/reset_password{% if request.session.uid %}?uid={{ request.session.uid }}{% else %}{% endif %}">修改密码</a> -->
-                  <a class="dropdown-item" href="/logout">注销</a>
+                  <a class="dropdown-item" href="/reset_password{% if request.session.uid %}?uid={{ request.session.uid }}{% else %}{% endif %}">修改密码</a>
+                  <a class="dropdown-item" href="/update_profile{% if request.session.uid %}?uid={{ request.session.uid }}{% else %}{% endif %}">修改个人信息</a>
+                  <a class="dropdown-item" href="/logout">退出</a>
               </div>
             </li>
             {% endif %}
@@ -87,80 +98,14 @@
 
     </div>
 
-  <div class="modal" id="resetPasswordModal" tabindex="-1" role="dialog" aria-labelledby="resetPasswordModal">
-  <div class="modal-dialog" role="document">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="exampleModalLabel">重置密码</h5>
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
-        </button>
-      </div>
-      <div class="modal-body">
-        <form>
-            <div class="form-group">
-                <label for="resetId" >邮箱</label>
-                <input type="text" class="form-control" id="resetId" placeholder="hugo.zhang@example.com">
-            </div>
-            <div class="form-group">
-                <label for="resetNewPassword" >新密码</label>
-                <input type="password" class="form-control" id="resetNewPassword" placeholder="p@ssw0rd123">
-            </div>
-            <div class="form-group">
-                <label for="resetNewPasswordAgain">再次输入密码</label>
-                <input type="password" class="form-control" id="resetNewPasswordAgain" placeholder="p@ssw0rd123">
-            </div>
-            <div class="form-group">
-                <p style="color: red">邮件发送后，请在三十分钟之内登录邮箱确认!</p>
-            </div>
-        </form>
-      </div>
-      <div class="modal-footer">
-          <button type="button" class="btn btn-primary" id="resetPost">发送邮件</button>
-      </div>
-    </div>
-  </div>
-  </div>
-  <!-- loading -->
-    <div class="modal fade" id="resetPasswordLoading" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" data-backdrop='static'>
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h4 class="modal-title" id="myModalLabel">提示</h4>
-                </div>
-                <div class="modal-body">
-                    <h1>正在发送邮件中...</h1>
-                </div>
-            </div>
-        </div>
-    </div>
     {% block content %} {% endblock %}
     <!-- <nav class="navbar fixed-bottom navbar-expand-sm navbar-dark bg-dark" style="margin-top: 20px"> -->
       <!-- <a class="navbar-brand" href="#" style="font-size: 16px;"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24"><path fill-rule="evenodd" d="M1.75 3A1.75 1.75 0 000 4.75v14c0 .966.784 1.75 1.75 1.75h20.5A1.75 1.75 0 0024 18.75v-14A1.75 1.75 0 0022.25 3H1.75zM1.5 4.75a.25.25 0 01.25-.25h20.5a.25.25 0 01.25.25v.852l-10.36 7a.25.25 0 01-.28 0l-10.36-7V4.75zm0 2.662V18.75c0 .138.112.25.25.25h20.5a.25.25 0 00.25-.25V7.412l-9.52 6.433c-.592.4-1.368.4-1.96 0L1.5 7.412z"></path></svg>&nbsp; &nbsp; shengling_2005@163.com</a> -->
     <!-- </nav> -->
   </div>
   {% block js %} {% endblock %}
-  <script type="text/javascript">
-    $(function(){
-      // refreshVcode('signin');
-        $(".login").mouseover(function(){
-                $(".sub").show();
-            }).mouseout(function(){
-                $(".sub").hide();
-            })
-        })
-</script>
-    <script>
-      $('#resetPassword').click(function () {
-          resetPassword()
-      });
 
-      $('#searchCom').click(function () {
-          window.location.href = '/bs/search?uid={% if request.session.uid %}{{ request.session.uid.uid }}{% endif %}&keyword=' + $('#searchKeyWord').val();
-          return false;
-      });
-  </script>
-  <script>
+  <script type="text/javascript">
       function getCookie(c_name)
       {
           if (document.cookie.length>0)

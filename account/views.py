@@ -47,16 +47,16 @@ def normal_user_list_data(request):
             profile = Profile.objects.filter().get(name=user.username)
             user = User.objects.get(username=profile.name)  # 获取用户
             tUserSrc = profile.get_user_src_display()
-            if tUserSrc == "机构用户":
-                tUserSrc = "管理员"
 
             if not user.is_superuser:
                 userData.append({'username': profile.name, 
                   'uid': profile.uid,
                   'phone': profile.phone,
                   'displayname': profile.displayname, 
+                  'classname': profile.classname, 
                   'email': profile.email,
                   'trainee_type': profile.get_trainee_type_display(),
+                  'trainee_code': profile.trainee_code,
                   'user_src': tUserSrc,
                   'is_staff': user.is_staff,
                   'is_active': user.is_active,

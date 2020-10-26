@@ -119,7 +119,7 @@ def normal_login(request):
         request.session['uid'] = profile.uid  # 设置Profile uid的session
         request.session['username'] = profile.name  # 设置用户名的session
         request.session['displayname'] = profile.displayname  # 设置用户名的session
-        request.session['usertype'] = profile.user_src  # 设置用户类型session，普通用户，机构用户
+        request.session['usertype'] = profile.user_src  # 设置用户类型session，普通用户，管理员
         # print("---------------profile.user_src")
         # print(profile.user_src)
         # print(request.session.get("usertype"))
@@ -161,7 +161,11 @@ def signup(request):
     password = request.POST.get('password', '')  # 密码
     password_again = request.POST.get('password_again', '')  # 确认密码
     vcode = request.POST.get('vcode', '')  # 注册验证码
+    classname = request.POST.get('classname', '')  # 班级名称
+    trainee_type = request.POST.get('trainee_type', '')  # 班级名称
+    trainee_code = request.POST.get('trainee_code', '')  # 班级名称
     sign = request.POST.get('sign')  # 注册验证码检验位
+
     if password != password_again:  # 两次密码不一样，返回错误码300002
         return json_response(*UserError.PasswordError)
     result = get_vcode(sign)  # 校验vcode，逻辑和登录视图相同
@@ -182,6 +186,9 @@ def signup(request):
         name=username,
         phone=phone,
         displayname=displayname,
+        classname=classname,
+        trainee_type=trainee_type,
+        trainee_code=trainee_code,
     )
     sign = str(uuid.uuid1())  # 生成邮箱校验码
     set_signcode(sign, phone)  # 在redis设置30min时限的验证周期
@@ -208,38 +215,39 @@ def sendmail(request):
         return json_response(*UserError.UserHasSentEmail)  # 如果用户同一时间多次点击发送，返回错误码300005
 
 
-
 @csrf_exempt
 @transaction.atomic
 def reset_password(request):
-    email = request.POST.get('email', '')
+    phone = request.POST.get('phone', '')
+    old_password = request.POST.get('old_password', '')
     new_password = request.POST.get('new_password', '')
     new_password_again = request.POST.get('new_password_again', '')
-    is_biz = request.POST.get('is_biz', 0)
 
     if new_password != new_password_again:
         return json_response(*UserError.PasswordError)
 
     try:
-        User.objects.get(email=email)
+        u = User.objects.get(username=phone)
     except User.DoesNotExist:
         return json_response(*UserError.UserNotFound)
 
-    if not get_has_sentemail(email):
-        sign = str(uuid.uuid1())
-        set_passwd(sign, new_password)
-        set_has_sentemail(email)
-
-        title = '[Quizz.cn密码重置邮件]'
-        sender = settings.EMAIL_HOST_USER
-        url = settings.DOMAIN + '/auth/reset_notify?email=' + email + '&sign=' + sign + '&is_biz=' + str(is_biz)
-        msg = '您好，Quizz.cn管理员想邀请您确认是否重置密码？{}'.format(url)
-
-        ret = send_mail(title, msg, sender, [email], fail_silently=True)
-        if not ret:
-            return json_response(*UserError.UserSendEmailFailed)
-
+    user = authenticate(request, username=u.username, password=old_password)  # 授权校验
+    if user is not None:  # 校验成功，获得返回用户信息
+        u.set_password(new_password)
+        u.save()
         return json_response(200, 'OK', {})
-
     else:
-        return json_response(*UserError.UserHasSentEmail)
+        return json_response(*UserError.PasswordError)
+
+@csrf_exempt
+@transaction.atomic
+def update_profile(request):
+    phone = request.POST.get('phone', '')
+    classname = request.POST.get('classname', '')
+    trainee_code = request.POST.get('trainee_code', '')
+
+    try:  # 校验成功，获得返回用户信息
+        Profile.objects.filter(name=phone).update(classname=classname, trainee_code=trainee_code)
+        return json_response(200, 'OK', {})
+    except User.DoesNotExist:
+        return json_response(*UserError.ProfileNotFound)

@@ -1,11 +1,10 @@
 {% extends 'base.html' %}
-{% block title %}排行榜{% endblock %}
+{% block title %}个人测试历史{% endblock %}
 {% block content %}
 
 <div class="main-content container">
         <div class="position toInWhere">
-            <b>当前位置：</b><a onclick="history.back(-1)">返回</a>
-            > <span>测试历史</span>
+            <b>当前位置：</b><span>测试历史</span>
         </div>
         <div class="row">
             <div class="card text-center col-12">
@@ -18,8 +17,9 @@
                         <th>编号</th>
                         <th>所属科室</th>
                         <th>测试名称</th>
-                        <th>题目数量</th>
-                        <th>正确/错误</th>
+                        <th>题量</th>
+                        <th>正确</th>
+                        <th>错误</th>
                         <th>得分</th>
                         <th>耗时(秒)</th>
                         <th>完成时间</th>
@@ -31,7 +31,8 @@
                         <td>{{qa.sponsor_name}}</td>
                         <td>{{qa.kind_name}}</td>
                         <td>{{qa.total_num}}</td>
-                        <td>{{qa.correct_num}}/{{qa.incorrect_num}}</td>
+                        <td>{{qa.correct_num}}</td>
+                        <td>{{qa.incorrect_num}}</td>
                         <td>{{qa.score}}</td>
                         <td>{{qa.time}}</td>
                         <td>{{qa.finished_time}}</td>
@@ -51,8 +52,8 @@
 
                 qa_id = $(this).val().split("_")[0];
                 kind_id = $(this).val().split("_")[1];
-                console.log(qa_id)
-                console.log(kind_id)
+                // console.log(qa_id)
+                // console.log(kind_id)
                 window.location.href = '/bs/qa_info_page?uid={{ request.session.uid }}&qa_id='+qa_id+'&kind_id='+kind_id;
             });
 

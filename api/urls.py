@@ -2,7 +2,7 @@
 
 from django.conf.urls import url
 
-from account import login_views
+from account import login_views, login_render
 from competition import game_views, set_views, rank_views
 from business import biz_views
 from django.urls import path,re_path
@@ -14,7 +14,8 @@ urlpatterns = [
     path('login_vcode', login_views.login_vcode, name='login_vcode'),
     path('signup_normal', login_views.signup, name='normal_signup'),
     path('sendmail', login_views.sendmail, name='sendmail'),
-    path('resetpasswd', login_views.reset_password, name='reset_password'),
+    path('resetpasswd', login_views.reset_password, name='resetpasswd'),
+    path('updateprofile', login_views.update_profile, name='updateprofile'),
 ]
 
 # game

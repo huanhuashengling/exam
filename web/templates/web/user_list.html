@@ -1,14 +1,10 @@
 {% extends '../base.html' %}
 {% block title %}用户列表{% endblock %}
 {% block content %}
-    <div class="main-content container">
-        <div class="position toInWhere">
-            <b>当前位置：</b><span>
-                <a>用户管理</a>
-        </div>
+    <div class="container">
         <div class="row text-center">
             <div id="toolbar">
-                <button class="btn btn-success" id="export-score-report-btn">导出用户信息</button>
+                <button class="btn btn-success" id="export-user-list">导出用户信息</button>
             </div>
             <table id="normal-user-list" class="table table-condensed table-responsive">
                 <thead>
@@ -25,8 +21,11 @@
                         <th data-field="username" data-sortable="true">
                             用户名
                         </th>
-                        <th data-field="user_src" data-sortable="true">
-                            权限类别
+                        <th data-field="classname" data-sortable="true">
+                            班级名称
+                        </th>
+                        <th data-field="trainee_code" data-sortable="true">
+                            学号
                         </th>
                         <th data-field="trainee_type" data-sortable="true">
                             学员类型
@@ -42,12 +41,96 @@
             </table>
         </div>
     </div>
+<!-- Modal -->
+<div class="modal fade" id="classnameModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="classnameModalLabel">修改的学员信息</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form class="form-reset">
+            <input type="hidden" id="phoneNumber">
+            <div class="form-group">
+                <label for="classname">班级名称:</label>
+                <input type="text" class="form-control" id="classname">
+            </div>
+            <div class="form-group" id="traineeCodeGroup">
+                <label for="classname">学号:</label>
+                <input type="text" class="form-control" id="traineeCode">
+            </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">返回</button>
+        <button type="button" class="btn btn-primary" id="update_btn">确认修改</button>
+      </div>
+    </div>
+  </div>
+</div>
 
+<!-- Modal -->
+<div class="modal fade" id="alertModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="alertModalLabel">信息修改成功！</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">确定</button>
+      </div>
+    </div>
+  </div>
+</div>
 
 <script type="text/javascript">
     $(document).ready(function () {
         $.ajaxSetup({
             data: {csrfmiddlewaretoken: '{{ csrf_token }}' }
+        });
+
+        $("#export-user-list").click(function() {
+            exportData();
+        });
+
+        $('#update_btn').click(function () {
+            var classname = $('#classname').val();
+
+            if(!$('#classname').val()) {
+                $('#classname').attr('placeholder', '班级名称不能为空');
+                $('#classname').css('border', '1px solid red');
+                return false;
+            }else{
+                $('#classname').css('border', '1px solid #C1FFC1');
+            }
+
+            $.ajax({
+                url: '/api/updateprofile',
+                type: 'post',
+                data: {
+                    'classname': $('#classname').val(),
+                    'trainee_code': $('#traineeCode').val(),
+                    'phone': $('#phoneNumber').val(),
+                },
+                dataType: 'json',
+                success: function (res) {
+                    $("#classnameModal").modal("hide");
+                    if(res.status === 200) {
+                        $("#alertModalLabel").val('用户信息修改成功！');
+                        $("#alertModal").modal("show");
+                    } else {
+                        $("#alertModalLabel").val('用户信息修改失败！');
+                        $("#alertModal").modal("show");
+                    }
+                    $('#normal-user-list').bootstrapTable("refresh");
+                }
+            });
         });
 
         $('#normal-user-list').bootstrapTable({
@@ -56,13 +139,18 @@
             search: "true",
             url: "/normal_user_list_data",
             pagination:"true",
-            pageList: [10, 20], 
+            pageList: [10, 20, 50, 100], 
             pageSize: 10,
             pageNumber: 1,
             toolbar:"#toolbar",
             showExport: true,          //是否显示导出
             showColumns: "true",           
-            exportDataType: "basic",              //basic', 'all', 'selected'.
+            // exportDataType: "basic",              //basic', 'all', 'selected'.
+            exportDataType: $(this).val(),//显示导出范围
+            exportTypes: ['json', 'xml', 'png', 'csv', 'txt', 'sql', 'doc', 'excel', 'xlsx', 'pdf'],//导出格式
+            exportOptions: {//导出设置
+                fileName: 'Tablexxx',//下载文件名称
+            },
             queryParams: function(params) {
                 var temp = {
                     csrfmiddlewaretoken: '{{ csrf_token }}'
@@ -99,12 +187,14 @@
     function actionCol(value, row, index) {
         return [
             "<button class='btn btn-primary btn-sm active_user_item'>激活</button> "+
-            " <button class='btn btn-warning btn-sm deactive_user_item'>锁定</button>"
+            " <button class='btn btn-warning btn-sm deactive_user_item'>锁定</button>"+
+            " <button class='btn btn-info btn-sm update_classname_item'>修改用户信息</button>"
         ].join('');
     }
 
     window.actionEvents = {
         'click .active_user_item': function(e, value, row, index) {
+            console.log(row);
             $.ajax({
                 url: "/active_normal_user",
                 data: {
@@ -115,10 +205,10 @@
                 dataType: 'json',
                 success: function (res) {
                     if (res.status === 200) {
-                        alert("用户（" + activeUsername + '）激活成功');
+                        alert("用户（" + row.username + '）激活成功');
                         window.location.href = "/normal_user_list";
                     } else {
-                        alert("用户（" + activeUsername + '）激活失败');
+                        alert("用户（" + row.username + '）激活失败');
                     }
                 }
             });
@@ -134,14 +224,59 @@
                 dataType: 'json',
                 success: function (res) {
                     if (res.status === 200) {
-                        alert("用户（" + activeUsername + '）锁定成功');
+                        alert("用户（" + row.username + '）锁定成功');
                         window.location.href = "/normal_user_list";
                     } else {
-                        alert("用户（" + activeUsername + '）锁定失败');
+                        alert("用户（" + row.username + '）锁定失败');
                     }
                 }
             });
         },
+        'click .update_classname_item': function(e, value, row, index) {
+            $("#classnameModalLabel").text("修改" + row.displayname + "医生的信息");
+            $("#classname").val(row.classname);
+            $("#phoneNumber").val(row.username);
+            
+
+            if("实习医生" == row.trainee_type) {
+                $("#classname").attr("placeholder", "例：15级临床五年制 或 外校人员");
+                $("#traineeCode").val(row.trainee_code);
+                $("#traineeCodeGroup").show();
+             } else if("住院医师" == row.trainee_type) {
+                $("#classname").attr("placeholder", "例：20级住院医师 或 外校人员");
+                $("#traineeCode").val("");
+                $("#traineeCodeGroup").hide();
+             } else if("进修医生" == row.trainee_type) {
+                $("#classname").attr("placeholder", "例：20级进修医师 或 外校人员");
+                $("#traineeCode").val("");
+                $("#traineeCodeGroup").hide();
+             }
+
+            $("#classnameModal").modal("show");
+        },
+    }
+
+    function exportData(){
+        var d = new Date();
+        var month = d.getMonth()+1;
+        var day = d.getDate();
+        var output = d.getFullYear() + '' +
+            (month<10 ? '0' : '') + month + '' +
+            (day<10 ? '0' : '') + day;
+
+        $('#normal-user-list').tableExport({
+            type: 'xlsx',
+            escape:"false",
+            htmlContent:'false',
+            exportDataType: "all",
+            Icons:'glyphicon-export', 
+            ignoreColumn: [0, 8],//忽略某一列的索引
+            fileName: output + '用户列表',//下载文件名称
+            onCellHtmlData: function (cell, row, col, data){//处理导出内容,自定义某一行、某一列、某个单元格的内容
+                console.info(data);
+                return data;
+            },
+        });
     }
     
 </script>

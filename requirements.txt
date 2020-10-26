@@ -17,3 +17,4 @@ TimeConvert==1.5.1
 tzlocal==2.1
 urllib3==1.24.1
 xlrd==1.2.0
+reportlab=3.5.53

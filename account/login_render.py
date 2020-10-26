@@ -135,6 +135,23 @@ def signup_redirect(request):
         'sign': sign
     })
 
+def reset_password(request):
+    uid = request.GET.get('uid', '')
+    profile = Profile.objects.get(uid=uid)
+    return render(request, 'web/reset_password.html', {
+        'phone': profile.phone
+    })
+
+def update_profile(request):
+    uid = request.GET.get('uid', '')
+    profile = Profile.objects.get(uid=uid)
+    return render(request, 'web/update_profile.html', {
+        'phone': profile.phone,
+        'displayname': profile.displayname,
+        'trainee_type': profile.get_trainee_type_display,
+        'trainee_type_data': profile.trainee_type,
+        'classname': profile.classname,
+    })
 
 @transaction.atomic
 def email_notify(request):

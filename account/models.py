@@ -21,7 +21,7 @@ class Profile(CreateUpdateMixin):
         (WX_USER, u'微信授权用户'),
         (GUEST_USER, u'游客用户'),
         (NORMAL_USER, u'普通用户'),
-        (COMPANY_USER, u'机构用户'),
+        (COMPANY_USER, u'管理员'),
     )
 
     MALE = 1
@@ -79,6 +79,8 @@ class Profile(CreateUpdateMixin):
     location = models.CharField(_(u'地址'), max_length=60, blank=True, null=True, help_text=u'用户地址')
 
     trainee_type = models.IntegerField(_(u'学员身份'), choices=TRAINEETYPE, default=PRACTICE, help_text=u'学员身份')
+    trainee_code = models.CharField(_(u'学员号码'), max_length=20, blank=True, null=True, help_text=u'学员号码')
+    classname = models.CharField(_(u'班级名称'), max_length=100, blank=True, null=True, help_text=u'班级名称')
 
     # 会员相关
     is_upgrade = models.IntegerField(_(u'是否升级会员'), default=0, help_text=u'是否升级会员')
@@ -105,7 +107,9 @@ class Profile(CreateUpdateMixin):
             'numid': self.numid,
             'name': self.name or '',
             'displayname': self.displayname or self.name,
+            'classname': self.classname,
             'trainee_type': self.trainee_type,
+            'trainee_code': self.trainee_code,
             'avatar': self.avatar or '',
         }
 
