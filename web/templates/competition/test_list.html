@@ -1,0 +1,22 @@
+{% extends '../base.html' %}
+{% block title %}比赛列表{% endblock %}
+{% block content %}
+<div class="container">
+  <div class="row">
+      {% for kind in kinds %}
+      <div class="col-md-4 col-sm-12">
+        <div class="list-group">
+          <a class="btn btn-primary" href="{% url 'bs:index' %}?uid={{ request.session.uid }}&kind_id={{kind.kind_id}}" style="margin: 10px;">
+            <div class="d-flex w-100 justify-content-between">
+              <h5 class="mb-1">{{ kind.sponsor_name }} “{{ kind.kind_name }}”</h5>
+              <small>{{ kind.total_partin_num }}位医生完成</small>
+            </div>
+            <p class="mb-1">点击去开始页</p>
+            <small>过期时间{{ kind.cop_finishat|date:"Y-m-d" }}</small>
+          </a>
+        </div>
+    </div>
+      {% endfor %}
+  </div>
+</div>
+{% endblock %}

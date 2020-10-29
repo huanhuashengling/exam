@@ -2,48 +2,20 @@
 {% block title %}个人测试历史{% endblock %}
 {% block content %}
 
-<div class="main-content container">
-        <div class="position toInWhere">
-            <b>当前位置：</b><span>测试历史</span>
-        </div>
-        <div class="row">
-            <div class="card text-center col-12">
-              <div class="card-header">
-                测试历史
-              </div>
-              <div class="card-body">
-                <table style="margin-top: 15px;" class="table table-hover">
-                    <tr>
-                        <th>编号</th>
-                        <th>所属科室</th>
-                        <th>测试名称</th>
-                        <th>题量</th>
-                        <th>正确</th>
-                        <th>错误</th>
-                        <th>得分</th>
-                        <th>耗时(秒)</th>
-                        <th>完成时间</th>
-                        <th>操作</th>
-                    </tr>
-                    {% for qa in qaData %}
-                    <tr>
-                        <td>{{forloop.counter}}</td>
-                        <td>{{qa.sponsor_name}}</td>
-                        <td>{{qa.kind_name}}</td>
-                        <td>{{qa.total_num}}</td>
-                        <td>{{qa.correct_num}}</td>
-                        <td>{{qa.incorrect_num}}</td>
-                        <td>{{qa.score}}</td>
-                        <td>{{qa.time}}</td>
-                        <td>{{qa.finished_time}}</td>
-                        <td><button class="btn btn-primary qa_item" value="{{qa.qa_id}}_{{qa.kind_id}}">查看答卷</button></td>
-                    </tr>
-                    {% endfor %}
-                </table>
-              </div>
-              
+<div class="container">
+    <div class="row">
+        {% for qa in qaData %}
+        <div class="col-md-4 col-sm-12">
+            <div class="card" style="margin: 10px;">
+                <div class="card-body">
+                    <p>编号：{{ forloop.counter }}</p>
+                    <h5 class="card-title">“{{ qa.kind_name }}” 得分{{ qa.score }}</h5>
+                      <p>您于{{ qa.finished_time }}完成的{{qa.sponsor_name}}“{{ qa.kind_name }}”，共{{ qa.total_num }}题，正确{{ qa.correct_num }}，错误{{ qa.incorrect_num }}，耗时{{ qa.time }}</p>
+                      <button class="btn btn-primary qa_item" value="{{qa.qa_id}}_{{qa.kind_id}}">查看答卷</button>
+                </div>
             </div>
         </div>
+        {% endfor %}
     </div>
 </div>
     <script>
@@ -56,29 +28,6 @@
                 // console.log(kind_id)
                 window.location.href = '/bs/qa_info_page?uid={{ request.session.uid }}&qa_id='+qa_id+'&kind_id='+kind_id;
             });
-
-            $.ajax({
-                url: '/api/myrank',
-                data: {
-                    uid: '{{ request.session.uid|safe }}',
-                    kind_id: '{{ kind_info.kind_id|safe }}'
-                },
-                dataType: 'json',
-                type: 'get',
-                success: function (res) {
-                    if(res.status === 200) {
-                        var rank  = res.data.rank;
-                        var timer = res.data.time / 1000 ;
-                        if (rank){
-                            var myResult = '<label><h4><b>我的排名:</b>&nbsp;&nbsp; 第<span class="rank" style="color:red">'+ rank + '</span>名</h4></label>'
-                                            + '<label><h4><b>我的用时:</b>&nbsp;&nbsp; <span class="timer" style="color:red">' + timer + '</span>秒</h4></label>'
-                        }else {
-                            var myResult = '<label><h4>您还没有参加比赛哦！<label><h4>'
-                        }
-                        $('#myResult').html(myResult)
-                    }
-                }
-            })
         })
     </script>
 {% endblock %}

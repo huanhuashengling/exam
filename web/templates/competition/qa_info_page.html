@@ -3,36 +3,34 @@
 {% load getindex %}
 {% block title %}答卷情况{% endblock %}
 {% block content %}
-    <div class="main-content container">
-        <div class="position toInWhere">
-            <b>当前位置：</b><span>
-                <a onclick="history.back(-1)">测试历史</a>
-            </span>&nbsp;&gt;&nbsp;<span>答卷情况</span>
-        </div>
-        <div class="inner-content" id="printContent">
+    <div class="container">
+      <div class="text-center">
+        <button class="btn btn-primary" onclick="history.back(-1)" style="margin: 10px;"> << 返回测试历史</button>
+      </div>
+        
           <div class="alert alert-primary" role="alert">
-            <p><small>[{{user.get_trainee_type_display }}] {{user_info.displayname }}医生，{{finished_time}} 参加”{{kind_info.kind_name}}“测试，答对{{qa_info.correct_num}}题，答错{{qa_info.incorrect_num}}题，得分{{qa_info.score}}分</small></p>
+            <p>[{{user.get_trainee_type_display }}] {{user_info.displayname }}医生，{{finished_time}} 参加”{{kind_info.kind_name}}“测试，答对{{qa_info.correct_num}}题，答错{{qa_info.incorrect_num}}题，得分{{qa_info.score}}分</p>
           </div>
             {% for qaItem in questionAnswerData %}
               {% if qaItem.questionPk in correctQuestionPks %}
-                <div class="card" style="font-size: 13px;">
+                <div class="card">
                   <div class="card-header"><span style="color: blue;">【正确】</span>{{ forloop.counter }}. {{qaItem.question}}(
                       {{selectLabel|getsplitindex:qaItem.answerInfo}}
                   )</div>
-                  <div class="card-body" style="padding-top: 5px; padding-bottom: 5px;">
+                  <div class="card-body">
                     {% for selectItem in qaItem.selectItems %}
-                      <p class="col" style="font-size: 12px; margin-bottom: 5px;">{{ selectLabel|getindex:forloop.counter0 }}. {{selectItem}}</p>
+                      <p class="col">{{ selectLabel|getindex:forloop.counter0 }}. {{selectItem}}</p>
                     {% endfor %}
                   </div>
                 </div>
               {% else %}
-                <div class="card" style="font-size: 13px;">
+                <div class="card">
                   <div class="card-header"><span style="color: red;">【错误】</span>{{ forloop.counter }}. {{qaItem.question}}(
                       {{selectLabel|getsplitindex:qaItem.answerInfo}}
                   )</div>
-                  <div class="card-body" style="padding-top: 5px; padding-bottom: 5px;">
+                  <div class="card-body">
                     {% for selectItem in qaItem.selectItems %}
-                      <p style="font-size: 12px; margin-bottom: 5px;">{{ selectLabel|getindex:forloop.counter0 }}. {{selectItem}}</p>
+                      <p>{{ selectLabel|getindex:forloop.counter0 }}. {{selectItem}}</p>
                     {% endfor %}
 
                   </div>
@@ -40,27 +38,4 @@
               {% endif %}
             {% endfor %}
     </div>
-    </div>
-<script type="text/javascript">
-      $(function(){
-          $("#print_btn").click(function(){
-            $("#printContent").printArea(); 
-          });
-      });
-      $('#goRank').click(function () {
-          window.location.href = '/bs/rank?uid={{ request.session.uid }}&kind_id={{ kind_info.kind_id }}';
-      });
-      $('#tryAgain').click(function () {
-          window.location.href = '/bs?uid={{ request.session.uid }}&kind_id={{ kind_info.kind_id }}';
-      });
-      $('#goHome').click(function () {
-          window.location.href = '/index{% if request.session.uid %}?uid={{ request.session.uid }}{% else %}{% endif %}';
-      });
-      $('#goBack').click(function () {
-          window.location.href = '/index{% if request.session.uid %}?uid={{ request.session.uid }}{% else %}{% endif %}';
-      });
-      $('#goQaInfoPage').click(function () {
-          window.location.href = '/bs/qa_info_page?uid={{ request.session.uid }}&qa_id={{ qa_info.qa_id }}';
-      })
-    </script>
 {% endblock %}

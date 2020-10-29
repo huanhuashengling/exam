@@ -136,6 +136,58 @@ def games(request, s):
     })
 
 @check_login
+def test_list(request, s='hot'):
+    uid = request.GET.get('uid', '')  # 获取uid
+    
+    if s == 'hot':
+        # 筛选条件: 完成时间大于当前时间;根据参与人数降序排序;根据创建时间降序排序;筛选10个
+        kinds = CompetitionKindInfo.objects.filter(
+            cop_finishat__gt=datetime.datetime.now(tz=datetime.timezone.utc),
+        ).order_by('-total_partin_num').order_by('-created_at')[:10]
+
+    elif s == 'infection':
+        kinds = CompetitionKindInfo.objects.filter(
+            kind_type=CompetitionKindInfo.INFECTION,
+            cop_finishat__gt=datetime.datetime.now(tz=datetime.timezone.utc)
+        ).order_by('-total_partin_num').order_by('-created_at')
+
+    elif s == 'internal':
+        kinds = CompetitionKindInfo.objects.filter(
+            kind_type=CompetitionKindInfo.INTERNAL,
+            cop_finishat__gt=datetime.datetime.now(tz=datetime.timezone.utc)
+        ).order_by('-total_partin_num').order_by('-created_at')
+
+    elif s == 'surgical':
+        kinds = CompetitionKindInfo.objects.filter(
+            kind_type=CompetitionKindInfo.SURGICAL,
+            cop_finishat__gt=datetime.datetime.now(tz=datetime.timezone.utc)
+        ).order_by('-total_partin_num').order_by('-created_at')
+
+    elif s == 'gynecology':
+        kinds = CompetitionKindInfo.objects.filter(
+            kind_type=CompetitionKindInfo.GYNECOLOGY,
+            cop_finishat__gt=datetime.datetime.now(tz=datetime.timezone.utc)
+        ).order_by('-total_partin_num').order_by('-created_at')
+
+    elif s == 'pediatric':
+        kinds = CompetitionKindInfo.objects.filter(
+            kind_type=CompetitionKindInfo.PEDIATRIC,
+            cop_finishat__gt=datetime.datetime.now(tz=datetime.timezone.utc)
+        ).order_by('-total_partin_num').order_by('-created_at')
+
+    elif s == 'general':
+        kinds = CompetitionKindInfo.objects.filter(
+            kind_type=CompetitionKindInfo.INTERVIEW,
+            cop_finishat__gt=datetime.datetime.now(tz=datetime.timezone.utc)
+        ).order_by('-total_partin_num').order_by('-created_at')
+
+    else:
+        kinds = None
+    return render(request, 'competition/test_list.html', {
+        'kinds': kinds,
+    })
+
+@check_login
 @check_copstatus
 def game(request):
     """
@@ -302,6 +354,13 @@ def rank(request):
         try:
             kind_info = CompetitionKindInfo.objects.get(kind_id=qainfo.data["kind_id"])
 
+            tTime = int(round(qainfo.detail["time"]))
+            
+            if tTime < 60:
+                tTime = str(tTime) + "s"
+            else:
+                tTime = str(int(tTime / 60)) + "min"
+                
             qaData.append({"kind_name" : kind_info.data["kind_name"], 
                 "kind_id": kind_info.data["kind_id"], 
                 "qa_id": qainfo.data["qa_id"], 
@@ -310,7 +369,7 @@ def rank(request):
                 "correct_num": qainfo.detail["correct_num"],
                 "incorrect_num": qainfo.detail["incorrect_num"],
                 "score": qainfo.detail["score"],
-                "time": qainfo.detail["time"],
+                "time": tTime,
                 "finished_time": finished_time,
                 })
         except CompetitionKindInfo.DoesNotExist:

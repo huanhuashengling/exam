@@ -88,7 +88,7 @@
                 dataType: 'json',
                 success: function(res){
                     if (res.status === 200){
-                        window.location.href = '/index';
+                        window.location.href = '/bs/test_list';
                     } else if(res.status === 300001) {
                         refreshVcode();
                         alert('用户名错误');
