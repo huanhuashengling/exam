@@ -1,4 +1,4 @@
-{% extends '../base.html' %}
+{% extends '../base1.html' %}
 {% block title %}用户列表{% endblock %}
 {% block content %}
     <div class="container">
@@ -90,16 +90,6 @@
 </div>
 {% endblock %}
   {% block js %} 
-      <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-table/1.18.0/bootstrap-table.min.css">
-      <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-table/1.18.0/bootstrap-table.min.js"></script>
-      <script src="https://cdn.bootcdn.net/ajax/libs/bootstrap-table/1.11.0/extensions/export/bootstrap-table-export.min.js"></script>
-      <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-table/1.18.0/locale/bootstrap-table-zh-CN.min.js" integrity="sha512-YUh+lvGu6Gg2huZGXtOT0HsXVI/KlKHcAnymMW1IsajD87dIxRDQGHh9dv5VfzPil/3tnvnWSea+0xlVCkouLg==" crossorigin="anonymous"></script>
-      <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/js/all.min.js"></script>
-    <!--在客户端保存生成的导出文件-->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.2/FileSaver.min.js"></script>
-    <!--以XLSX（Excel 2007+ XML格式）格式导出表（SheetJS）-->
-    <script src="https://cdn.bootcdn.net/ajax/libs/xlsx/0.10.0/xlsx.core.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/TableExport/5.2.0/js/tableexport.min.js"></script>
 <script type="text/javascript">
     $(document).ready(function () {
         $.ajaxSetup({

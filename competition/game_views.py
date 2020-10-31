@@ -283,7 +283,7 @@ def games(request, s):
 def qa_history_data(request):
     qaData = []
     try:
-        qaInfos = CompetitionQAInfo.objects.filter(finished = 1)
+        qaInfos = CompetitionQAInfo.objects.filter(finished = 1).order_by('-finished_stamp')
     except CompetitionQAInfo.DoesNotExist:
         return render(request, 'err.html', CompetitionNotFound)
 

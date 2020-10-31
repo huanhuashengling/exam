@@ -1,0 +1,126 @@
+{% load staticfiles %}
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+      <meta charset="utf-8">
+      <meta http-equiv="X-UA-Compatible" content="IE=edge">
+      <meta name="viewport" content="width=device-width, initial-scale=1">
+      <title>{% block title %}{% endblock %}</title>
+      <link rel="stylesheet" type="text/css" href="{% static 'css/bootstrap.min.css' %}">
+      <link rel="stylesheet" type="text/css" href="{% static 'css/bootstrap-table.min.css' %}">
+      <script src="{% static '/js/jquery.min.js' %}"></script>
+      <script src="{% static '/js/popper.min.js' %}"></script>
+      <script src="{% static '/js/bootstrap.min.js' %}"></script>
+      <script src="{% static '/js/base64.min.js' %}"></script>
+
+      <script src="{% static '/js/bootstrap-table.min.js' %}"></script>
+      <script src="{% static '/js/bootstrap-table-export.min.js' %}"></script>
+      <script src="{% static '/js/locale/bootstrap-table-zh-CN.min.js' %}"></script>
+      <script src="{% static '/js/all.min.js' %}"></script>
+      <script src="{% static '/js/FileSaver.min.js' %}"></script>
+      <script src="{% static '/js/xlsx.core.min.js' %}"></script>
+      <script src="{% static '/js/tableexport.min.js' %}"></script>
+
+    <style>
+      html {
+        position: relative;
+        min-height: 100%;
+        padding-bottom:90px;
+      }
+      body {
+        margin-bottom: 90px;
+      }
+      footer {
+        position: absolute;
+        bottom: 0;
+        width: 100%;
+        background-color: #3b4045;
+        /*height: 60px;*/
+        padding-top: 10px;
+      }
+      footer a:visited {
+          color: #fff !important;
+      }
+
+      footer a:hover, footer a:active {
+          color: #fff !important;
+      }
+
+      footer a {
+          color: #fff !important;
+      }
+    </style>
+  </head>
+  <body>
+  <main role="main">
+    <!-- <p>{{request.session.usertype}}</p>
+    <p>{{request.session.uid}}</p> -->
+    <nav class="navbar navbar-expand-md navbar-light bg-light">
+      <div class="container">
+        <a class="navbar-brand" href="#">知识树—医知题测</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarsExample07" aria-controls="navbarsExample07" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="navbarsExample07">
+          <ul class="navbar-nav mr-auto">
+
+            {% if 33 == request.session.usertype %}
+              <li class="nav-item active">
+                <a class="nav-link" href="/index{% if request.session.uid %}?uid={{ request.session.uid }}{% else %}{% endif %}">首页<span class="sr-only">(current)</span></a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="/bs/set_bank_index{% if request.session.uid %}?uid={{ request.session.uid }}{% else %}{% endif %}">题库管理</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="/bs/set_game_index{% if request.session.uid %}?uid={{ request.session.uid }}{% else %}{% endif %}">测试管理</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="/bs/qa_history{% if request.session.uid %}?uid={{ request.session.uid }}{% else %}{% endif %}" tabindex="-1">测试历史</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="/normal_user_list{% if request.session.uid %}?uid={{ request.session.uid }}{% else %}{% endif %}" tabindex="-1">用户管理</a>
+              </li>
+              <!-- <li class="nav-item">
+                <a class="nav-link" href="/biz{% if request.session.uid %}?uid={{ request.session.uid }}{% else %}{% endif %}" tabindex="-1">测试历史</a>
+              </li> -->
+            {% elif 22 == request.session.usertype  %}
+              <li class="nav-item active">
+                <a class="nav-link" href="/bs/test_list{% if request.session.uid %}?uid={{ request.session.uid }}{% else %}{% endif %}">选择测试<span class="sr-only">(current)</span></a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="/bs/rank{% if request.session.uid %}?uid={{ request.session.uid }}{% else %}{% endif %}">测试历史</a>
+              </li>
+              <!-- <li class="nav-item">
+                <a class="nav-link" href="/biz{% if request.session.uid %}?uid={{ request.session.uid }}{% else %}{% endif %}" tabindex="-1">个人数据</a>
+              </li> -->
+            {% endif %}
+            {% if request.session.uid %}
+            <li class="nav-item dropdown" class="my-2 my-lg-0">
+              <a class="nav-link dropdown-toggle" href="javascript:void(0);" id="dropdown07" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">{% if request.session.uid %}{{ request.session.displayname }}医生{% else %}登录{% endif %}</a>
+              <div class="dropdown-menu" aria-labelledby="dropdown07">
+                  <a class="dropdown-item" href="/reset_password{% if request.session.uid %}?uid={{ request.session.uid }}{% else %}{% endif %}">修改密码</a>
+                  <a class="dropdown-item" href="/update_profile{% if request.session.uid %}?uid={{ request.session.uid }}{% else %}{% endif %}">修改个人信息</a>
+                  <a class="dropdown-item" href="/logout">退出</a>
+              </div>
+            </li>
+            {% endif %}
+          </ul>
+        </div>
+      </div>
+    </nav>
+
+    {% block content %} {% endblock %}
+  </main> 
+
+    <footer class="mt-auto">
+      <div class="container">
+        <p class="text-center" style="color: #fff; "><small>© 2020-2025 KnowledgeTree, Inc.  | <a href="http://beian.miit.gov.cn/" target="_blank">湘ICP备2020020647号-1</a></small></p>
+      </div>
+    </footer>
+
+  {% block js %} {% endblock %}
+  </body>
+</html>
+
+

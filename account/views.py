@@ -41,7 +41,7 @@ def normal_user_list_data(request):
 
     userData = []
     try:
-        users = User.objects.all()
+        users = User.objects.all().order_by("-date_joined")
 
         for user in users:
             profile = Profile.objects.filter().get(name=user.username)

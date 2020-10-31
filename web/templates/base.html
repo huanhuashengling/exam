@@ -8,29 +8,46 @@
       <title>{% block title %}{% endblock %}</title>
       <link rel="stylesheet" type="text/css" href="{% static 'css/bootstrap.min.css' %}">
       <script src="{% static '/js/jquery.min.js' %}"></script>
-      <!-- <script src="{% static '/js/jquery.PrintArea.js' %}"></script> -->
       <script src="{% static '/js/popper.min.js' %}"></script>
-      
-      <!--bootstrap核心js-->
       <script src="{% static '/js/bootstrap.min.js' %}"></script>
       <script src="{% static '/js/base64.min.js' %}"></script>
+    <style>
+      html {
+        position: relative;
+        min-height: 100%;
+        padding-bottom:90px;
+      }
+      body {
+        margin-bottom: 90px;
+      }
+      footer {
+        position: absolute;
+        bottom: 0;
+        width: 100%;
+        background-color: #3b4045;
+        /*height: 60px;*/
+        padding-top: 10px;
+      }
+      footer a:visited {
+          color: #fff !important;
+      }
 
-      <style>
-        .cate {
-            padding-bottom: 20px;
-        }
-        .modal-dialog {
-            padding-top : 200px;
-        }
+      footer a:hover, footer a:active {
+          color: #fff !important;
+      }
+
+      footer a {
+          color: #fff !important;
+      }
     </style>
   </head>
   <body>
-  <div class="main-container">
+  <main role="main">
     <!-- <p>{{request.session.usertype}}</p>
     <p>{{request.session.uid}}</p> -->
-    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <nav class="navbar navbar-expand-md navbar-light bg-light">
       <div class="container">
-        <a class="navbar-brand" href="#">医知题测</a>
+        <a class="navbar-brand" href="#">知识树—医知题测</a>
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarsExample07" aria-controls="navbarsExample07" aria-expanded="false" aria-label="Toggle navigation">
           <span class="navbar-toggler-icon"></span>
         </button>
@@ -83,54 +100,17 @@
       </div>
     </nav>
 
-    <div class="top-container col-md-12" >
-
-    </div>
-
     {% block content %} {% endblock %}
-    <!-- <nav class="navbar fixed-bottom navbar-expand-sm navbar-dark bg-dark" style="margin-top: 20px"> -->
-      <!-- <a class="navbar-brand" href="#" style="font-size: 16px;"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24"><path fill-rule="evenodd" d="M1.75 3A1.75 1.75 0 000 4.75v14c0 .966.784 1.75 1.75 1.75h20.5A1.75 1.75 0 0024 18.75v-14A1.75 1.75 0 0022.25 3H1.75zM1.5 4.75a.25.25 0 01.25-.25h20.5a.25.25 0 01.25.25v.852l-10.36 7a.25.25 0 01-.28 0l-10.36-7V4.75zm0 2.662V18.75c0 .138.112.25.25.25h20.5a.25.25 0 00.25-.25V7.412l-9.52 6.433c-.592.4-1.368.4-1.96 0L1.5 7.412z"></path></svg>&nbsp; &nbsp; shengling_2005@163.com</a> -->
-    <!-- </nav> -->
-  </div>
+  </main> 
+
+    <footer class="mt-auto">
+      <div class="container">
+        <p class="text-center" style="color: #fff; margin-bottom: 5px;"><small>© 2020-2025 KnowledgeTree, Inc.</small></p>
+        <p class="text-center" style="color: #fff; margin-top: 5px;"><small><a href="http://beian.miit.gov.cn/" target="_blank">湘ICP备2020020647号-1</a></small></p>
+      </div>
+    </footer>
+
   {% block js %} {% endblock %}
-
-  <script type="text/javascript">
-      function getCookie(c_name)
-      {
-          if (document.cookie.length>0)
-          {
-              c_start=document.cookie.indexOf(c_name + "=");
-              if (c_start!==-1)
-              {
-                  c_start=c_start + c_name.length+1;
-                  c_end=document.cookie.indexOf(";",c_start);
-                  if (c_end===-1) c_end=document.cookie.length;
-                  return unescape(document.cookie.substring(c_start,c_end))
-              }
-          }
-          return ""
-      }
-
-      function setCookie(c_name,value,expiredays)
-      {
-          var exdate=new Date();
-          exdate.setDate(exdate.getDate()+expiredays);
-          document.cookie=c_name+ "=" +escape(value)+
-              ((expiredays==null) ? "" : "; expires="+exdate.toGMTString())
-      }
-
-      function checkEmail(email) {
-          return email.match('^\\w+([-+.]\\w+)*@\\w+([-.]\\w+)*\\.\\w+([-.]\\w+)*$')
-      }
-
-      function checkPassword(password) {
-          return password.match('^\\w{6,18}$');
-      }
-
-      $('#home').click(function () {
-          window.location.href = '/index{% if request.session.uid %}?uid={{ request.session.uid }}{% else %}{% endif %}';
-      })
-  </script>
   </body>
 </html>
 
