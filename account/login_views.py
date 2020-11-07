@@ -126,7 +126,10 @@ def normal_login(request):
         set_profile(profile.data)  # 将用户信息保存到redis，查用户信息从redis中查询
     else:
         return json_response(*UserError.PasswordError)  # 校验失败，返回错误码300002
-    return json_response(200, 'OK', {  # 返回JSON格式数据
+    recode = 200
+    if 33 == profile.user_src:
+        recode = 300
+    return json_response(recode, 'OK', {  # 返回JSON格式数据
         'user_info': profile.data,
         'has_login': bool(profile),
     })
