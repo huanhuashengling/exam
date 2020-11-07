@@ -5,10 +5,8 @@
 <div class="container">
         <div class="row">
             <div id="toolbar">
-                <button class="btn btn-success" id="export-history-btn">导出测试情况</button>
-                <input type="hidden" id="user-src" value="{{user_src}}">
             </div>
-            <table id="test-history-list" class="table table-condensed table-responsive">
+            <table id="list-bank" class="table table-condensed table-responsive">
                 <thead>
                     <tr>
                         <th data-field="" checkbox="true">
@@ -18,31 +16,13 @@
                             序号
                         </th>
                         <th data-field="sponsor_name" data-sortable="true">
-                            科室
+                            题干
                         </th>
                         <th data-field="name" data-sortable="true">
-                            学员姓名
+                            选项
                         </th>
                         <th data-field="trainee_type" data-sortable="true">
-                            学员类型
-                        </th>
-                        <th data-field="kind_name" data-sortable="true">
-                            测试名称
-                        </th>
-                        <th data-field="total_num" data-sortable="true">
-                            题量
-                        </th>
-                        <th data-field="correct_num" data-sortable="true">
-                            对
-                        </th>
-                        <th data-field="incorrect_num" data-sortable="true">
-                            错
-                        </th>
-                        <th data-field="score" data-sortable="true">
-                            得分
-                        </th>
-                        <th data-field="time" data-sortable="true">
-                            耗时
+                            答案
                         </th>
                         <th data-field="finished_time" data-sortable="true">
                             完成时间

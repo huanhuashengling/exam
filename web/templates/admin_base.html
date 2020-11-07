@@ -65,7 +65,7 @@
         <div class="collapse navbar-collapse" id="navbarsExample07">
           <ul class="navbar-nav mr-auto">
 
-            {% if 33 == request.session.usertype %}
+            {% if request.session.uid %}
               <li class="nav-item active">
                 <a class="nav-link" href="/index{% if request.session.uid %}?uid={{ request.session.uid }}{% else %}{% endif %}">首页<span class="sr-only">(current)</span></a>
               </li>
@@ -84,23 +84,11 @@
               <!-- <li class="nav-item">
                 <a class="nav-link" href="/biz{% if request.session.uid %}?uid={{ request.session.uid }}{% else %}{% endif %}" tabindex="-1">测试历史</a>
               </li> -->
-            {% elif 22 == request.session.usertype  %}
-              <li class="nav-item active">
-                <a class="nav-link" href="/bs/test_list{% if request.session.uid %}?uid={{ request.session.uid }}{% else %}{% endif %}">选择测试<span class="sr-only">(current)</span></a>
-              </li>
-              <li class="nav-item">
-                <a class="nav-link" href="/bs/rank{% if request.session.uid %}?uid={{ request.session.uid }}{% else %}{% endif %}">测试历史</a>
-              </li>
-              <!-- <li class="nav-item">
-                <a class="nav-link" href="/biz{% if request.session.uid %}?uid={{ request.session.uid }}{% else %}{% endif %}" tabindex="-1">个人数据</a>
-              </li> -->
-            {% endif %}
-            {% if request.session.uid %}
             <li class="nav-item dropdown" class="my-2 my-lg-0">
               <a class="nav-link dropdown-toggle" href="javascript:void(0);" id="dropdown07" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">{% if request.session.uid %}{{ request.session.displayname }}医生{% else %}登录{% endif %}</a>
               <div class="dropdown-menu" aria-labelledby="dropdown07">
-                  <a class="dropdown-item" href="/reset_password{% if request.session.uid %}?uid={{ request.session.uid }}{% else %}{% endif %}">修改密码</a>
-                  <a class="dropdown-item" href="/update_profile{% if request.session.uid %}?uid={{ request.session.uid }}{% else %}{% endif %}">修改个人信息</a>
+                  <!-- <a class="dropdown-item" href="/change_password{% if request.session.uid %}?uid={{ request.session.uid }}{% else %}{% endif %}">修改密码</a>
+                  <a class="dropdown-item" href="/update_profile{% if request.session.uid %}?uid={{ request.session.uid }}{% else %}{% endif %}">修改个人信息</a> -->
                   <a class="dropdown-item" href="/logout">退出</a>
               </div>
             </li>

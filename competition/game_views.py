@@ -236,37 +236,37 @@ def games(request, s):
 
     elif s == 'tech':
         kinds = CompetitionKindInfo.objects.filter(
-            kind_type=CompetitionKindInfo.INFECTION,
+            sponsor_name=CompetitionKindInfo.INFECTION,
             cop_finishat__gt=datetime.datetime.now(tz=datetime.timezone.utc)
         ).order_by('-total_partin_num').order_by('-created_at')
 
     elif s == 'edu':
         kinds = CompetitionKindInfo.objects.filter(
-            kind_type=CompetitionKindInfo.EDUCATION,
+            sponsor_name=CompetitionKindInfo.EDUCATION,
             cop_finishat__gt=datetime.datetime.now(tz=datetime.timezone.utc)
         ).order_by('-total_partin_num').order_by('-created_at')
 
     elif s == 'culture':
         kinds = CompetitionKindInfo.objects.filter(
-            kind_type=CompetitionKindInfo.CULTURE,
+            sponsor_name=CompetitionKindInfo.CULTURE,
             cop_finishat__gt=datetime.datetime.now(tz=datetime.timezone.utc)
         ).order_by('-total_partin_num').order_by('-created_at')
 
     elif s == 'sport':
         kinds = CompetitionKindInfo.objects.filter(
-            kind_type=CompetitionKindInfo.SPORT,
+            sponsor_name=CompetitionKindInfo.SPORT,
             cop_finishat__gt=datetime.datetime.now(tz=datetime.timezone.utc)
         ).order_by('-total_partin_num').order_by('-created_at')
 
     elif s == 'general':
         kinds = CompetitionKindInfo.objects.filter(
-            kind_type=CompetitionKindInfo.GENERAL,
+            sponsor_name=CompetitionKindInfo.GENERAL,
             cop_finishat__gt=datetime.datetime.now(tz=datetime.timezone.utc)
         ).order_by('-total_partin_num').order_by('-created_at')
 
     elif s == 'interview':
         kinds = CompetitionKindInfo.objects.filter(
-            kind_type=CompetitionKindInfo.INTERVIEW,
+            sponsor_name=CompetitionKindInfo.INTERVIEW,
             cop_finishat__gt=datetime.datetime.now(tz=datetime.timezone.utc)
         ).order_by('-total_partin_num').order_by('-created_at')
 

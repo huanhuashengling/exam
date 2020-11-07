@@ -8,7 +8,7 @@
         <div class="list-group">
           <a class="btn btn-primary" href="{% url 'bs:index' %}?uid={{ request.session.uid }}&kind_id={{kind.kind_id}}" style="margin: 10px;">
             <div class="d-flex w-100 justify-content-between">
-              <h5 class="mb-1">{{ kind.sponsor_name }} “{{ kind.kind_name }}”</h5>
+              <h5 class="mb-1">{{ kind.get_sponsor_name_display }} “{{ kind.kind_name }}”</h5>
               <small>{{ kind.total_partin_num }}位医生完成</small>
             </div>
             <p class="mb-1">点击去开始页</p>

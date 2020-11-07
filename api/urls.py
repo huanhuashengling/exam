@@ -14,7 +14,7 @@ urlpatterns = [
     path('login_vcode', login_views.login_vcode, name='login_vcode'),
     path('signup_normal', login_views.signup, name='normal_signup'),
     path('sendmail', login_views.sendmail, name='sendmail'),
-    path('resetpasswd', login_views.reset_password, name='resetpasswd'),
+    path('changepasswd', login_views.change_password, name='changepasswd'),
     path('updateprofile', login_views.update_profile, name='updateprofile'),
 ]
 
@@ -25,13 +25,16 @@ urlpatterns += [
     path('entry', game_views.userinfo_entry, name='userinfo_entry'),
     # re_path('games/s/(\w+)', game_views.games, name='query_games'),
     path('qa_history_data', game_views.qa_history_data, name='qa_history_data'),
+
 ]
 
 # set
 urlpatterns += [
-    re_path('banks/s/(\d+)', set_views.banks, name='query_banks'),
+    re_path('query_banks', set_views.banks, name='query_banks'),
     re_path('banks/detail/(?P<bank_id>\w+)', set_views.bank_detail, name='bank_detail'),
     path('banks/set', set_views.set_bank, name='set_bank'),
+    path('game_list_data', set_views.game_list_data, name='game_list_data'),
+    path('update_competition_kind_info', set_views.update_competition_kind_info, name='update_competition_kind_info'),
 ]
 
 # rank

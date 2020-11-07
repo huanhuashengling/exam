@@ -100,3 +100,18 @@ def deactive_normal_user(request):
     return json_response(200, 'OK', {
         'username': activeUsername,
     })
+
+def reset_password(request):
+    resetUserId = request.POST.get('resetUserId', '')  
+    resetUsername = request.POST.get('resetUsername', '')
+    try:
+        user = User.objects.get(username=resetUsername)  # 获取用户
+    except User.DoesNotExist:
+        user = None
+
+    if user is not None:  # 校验成功，获得返回用户信息
+        user.set_password("123456")
+        user.save()
+        return json_response(200, 'OK', {})
+    else:
+        return json_response(*UserError.PasswordError)

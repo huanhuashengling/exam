@@ -31,7 +31,9 @@ def web_index(request):
         #     'login_info': settings.WXWEB_LOGIN_PARAMS or {},
         #     'has_login': False
         # })
-
+    if 33 != profile.user_src:
+        return redirect("/bs/test_list")
+    
     return render(request, 'web/index.html', {
         'user_info': profile and profile.data,
         'upgrade_info': profile and profile.upgrade_data,
@@ -135,10 +137,10 @@ def signup_redirect(request):
         'sign': sign
     })
 
-def reset_password(request):
+def change_password(request):
     uid = request.GET.get('uid', '')
     profile = Profile.objects.get(uid=uid)
-    return render(request, 'web/reset_password.html', {
+    return render(request, 'web/change_password.html', {
         'phone': profile.phone
     })
 

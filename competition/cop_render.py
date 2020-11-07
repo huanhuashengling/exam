@@ -32,12 +32,6 @@ from django.conf import settings
 
 @check_login
 def home(request):
-    """
-    比赛首页首页视图
-    :param request: 请求对象
-    :return: 渲染视图: user_info: 用户信息; kind_info: 比赛信息;is_show_userinfo: 是否展示用户信息表单;user_info_has_entered: 是否已经录入表单;
-             userinfo_fields: 表单字段;option_fields: 表单字段中呈现为下拉框的字段;
-    """
     uid = request.GET.get('uid', '')  # 获取uid
     kind_id = request.GET.get('kind_id', '')  # 获取kind_id
     created = request.GET.get('created', '0')  # 获取标志位，以后会用到
@@ -45,6 +39,7 @@ def home(request):
         kind_info = CompetitionKindInfo.objects.get(kind_id=kind_id)
     except CompetitionKindInfo.DoesNotExist:  # 不存在渲染错误视图
         return render(request, 'err.html', CompetitionNotFound)
+
     try:  # 获取题库数据
         bank_info = BankInfo.objects.get(bank_id=kind_info.bank_id)
     except BankInfo.DoesNotExist:  # 不存在渲染错误视图
@@ -95,37 +90,37 @@ def games(request, s):
 
     elif s == 'infection':
         kinds = CompetitionKindInfo.objects.filter(
-            kind_type=CompetitionKindInfo.INFECTION,
+            sponsor_name=CompetitionKindInfo.INFECTION,
             cop_finishat__gt=datetime.datetime.now(tz=datetime.timezone.utc)
         ).order_by('-total_partin_num').order_by('-created_at')
 
     elif s == 'internal':
         kinds = CompetitionKindInfo.objects.filter(
-            kind_type=CompetitionKindInfo.INTERNAL,
+            sponsor_name=CompetitionKindInfo.INTERNAL,
             cop_finishat__gt=datetime.datetime.now(tz=datetime.timezone.utc)
         ).order_by('-total_partin_num').order_by('-created_at')
 
     elif s == 'surgical':
         kinds = CompetitionKindInfo.objects.filter(
-            kind_type=CompetitionKindInfo.SURGICAL,
+            sponsor_name=CompetitionKindInfo.SURGICAL,
             cop_finishat__gt=datetime.datetime.now(tz=datetime.timezone.utc)
         ).order_by('-total_partin_num').order_by('-created_at')
 
     elif s == 'gynecology':
         kinds = CompetitionKindInfo.objects.filter(
-            kind_type=CompetitionKindInfo.GYNECOLOGY,
+            sponsor_name=CompetitionKindInfo.GYNECOLOGY,
             cop_finishat__gt=datetime.datetime.now(tz=datetime.timezone.utc)
         ).order_by('-total_partin_num').order_by('-created_at')
 
     elif s == 'pediatric':
         kinds = CompetitionKindInfo.objects.filter(
-            kind_type=CompetitionKindInfo.PEDIATRIC,
+            sponsor_name=CompetitionKindInfo.PEDIATRIC,
             cop_finishat__gt=datetime.datetime.now(tz=datetime.timezone.utc)
         ).order_by('-total_partin_num').order_by('-created_at')
 
     elif s == 'general':
         kinds = CompetitionKindInfo.objects.filter(
-            kind_type=CompetitionKindInfo.INTERVIEW,
+            sponsor_name=CompetitionKindInfo.INTERVIEW,
             cop_finishat__gt=datetime.datetime.now(tz=datetime.timezone.utc)
         ).order_by('-total_partin_num').order_by('-created_at')
 
@@ -147,37 +142,37 @@ def test_list(request, s='hot'):
 
     elif s == 'infection':
         kinds = CompetitionKindInfo.objects.filter(
-            kind_type=CompetitionKindInfo.INFECTION,
+            sponsor_name=CompetitionKindInfo.INFECTION,
             cop_finishat__gt=datetime.datetime.now(tz=datetime.timezone.utc)
         ).order_by('-total_partin_num').order_by('-created_at')
 
     elif s == 'internal':
         kinds = CompetitionKindInfo.objects.filter(
-            kind_type=CompetitionKindInfo.INTERNAL,
+            sponsor_name=CompetitionKindInfo.INTERNAL,
             cop_finishat__gt=datetime.datetime.now(tz=datetime.timezone.utc)
         ).order_by('-total_partin_num').order_by('-created_at')
 
     elif s == 'surgical':
         kinds = CompetitionKindInfo.objects.filter(
-            kind_type=CompetitionKindInfo.SURGICAL,
+            sponsor_name=CompetitionKindInfo.SURGICAL,
             cop_finishat__gt=datetime.datetime.now(tz=datetime.timezone.utc)
         ).order_by('-total_partin_num').order_by('-created_at')
 
     elif s == 'gynecology':
         kinds = CompetitionKindInfo.objects.filter(
-            kind_type=CompetitionKindInfo.GYNECOLOGY,
+            sponsor_name=CompetitionKindInfo.GYNECOLOGY,
             cop_finishat__gt=datetime.datetime.now(tz=datetime.timezone.utc)
         ).order_by('-total_partin_num').order_by('-created_at')
 
     elif s == 'pediatric':
         kinds = CompetitionKindInfo.objects.filter(
-            kind_type=CompetitionKindInfo.PEDIATRIC,
+            sponsor_name=CompetitionKindInfo.PEDIATRIC,
             cop_finishat__gt=datetime.datetime.now(tz=datetime.timezone.utc)
         ).order_by('-total_partin_num').order_by('-created_at')
 
     elif s == 'general':
         kinds = CompetitionKindInfo.objects.filter(
-            kind_type=CompetitionKindInfo.INTERVIEW,
+            sponsor_name=CompetitionKindInfo.INTERVIEW,
             cop_finishat__gt=datetime.datetime.now(tz=datetime.timezone.utc)
         ).order_by('-total_partin_num').order_by('-created_at')
 
@@ -326,6 +321,18 @@ def qa_history(request):
     user_src = profile.user_src
     return render(request, 'competition/history.html', {
         'user_src': user_src,
+    })
+
+@check_login
+def list_bank(request):
+    bank_id = request.GET.get('bank_id', '')
+    try:
+        BankInfo = BankInfo.objects.get(bank_id=bank_id)
+    except BankInfo.DoesNotExist:
+        return render(request, 'err.html', BankInfoNotFound)
+
+    return render(request, 'setbanks/bank_list.html', {
+        
     })
 
 @check_login

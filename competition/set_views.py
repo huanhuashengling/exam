@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-
+import datetime
 from django.db import transaction
 from django.views.decorators.csrf import csrf_exempt
 
@@ -13,16 +13,22 @@ from utils.errors import SetError, BizError, ProfileError
 from utils.decorators import check_login, logerr
 
 
-def banks(request, s):
-    if s == '999':
-        banks = BankInfo.objects.values_list('bank_name', 'bank_id', 'kind_num', 'choice_num', 'fillinblank_num').order_by('-kind_num')
-        return json_response(200, 'OK', {'banks': [{'bank_name': b[0], 'bank_id': b[1], 'kind_num': b[2], 'total_question_num': b[3] + b[4]} for b in banks]})
-    bank_types = [t[0] for t in BankInfo.BANK_TYPES]
-
-    if int(s) in bank_types:
-        banks = BankInfo.objects.filter(bank_type=s).values_list('bank_name', 'bank_id', 'kind_num', 'choice_num', 'fillinblank_num')
-        return json_response(200, 'OK', {'banks': [{'bank_name': b[0], 'bank_id': b[1], 'kind_num': b[2], 'total_question_num': b[3] + b[4]} for b in banks]})
-
+def banks(request):
+    banks = BankInfo.objects.order_by('-kind_num')
+    bankData = []
+    for bank in banks:
+        bankData.append({'bank_name': bank.bank_name, 
+                        'bank_id': bank.bank_id, 
+                        'bank_type': bank.get_bank_type_display(), 
+                        'kind_num': bank.kind_num, 
+                        'total_question_num': bank.total_question_num,
+                        'choice_num': bank.choice_num,
+                        'fillinblank_num': bank.fillinblank_num,
+                        'partin_num': bank.partin_num,
+                        })
+    # return json_response(200, 'OK', {'banks': [{'bank_name': b[0], 'bank_id': b[1], 'kind_num': b[2], 'total_question_num': b[3] + b[4]} for b in banks]})
+    return json_response(200, 'OK', {'banks': bankData})
+    
     return json_response(*SetError.BankTypeError)
 
 
@@ -34,7 +40,14 @@ def bank_detail(request, bank_id):
 
     return json_response(200, 'OK', {'bank_info': bank.data})
 
+def bank_detail(request, bank_id):
+    try:
+        bank = BankInfo.objects.get(bank_id=bank_id)
+    except BankInfo.DoesNotExist:
+        return json_response(*SetError.BankInfoNotFound)
 
+    return json_response(200, 'OK', {'bank_info': bank.data})
+    
 @logerr
 @csrf_exempt
 @check_login
@@ -55,7 +68,12 @@ def set_bank(request):
     form_data = request.POST.get('form_data', '')
     field_name_data = request.POST.get('field_name_data', '')
     option_data = request.POST.get('option_data', '')
-
+    # is_open = request.POST.get('is_open', True)
+    # print(request.POST.get('is_open'))
+    # print(type(request.POST.get('is_open')))
+    is_open = True if request.POST.get('is_open') == 'true' else False
+    # print(is_open)
+    # print(type(is_open))
     try:
         BusinessAccountInfo.objects.select_for_update().get(account_id=account_id)
     except BusinessAccountInfo.DoesNotExist:
@@ -103,6 +121,7 @@ def set_bank(request):
         'question_num': question_num,
         'cop_startat': cop_startat,
         'period_time': period or 0,
+        'is_open': is_open,
         'cop_finishat': cop_finishat
     }
     kind_info, kind_created = CompetitionKindInfo.objects.select_for_update().get_or_create(
@@ -119,6 +138,58 @@ def set_bank(request):
 
     set_pageconfig(app_config_info.data)
 
+    return json_response(200, 'OK', {})
+
+def game_list_data(request):
+    kindData = []
+    kinds = CompetitionKindInfo.objects.all()
+    for kind in kinds:
+        copStartat = kind.cop_startat.strftime("%Y/%m/%d")
+        copFinishat = kind.cop_finishat.strftime("%Y/%m/%d")
+        copFinishatValue = kind.cop_finishat.strftime("%Y-%m-%d")
+        isOpen = "否"
+        if kind.is_open:
+            isOpen = "是"
+        bank_info = BankInfo.objects.get(bank_id=kind.bank_id)
+        kindData.append({'sponsor_name': kind.get_sponsor_name_display(),
+                        'kind_name': kind.kind_name,
+                        'kind_id': kind.kind_id,
+                        'bank_name': bank_info.bank_name,
+                        'kind_type': kind.get_kind_type_display(),
+                        'total_score': kind.total_score,
+                        'question_num': kind.question_num,
+                        'cop_startat': copStartat,
+                        'period': kind.period_time,
+                        'cop_finishat': copFinishat,
+                        'copFinishatValue': copFinishatValue,
+                        'is_open': isOpen,
+                        'is_open_value': kind.is_open,
+                        'total_partin_num': kind.total_partin_num,
+                        })
+
     return json_response(200, 'OK', {
-        'kind_info': kind_info.data,
+        'data': kindData,
     })
+
+def update_competition_kind_info(request):
+    kind_id = request.POST.get('kind_id', '')
+    uid = request.POST.get('uid', '')
+    kind_name = request.POST.get('kind_name', '')
+    kind_type = request.POST.get('kind_type', '')
+    question_num = int(request.POST.get('question_num', 1))
+    total_score = int(request.POST.get('total_score', 100))
+    cop_finishat = request.POST.get('cop_finishat')
+    period = request.POST.get('period') or 0
+    is_open = True if request.POST.get('is_open') == 'true' else False
+
+    kind_info = CompetitionKindInfo.objects.get(kind_id=kind_id)
+    kind_info.kind_name = kind_name 
+    kind_info.kind_type = kind_type 
+    kind_info.total_score = total_score 
+    kind_info.question_num = question_num 
+    kind_info.cop_finishat = cop_finishat
+    kind_info.period_time = period
+    kind_info.is_open = is_open
+    kind_info.save()
+
+    return json_response(200, 'OK', {})

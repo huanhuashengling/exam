@@ -20,12 +20,14 @@ urlpatterns = [
     path('donate', cop_render.donate, name='donate'),
     path('exportpdf', cop_render.exportpdf, name='exportpdf'),
     path('test_list', cop_render.test_list, name='test_list'),
+    path('list-bank', cop_render.list_bank, name='list-bank'),
 ]
 
 # 配置比赛url
 urlpatterns += [
     path('set_bank_index', set_render.bank_index, name='set_bank_index'),
     path('set_game_index', set_render.game_index, name='set_game_index'),
+    path('get_bank_data', set_render.get_bank_data, name='get_bank_data'),
     path('set/bank', set_render.set_bank, name='set_bank'),
     path('set/bank/tdownload', set_render.template_download, name='template_download'),
     path('set/bank/upbank', set_render.upload_bank, name='upload_bank'),

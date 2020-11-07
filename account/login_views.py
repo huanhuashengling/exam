@@ -217,7 +217,7 @@ def sendmail(request):
 
 @csrf_exempt
 @transaction.atomic
-def reset_password(request):
+def change_password(request):
     phone = request.POST.get('phone', '')
     old_password = request.POST.get('old_password', '')
     new_password = request.POST.get('new_password', '')

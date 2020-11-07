@@ -16,7 +16,15 @@ class CompetitionKindInfo(CreateUpdateMixin):
     PEDIATRIC = 3 #儿科
     GYNECOLOGY = 4 #妇科
 
+    DAILY_PRACTICE = 0
+    OUT_TEST = 1
+
     KIND_TYPES = (
+        (DAILY_PRACTICE, u'日常练习'),
+        (OUT_TEST, u'出科测试'),
+    )
+
+    SPONSOR_NAMES = (
         (INFECTION, u'感染科'),
         (INTERNAL, u'内科'),
         (SURGICAL, u'外科'),
@@ -24,29 +32,31 @@ class CompetitionKindInfo(CreateUpdateMixin):
         (GYNECOLOGY, u'妇科'),
     )
 
-    kind_id = ShortUUIDField(_(u'比赛id'), max_length=32, blank=True, null=True, help_text=u'比赛类别唯一标识', db_index=True)
+    kind_id = ShortUUIDField(_(u'测试id'), max_length=32, blank=True, null=True, help_text=u'测试类别唯一标识', db_index=True)
     account_id = models.CharField(_(u'出题账户id'), max_length=32, blank=True, null=True, help_text=u'商家账户唯一标识', db_index=True)
     app_id = models.CharField(_(u'应用id'), max_length=32, blank=True, null=True, help_text=u'应用唯一标识', db_index=True)
     bank_id = models.CharField(_(u'题库id'), max_length=32, blank=True, null=True, help_text=u'题库唯一标识', db_index=True)
-    kind_type = models.IntegerField(_(u'比赛类型'), default=INFECTION, choices=KIND_TYPES, help_text=u'比赛类型')
-    kind_name = models.CharField(_(u'比赛名称'), max_length=32, blank=True, null=True, help_text=u'竞赛类别名称')
+    kind_type = models.IntegerField(_(u'测试类别'), default=DAILY_PRACTICE, choices=KIND_TYPES, help_text=u'测试类别')
+    kind_name = models.CharField(_(u'测试名称'), max_length=32, blank=True, null=True, help_text=u'测试名称')
 
-    sponsor_name = models.CharField(_(u'赞助商名称'), max_length=60, blank=True, null=True, help_text=u'赞助商名称')
+    sponsor_name = models.IntegerField(_(u'出题科室'), default=INFECTION, choices=SPONSOR_NAMES, help_text=u'出题科室')
 
     total_score = models.IntegerField(_(u'总分数'), default=0, help_text=u'总分数')
     question_num = models.IntegerField(_(u'题目个数'), default=0, help_text=u'出题数量')
 
     # 周期相关
-    cop_startat = models.DateTimeField(_(u'比赛开始时间'), default=timezone.now, help_text=_(u'比赛开始时间'))
+    cop_startat = models.DateTimeField(_(u'测试开始时间'), default=timezone.now, help_text=_(u'测试开始时间'))
     period_time = models.IntegerField(_(u'答题时间'), default=60, help_text=u'答题时间(min)')
-    cop_finishat = models.DateTimeField(_(u'比赛结束时间'), blank=True, null=True, help_text=_(u'比赛结束时间'))
+    cop_finishat = models.DateTimeField(_(u'测试结束时间'), blank=True, null=True, help_text=_(u'测试结束时间'))
 
     # 参与相关
     total_partin_num = models.IntegerField(_(u'total_partin_num'), default=0, help_text=u'总参与人数')
 
+    is_open = models.BooleanField(_(u'展示用户表单'), default=False, help_text=u'是否展示用户信息表单')
+
     class Meta:
-        verbose_name = _(u'比赛类别信息')
-        verbose_name_plural = _(u'比赛类别信息')
+        verbose_name = _(u'测试类别信息')
+        verbose_name_plural = _(u'测试类别信息')
 
     def __unicode__(self):
         return str(self.pk)
@@ -66,6 +76,7 @@ class CompetitionKindInfo(CreateUpdateMixin):
             'cop_finishat': self.cop_finishat,
             'period_time': self.period_time,
             'sponsor_name': self.sponsor_name,
+            'is_open': self.is_open,
         }
 
 
@@ -96,7 +107,7 @@ class BankInfo(CreateUpdateMixin):
     choice_num = models.IntegerField(_(u'选择题数'), default=0, help_text=u'选择题数')
     fillinblank_num = models.IntegerField(_(u'填空题数'), default=0, help_text=u'填空题数')
     bank_type = models.IntegerField(_(u'题库类型'), default=INFECTION, choices=BANK_TYPES, help_text=u'题库类型')
-    kind_num = models.IntegerField(_(u'比赛使用次数'), default=0, help_text=u'比赛使用次数')
+    kind_num = models.IntegerField(_(u'测试使用次数'), default=0, help_text=u'测试使用次数')
     partin_num = models.IntegerField(_(u'总答题人数'), default=0, help_text=u'总答题人数')
 
     class Meta:
@@ -267,7 +278,7 @@ class CompetitionQAInfo(CreateUpdateMixin):
     )
 
     status = models.IntegerField(_(u'答题状态'), choices=STATUS_CHOICES, default=0, help_text=u'答题状态')
-    kind_id = models.CharField(_(u'比赛id'), max_length=32, blank=True, null=True, help_text=u'比赛类别唯一标识', db_index=True)
+    kind_id = models.CharField(_(u'测试id'), max_length=32, blank=True, null=True, help_text=u'测试类别唯一标识', db_index=True)
     qa_id = ShortUUIDField(_(u'问题id'), max_length=32, blank=True, null=True, help_text=u'QA 唯一标识', db_index=True)
     uid = models.CharField(_(u'用户id'), max_length=32, blank=True, null=True, help_text=u'用户唯一标识', db_index=True)
 
@@ -293,8 +304,8 @@ class CompetitionQAInfo(CreateUpdateMixin):
     score = models.FloatField(_(u'得分'), default=0, help_text=u'分数')
 
     class Meta:
-        verbose_name = _(u'比赛问题记录')
-        verbose_name_plural = _(u'比赛问题记录')
+        verbose_name = _(u'测试问题记录')
+        verbose_name_plural = _(u'测试问题记录')
 
     def __unicode__(self):
         return str(self.pk)

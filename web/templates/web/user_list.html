@@ -1,4 +1,4 @@
-{% extends '../base1.html' %}
+{% extends '../admin_base.html' %}
 {% block title %}用户列表{% endblock %}
 {% block content %}
     <div class="container">
@@ -189,7 +189,8 @@
         return [
             "<button class='btn btn-primary btn-sm active_user_item'>激活</button> "+
             " <button class='btn btn-warning btn-sm deactive_user_item'>锁定</button>"+
-            " <button class='btn btn-info btn-sm update_classname_item'>修改用户信息</button>"
+            " <button class='btn btn-info btn-sm update_classname_item'>修改用户信息</button>"+
+            " <button class='btn btn-success btn-sm reset_password'>重置密码</button>"
         ].join('');
     }
 
@@ -254,6 +255,25 @@
              }
 
             $("#classnameModal").modal("show");
+        },
+        'click .reset_password': function(e, value, row, index) {
+            $.ajax({
+                url: "/reset_password",
+                data: {
+                    'resetUserId': row.uid,
+                    'resetUsername': row.username,
+                },
+                type: 'post',
+                dataType: 'json',
+                success: function (res) {
+                    if (res.status === 200) {
+                        alert("用户（" + row.username + '）密码重置为123456');
+                        window.location.href = "/normal_user_list";
+                    } else {
+                        alert("用户（" + row.username + '）锁定失败');
+                    }
+                }
+            });
         },
     }
 

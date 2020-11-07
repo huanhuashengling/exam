@@ -1,14 +1,137 @@
-{% extends 'base.html' %}
+{% extends 'admin_base.html' %}
 {% load staticfiles %}
 {% block title %}我要出题{% endblock %}
 {% block content %}
-<div class="main-content container">
-    <div class="inner-content">
-        <div class="jumbotron" >
-            <h1 style="color: orange; font-size: 40px; margin-left: 20px;">录制题库</h1><br />
-            <p style="font-size: 18px; margin-left: 20px;">您可以通过下载我们的电子模板，对其进行简单的编辑，然后再将您的模板上传到我们的服务器，就可以录制一套您自己的题库啦~</p><br />
-            <p><a class="btn btn-primary btn-lg" href="/bs/set/bank?uid={{ request.session.uid }}" role="button" style="margin-left: 20px;">开始录制</a></p>
+<div class="container">
+    <div class="alert alert-info" style="margin-top: 20px;">
+        <h5>导入题库</h5>
+        <form id="uploadFileForm" method="post" action="/bs/set/bank/upbank" enctype="multipart/form-data">{% csrf_token %}
+            <div class="row">
+            <div class="col-2">
+                <a id="tDownload" href="/bs/set/bank/tdownload?uid={{ user_info.uid }}" class="btn btn-success">下载题库模板</a>
+            </div>
+            <div class="col-2">
+                <input id="bankName" name="bank_name" type="text" class="form-control" placeholder="输入题库名称" />
+            </div>
+            <div class="col-3">
+                <select class="form-control">
+                    <option>选择科室</option>
+                    {% for t in bank_types %}
+                        {% if t.name == "感染科" %}
+                            <option selected onclick="choiceBankType(this)">{{ t.name }}</option>
+                        {% else %}
+                            <option onclick="choiceBankType(this)">{{ t.name }}</option>
+                        {% endif %}
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-3">
+                <input class="form-control" name="template" type="file" id="uploadFile">
+            </div>
+            <input type="hidden" name="uid" value="{{ user_info.uid }}" />
+
+            <div class="col-2">
+                <button type="submit" id="startUpload" class="btn btn-success">导入</button>
+            </div>
         </div>
+        </form>
     </div>
+    <div class="row" style="margin-top: 20px;">
+        <div id="toolbar">
+        </div>
+        <table id="bank-list" class="table table-condensed table-responsive">
+        <thead>
+        <tr>
+            <th data-field="" checkbox="true">
+
+            </th>
+            <th data-field="">
+                序号
+            </th>
+            <th data-field="bank_type" data-sortable="true">
+                科室
+            </th>
+            <th data-field="bank_name" data-sortable="true">
+                题库名称
+            </th>
+            <th data-field="total_question_num" data-sortable="true">
+                题目数量
+            </th>
+            <th data-field="choice_num" data-sortable="true">
+                选择题
+            </th>
+            <!-- <th data-field="fillinblank_num" data-sortable="true">
+                填空题
+            </th> -->
+            <th data-field="kind_num" data-sortable="true">
+                使用次数
+            </th>
+            <th data-field="partin_num" data-sortable="true">
+                答题人次
+            </th>
+            <th data-field="uid" data-formatter="actionCol" data-events="actionEvents">
+              操作
+            </th>
+        </tr>
+        </thead>
+        </table>
+    </div>
+
 </div>
+{% endblock %}
+
+{% block js %} 
+<script>
+$(document).ready(function () {
+    $.ajaxSetup({
+        data: {csrfmiddlewaretoken: '{{ csrf_token }}' },
+    });
+    $('#bank-list').bootstrapTable({
+        method: 'get', 
+        dataType: "json",
+        search: "true",
+        url: "/api/query_banks",
+        pagination:"true",
+        pageList: [10, 20, 50, 100], 
+        pageSize: 10,
+        pageNumber: 1,
+        toolbar:"#toolbar",
+        showExport: true,          //是否显示导出
+        showColumns: "true",           
+        exportDataType: "basic",              //basic', 'all', 'selected'.
+        queryParams: function(params) {
+            var temp = {
+                csrfmiddlewaretoken: '{{ csrf_token }}'
+            };
+            return temp;
+        },
+        // clickToSelect: true,
+        columns: [{  
+                    checkbox: true  
+                },{  
+                    title: '序号',
+                    formatter: function (value, row, index) {  
+                        return (index+1).toString();  
+                    }  
+                }],
+        responseHandler: function (res) {
+            // console.log(res.data.banks);
+            return res.data.banks;
+        },
+    });
+
+});
+
+    function actionCol(value, row, index) {
+        return [
+            "<button class='btn btn-primary btn-sm list-bank' disabled>查看题库内容</button> "
+        ].join('');
+    }
+
+    window.actionEvents = {
+        'click .list-bank': function(e, value, row, index) {
+            window.location.href = '/bs/list_bank?bank_id='+row.bank_id;
+        },
+    }
+</script>
 {% endblock %}

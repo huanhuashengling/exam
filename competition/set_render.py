@@ -49,7 +49,14 @@ def bank_index(request):
     except Profile.DoesNotExist:
         return render(request, 'err.html', ProfileNotFound)
 
-    return render(request, 'setbanks/index.html', {'user_info': profile.data})
+    bank_types = []
+    for i, j in BankInfo.BANK_TYPES:  # 返回所有题库类型
+        bank_types.append({'id': i, 'name': j})
+
+    return render(request, 'setbanks/index.html', {
+        'user_info': profile.data,
+        'bank_types': bank_types
+    })
 
 @check_login
 def set_bank(request):
@@ -71,6 +78,24 @@ def set_bank(request):
         'bank_types': bank_types
     })
 
+@check_login
+def get_bank_data(request):
+    uid = request.GET.get('uid', '')
+    try:
+        profile = Profile.objects.get(uid=uid)  # 检查账户信息
+    except Profile.DoesNotExist:
+        return render(request, 'err.html', ProfileNotFound)
+
+    banks = BankInfo.objects.all()  # 检查账户信息
+
+
+    bank_types = []
+    for i, j in BankInfo.BANK_TYPES:  # 返回所有题库类型
+        bank_types.append({'id': i, 'name': j})
+    return render(request, 'setbanks/bank.html', {  # 渲染模板
+        'user_info': profile.data,
+        'banks': banks
+    })
 
 
 @check_login
@@ -161,6 +186,7 @@ def upload_bank(request):
 def set_game(request):
     uid = request.GET.get('uid', '')
 
+    print("set_game"+ uid)
     try:
         profile = Profile.objects.get(uid=uid)
     except Profile.DoesNotExist:
