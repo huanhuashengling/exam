@@ -5,7 +5,7 @@
 <div class="container">
         <div class="row">
             <div id="toolbar">
-                <button class="btn btn-success" id="export-history-btn">导出测试情况</button>
+                <!-- <button class="btn btn-success" id="export-history-btn">导出测试情况</button> -->
                 <input type="hidden" id="user-src" value="{{user_src}}">
             </div>
             <table id="test-history-list" class="table table-condensed table-responsive">
@@ -64,9 +64,9 @@
             data: {csrfmiddlewaretoken: '{{ csrf_token }}' },
         });
 
-        $("#export-history-btn").click(function() {
-            exportHistoryData();
-        });
+        // $("#export-history-btn").click(function() {
+        //     exportHistoryData();
+        // });
 
         $(".qa_item").click(function(e) {
             uid = $(this).val().split("_")[0];
@@ -137,31 +137,31 @@
         },
     }
 
-    function exportHistoryData(){
-        var d = new Date();
-        var month = d.getMonth()+1;
-        var day = d.getDate();
-        var output = d.getFullYear() + '' +
-            (month<10 ? '0' : '') + month + '' +
-            (day<10 ? '0' : '') + day;
+    // function exportHistoryData(){
+    //     var d = new Date();
+    //     var month = d.getMonth()+1;
+    //     var day = d.getDate();
+    //     var output = d.getFullYear() + '' +
+    //         (month<10 ? '0' : '') + month + '' +
+    //         (day<10 ? '0' : '') + day;
 
-        $('#test-history-list').tableExport({
-            type: 'xlsx',
-            escape:"false",
-            exportDataType: "all",
-            ignoreColumn: [0, 12],//忽略某一列的索引
-            fileName:  output + '测试历史记录',//下载文件名称
-            onCellHtmlData: function (cell, row, col, data){//处理导出内容,自定义某一行、某一列、某个单元格的内容
-                if(row == 0){
-                    return data;
-                }
-                // console.info(col + ": " + data);
-                if(col == 1) {
-                    return parseInt(data).toString();
-                }
-                return data;
-            },
-        });
-    }
+    //     $('#test-history-list').tableExport({
+    //         type: 'xlsx',
+    //         escape:"false",
+    //         exportDataType: "all",
+    //         ignoreColumn: [0, 12],//忽略某一列的索引
+    //         fileName:  output + '测试历史记录',//下载文件名称
+    //         onCellHtmlData: function (cell, row, col, data){//处理导出内容,自定义某一行、某一列、某个单元格的内容
+    //             if(row == 0){
+    //                 return data;
+    //             }
+    //             // console.info(col + ": " + data);
+    //             if(col == 1) {
+    //                 return parseInt(data).toString();
+    //             }
+    //             return data;
+    //         },
+    //     });
+    // }
 </script>
 {% endblock %}

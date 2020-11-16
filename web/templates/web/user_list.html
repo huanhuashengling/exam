@@ -4,7 +4,7 @@
     <div class="container">
         <div class="row text-center">
             <div id="toolbar">
-                <button class="btn btn-success" id="export-user-list">导出用户信息</button>
+                <!-- <button class="btn btn-success" id="export-user-list">导出用户信息</button> -->
             </div>
             <table id="normal-user-list" class="table table-condensed table-responsive">
                 <thead>
@@ -96,9 +96,9 @@
             data: {csrfmiddlewaretoken: '{{ csrf_token }}' }
         });
 
-        $("#export-user-list").click(function() {
-            exportData();
-        });
+        // $("#export-user-list").click(function() {
+        //     exportData();
+        // });
 
         $('#update_btn').click(function () {
             var classname = $('#classname').val();
@@ -277,28 +277,28 @@
         },
     }
 
-    function exportData(){
-        var d = new Date();
-        var month = d.getMonth()+1;
-        var day = d.getDate();
-        var output = d.getFullYear() + '' +
-            (month<10 ? '0' : '') + month + '' +
-            (day<10 ? '0' : '') + day;
+    // function exportData(){
+    //     var d = new Date();
+    //     var month = d.getMonth()+1;
+    //     var day = d.getDate();
+    //     var output = d.getFullYear() + '' +
+    //         (month<10 ? '0' : '') + month + '' +
+    //         (day<10 ? '0' : '') + day;
 
-        $('#normal-user-list').tableExport({
-            type: 'xlsx',
-            escape:"false",
-            htmlContent:'false',
-            exportDataType: "all",
-            Icons:'glyphicon-export', 
-            ignoreColumn: [0, 8],//忽略某一列的索引
-            fileName: output + '用户列表',//下载文件名称
-            onCellHtmlData: function (cell, row, col, data){//处理导出内容,自定义某一行、某一列、某个单元格的内容
-                console.info(data);
-                return data;
-            },
-        });
-    }
+    //     $('#normal-user-list').tableExport({
+    //         type: 'xlsx',
+    //         escape:"false",
+    //         htmlContent:'false',
+    //         exportDataType: "all",
+    //         Icons:'glyphicon-export', 
+    //         ignoreColumn: [0, 8],//忽略某一列的索引
+    //         fileName: output + '用户列表',//下载文件名称
+    //         onCellHtmlData: function (cell, row, col, data){//处理导出内容,自定义某一行、某一列、某个单元格的内容
+    //             console.info(data);
+    //             return data;
+    //         },
+    //     });
+    // }
     
 </script>
 {% endblock %}
