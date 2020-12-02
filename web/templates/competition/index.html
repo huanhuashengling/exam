@@ -4,7 +4,7 @@
     <div class="container">
         <div class="jumbotron">
           <h4 class="display-5">{{ request.session.displayname }} 医生，欢迎参加 “<b>{{kind_info.kind_name}}</b>” 测试!</h4>
-          <p class="lead">本测试由<b>{{ kind_info.sponsor_name }}</b>出题，共有<b>{{ kind_info.question_num }}</b>道题，满分{{ kind_info.total_score }}分，请在{{ kind_info.period_time }}分钟内完成测试。</p>
+          <p class="lead">本测试由<b>{{ sponsorName }}</b>出题，共有<b>{{ kind_info.question_num }}</b>道题，满分{{ kind_info.total_score }}分，请在{{ kind_info.period_time }}分钟内完成测试。</p>
           <hr class="my-4">
           <p>本测试创建于{{ kind_info.cop_startat }}，题目从题库（共{{ bank_info.total_question_num }}道）中随机抽取，请在{{ kind_info.cop_finishat }}前完成本次测试。</p>
           <a id="startAnswer" href="#" class="btn btn-primary btn-lg" >开始当前测试</a>

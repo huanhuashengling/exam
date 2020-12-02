@@ -5,37 +5,68 @@
 {% block content %}
     <div class="container">
       <div class="text-center">
-        <button class="btn btn-primary" onclick="history.back(-1)" style="margin: 10px;"> << 返回测试历史</button>
+        <button class= "btn btn-primary" onclick="history.back(-1)"> << 返回测试历史</button>
       </div>
         
           <div class="alert alert-primary" role="alert">
             <p>[{{user.get_trainee_type_display }}] {{user_info.displayname }}医生，{{finished_time}} 参加”{{kind_info.kind_name}}“测试，答对{{qa_info.correct_num}}题，答错{{qa_info.incorrect_num}}题，得分{{qa_info.score}}分</p>
           </div>
-            {% for qaItem in questionAnswerData %}
-              {% if qaItem.questionPk in correctQuestionPks %}
-                <div class="card">
-                  <div class="card-header"><span style="color: blue;">【正确】</span>{{ forloop.counter }}. {{qaItem.question}}(
-                      {{selectLabel|getsplitindex:qaItem.answerInfo}}
-                  )</div>
-                  <div class="card-body">
-                    {% for selectItem in qaItem.selectItems %}
-                      <p class="col">{{ selectLabel|getindex:forloop.counter0 }}. {{selectItem}}</p>
-                    {% endfor %}
-                  </div>
-                </div>
-              {% else %}
-                <div class="card">
-                  <div class="card-header"><span style="color: red;">【错误】</span>{{ forloop.counter }}. {{qaItem.question}}(
-                      {{selectLabel|getsplitindex:qaItem.answerInfo}}
-                  )</div>
-                  <div class="card-body">
-                    {% for selectItem in qaItem.selectItems %}
-                      <p>{{ selectLabel|getindex:forloop.counter0 }}. {{selectItem}}</p>
-                    {% endfor %}
+          <div class="alert alert-success text-center" style="margin-top: 5px;margin-bottom: 5px;">A1型题</div>
+          {% for qaItem in A1QAdata %}
+            <div class="card">
+              <div class="card-header"><span style="color: {{qaItem.colorStr}}">{{qaItem.corrStr}}</span>{{qaItem.itemOrder}}. {{qaItem.questionTxt}}</div>
+              <div class="card-body">
+                {% for selectItem in qaItem.selectItems %}
+                  <p>{{selectItem}}</p>
+                {% endfor %}
+              </div>
+            </div>
+          {% endfor %}
 
-                  </div>
-                </div>
-              {% endif %}
-            {% endfor %}
+          {% if A2QANum > 0 %}
+            <div class="alert alert-success text-center" style="margin-top: 5px;margin-bottom: 5px;">A2型题</div>
+          {% endif %}
+          {% for qaItem in A2QAdata %}
+            <div class="card">
+              <div class="card-header"><span style="color: {{qaItem.colorStr}}">{{qaItem.corrStr}}</span>{{qaItem.itemOrder}}. {{qaItem.questionTxt}}</div>
+              <div class="card-body">
+                {% for selectItem in qaItem.selectItems %}
+                  <p>{{selectItem}}</p>
+                {% endfor %}
+              </div>
+            </div>
+          {% endfor %}
+          {% if A3QANum > 0 %}
+            <div class="alert alert-success text-center" style="margin-top: 5px;margin-bottom: 5px;">A3型题</div>
+          {% endif %}
+          {% for qaItem in A3QAdata %}
+            <div class="card">
+              {{qaItem.groupQuestionTxt}}
+              <div class="card-header"><span style="color: {{qaItem.colorStr}}">{{qaItem.corrStr}}</span>{{qaItem.itemOrder}}. {{qaItem.questionTxt}}</div>
+              <div class="card-body">
+                {% for selectItem in qaItem.selectItems %}
+                  <p>{{selectItem}}</p>
+                {% endfor %}
+              </div>
+            </div>
+          {% endfor %}
+
+          {% if BQANum > 0 %}
+            <div class="alert alert-success text-center" style="margin-top: 5px;margin-bottom: 5px;">B型题</div>
+          {% endif %}
+          {% for qaItem in BQAdata %}
+            <div class="card">
+              <div class="card-body">
+                {% for selectItem in qaItem.selectItems %}
+                  <p>{{selectItem}}</p>
+                {% endfor %}
+              </div>
+              <div class="card-footer">
+                {% for BQuestion in qaItem.BQuestionArr %}
+                  <p><span style="color: {{BQuestion.colorStr}}">{{BQuestion.corrStr}}</span>{{BQuestion.itemOrder}}.{{BQuestion.questionTxt}}</p>
+                {% endfor %}
+              </div>
+            </div>
+          {% endfor %}
     </div>
 {% endblock %}

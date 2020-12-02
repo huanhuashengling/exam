@@ -137,9 +137,12 @@ def upload_bank(request):
     :return: 返回用户信息user_info和上传成功的个数
     """
     uid = request.POST.get('uid', '')  # 获取uid
-    bank_name = request.POST.get('bank_name', '')  # 获取题库名称
+    # bank_name = request.POST.get('bank_name', '')  # 获取题库名称
     bank_type = request.POST.get('bank_type', BankInfo.INFECTION)  # 获取题库类型
     template = request.FILES.get('template', None)  # 获取模板文件
+    bank_name = request.FILES['template'].name.split(".")[0]
+    # print(filename)
+    # return
     for k, v in dict(BankInfo.BANK_TYPES).items():
         if v == bank_type:
             bank_type = k
@@ -170,15 +173,18 @@ def upload_bank(request):
     final_path = os.path.join(today_bank_repo, get_now_string(bank_info.bank_id)) + '.xlsx'  # 生成文件名
     with open(final_path, 'wb+') as f:  # 保存到目录
         f.write(template.read())
-    choice_num, fillinblank_num = upload_questions(final_path, bank_info)  # 使用xlrd读取excel文件到数据库
-    if "subject not found" == choice_num and "subject not found" == fillinblank_num:
+    A1_choice_num, A2_choice_num, A3_choice_num, B_choice_num, G_fillinblank_num = upload_questions(final_path, bank_info)  # 使用xlrd读取excel文件到数据库
+    if "subject not found" == A1_choice_num and "subject not found" == G_fillinblank_num:
         return render(request, 'err.html', SubjectNotFound)
 
     return render(request, 'setbanks/bank.html', {  # 渲染视图
         'user_info': profile.data,
         'created': {
-            'choice_num': choice_num,
-            'fillinblank_num': fillinblank_num
+            'A1_choice_num': A1_choice_num,
+            'A2_choice_num': A2_choice_num,
+            'A3_choice_num': A3_choice_num,
+            'B_choice_num': B_choice_num,
+            'fillinblank_num': G_fillinblank_num
         }
     })
 
@@ -206,8 +212,15 @@ def set_game(request):
         if f.name not in ['id', 'created_at', 'updated_at', 'kind_id', 'uid', 'status']:
             form_fields.append({'field_name': f.name, 'label': f.verbose_name})
 
-    banks = BankInfo.objects.values_list('bank_name', 'bank_id', 'kind_num', 'choice_num', 'fillinblank_num').order_by('-kind_num')[:10]
-    banks = [{'bank_name': b[0], 'bank_id': b[1], 'kind_num': b[2], 'total_question_num': b[3] + b[4]} for b in banks]
+    banks = BankInfo.objects.values_list('bank_name', 'bank_id', 'kind_num', 'A1_choice_num', 'A2_choice_num','A3_choice_num','B_choice_num', 'G_fillinblank_num').order_by('-kind_num')[:10]
+    banks = [{'bank_name': b[0], 'bank_id': b[1],
+        'kind_num': b[2], 
+        'A1_choice_num': b[3],
+        'A2_choice_num': b[4],
+        'A3_choice_num': b[5],
+        'B_choice_num': b[6],
+        'G_fillinblank_num': b[7],
+        'total_question_num': b[3] + b[4] + b[5] + b[6] + b[7]} for b in banks]
 
     return render(request, 'setgames/game.html', {
         'account_id': biz.account_id,

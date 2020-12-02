@@ -18,11 +18,7 @@
           </div>
           <div class="card-body">
             <input type="hidden" id="questionPk">
-            <p class="lead">
-                <label id="question" style="font-size: 15px;"></label>
-            </p>
-            <div id="choiceBox" class="checkbox" style="border: #31b0d5; font-size:15px;">
-            </div>
+            <div id="questionTxt"></div>
             <div id="fullinBox" class="form-inline" style="text-align:center">
                 <input type="text" class="form-control" id="answerF" placeholder="请输入答案"  style="width:400px" />
                 <input type="hidden" id="answerPk" />
@@ -53,7 +49,6 @@
           if({{ period_time|safe }}) {
               startTimer1();
           }
-          // $('#loadingModal').modal('show');
           uid = '{{ user_info.uid|safe }}';
           kind_id = '{{ kind_id|safe }}';
           $.ajax({
@@ -66,9 +61,12 @@
               dataType: 'json',
               success: function (res) {
                   response = res;
-                  questionNum = res.data.kind_info.question_num;
+                  console.log(response);
+                  questionNum = response.data.questions.length;
+                  // questionNum = res.data.kind_info.question_num;
                   answerDict = new Array(questionNum);
                   for(var i=0; i < questionNum; i++){
+                    // console.log(response);
                       if(response.data.questions[i].qtype === 'choice') {
                           answerDict['c_' + response.data.questions[i].pk] = '';
                       }else{
@@ -77,23 +75,10 @@
                   }
                   // 取答案中的第一个值
                   if(res.data.questions[0].qtype === 'choice') {            // 选择题的情况
-                      multiChoiceStr = "";
-                      multiChoice = res.data.questions[0].multiChoice;
-                      tItems = res.data.questions[0].items.split("|");
-                      questionPkArr[currentPage-1] = res.data.questions[0].pk;
-                      if(!multiChoice) {
-                        tHtml = buildRadioSelectHtml(tItems, res.data.questions[0].pk);
-                        $("#questionPk").val("itemRadios_" + res.data.questions[0].pk);
-                      } else {
-                        multiChoiceStr = "【多选题】"
-                        tHtml = buildCheckboxSelectHtml(tItems, res.data.questions[0].pk);
-                        $("#questionPk").val("itemCheckboxs_" + res.data.questions[0].pk);
-                      }
-                      $('#question').html("第"+currentPage+"题：" + res.data.questions[0].question + multiChoiceStr);  // currentPage - 1
-                      $('#choiceBox').html(tHtml);
+                    showQuestionTxt(currentPage, res.data.questions[0], answerDict); 
                       
-                      hasNext = (currentPage < questionNum);
-                      $('#fullinBox').hide();
+                    hasNext = (currentPage < questionNum);
+                    $('#fullinBox').hide();
                   } else{                                                    // 填空题的情况
                       $('#question').html(res.data.questions[0].question.replace('##', '______'));
                       $('#answerPk').val('f_' + res.data.questions[0].pk);
@@ -110,43 +95,23 @@
                     selectVal.push($(this).val());
                 });
                 answerDict["c_"+$("#questionPk").val().split("_")[1]] = selectVal;
-                console.log(answerDict);
 
                   removeChecked();
                   clearInputData();
                   currentPage = currentPage - 1;
 
-                  console.log(answerDict["c_" + questionPkArr[currentPage-1]]);
-
-                  if(response.data.questions[currentPage - 1].qtype === 'choice') {
-
+                  var prevQItem = response.data.questions[currentPage - 1];
+                  if(prevQItem.qtype === 'choice') {
                       $('#choiceBox').show();
-                      multiChoiceStr = "";
-                      multiChoice = response.data.questions[currentPage - 1].multiChoice;
-
-                      var pk = response.data.questions[currentPage - 1].pk;
-                      questionPkArr[currentPage-1] = pk;
-
-                      tItems = response.data.questions[currentPage - 1].items.split("|");
-                      if(!multiChoice) {
-                        tHtml = buildRadioSelectHtml(tItems, pk, answerDict["c_" + questionPkArr[currentPage-1]]);
-                        $("#questionPk").val("itemRadios_" + pk);
-                      } else {
-                        multiChoiceStr = "【多选题】"
-                        tHtml = buildCheckboxSelectHtml(tItems, pk, answerDict["c_" + questionPkArr[currentPage-1]]);
-                        $("#questionPk").val("itemCheckboxs_" + pk);
-                      }
-                      $('#question').html("第"+currentPage+"题：" + response.data.questions[currentPage - 1].question + multiChoiceStr);
-                      $('#choiceBox').html(tHtml);
-
+                      showQuestionTxt(currentPage, prevQItem, answerDict); 
                       $('#fullinBox').hide();
                       hasPrevious = currentPage > 1;
                       hasNext = currentPage < questionNum
                   }else{
-                      var pk2 = response.data.questions[currentPage - 1].pk;
+                      var pk2 = prevQItem.pk;
                       $('#fullinBox').show();
-                      $('#question').html(response.data.questions[currentPage - 1].question.replace('##', '______'));
-                      $('#answerPk').val(response.data.questions[currentPage - 1].pk);
+                      $('#question').html(prevQItem.question.replace('##', '______'));
+                      $('#answerPk').val(prevQItem.pk);
                       if(answerDict['f_' + pk2]) {
                           $('#answerF').val(answerDict['f_' + pk2]);
                       }
@@ -166,48 +131,29 @@
                     selectVal.push($(this).val());
                 });
                 answerDict["c_"+$("#questionPk").val().split("_")[1]] = selectVal;
-                console.log(answerDict);
 
-                  removeChecked();
-                  clearInputData();
-                  currentPage = currentPage + 1;
-                  console.log(answerDict["c_" + questionPkArr[currentPage]]);
-
-                  if(response.data.questions[currentPage - 1].qtype === 'choice') {
-                      $('#choiceBox').show();
-                      multiChoiceStr = "";
-                      multiChoice = response.data.questions[currentPage - 1].multiChoice;
-                      // console.log(response.data.questions[currentPage - 1].answer);
-                      var pk = response.data.questions[currentPage - 1].pk;
-                      questionPkArr[currentPage-1] = pk;
-
-                      tItems = response.data.questions[currentPage - 1].items.split("|");
-
-                      if(!multiChoice) {
-                        tHtml = buildRadioSelectHtml(tItems, pk, answerDict["c_" + questionPkArr[currentPage-1]]);
-                        $("#questionPk").val("itemRadios_" + pk);
-                      } else {
-                        multiChoiceStr = "【多选题】"
-                        tHtml = buildCheckboxSelectHtml(tItems, pk, answerDict["c_" + questionPkArr[currentPage-1]]);
-                        $("#questionPk").val("itemCheckboxs_" + pk);
-                      }
-                      $('#question').html("第"+currentPage+"题：" + response.data.questions[currentPage - 1].question + multiChoiceStr);
-                      $('#choiceBox').html(tHtml);
-                      $('#fullinBox').hide();
-                      hasPrevious = currentPage > 1;
-                      hasNext = currentPage < questionNum
-                  }else{
-                      var pk1 = response.data.questions[currentPage - 1].pk;
-                      $('#fullinBox').show();
-                      $('#question').html(response.data.questions[currentPage - 1].question.replace('##', '______'));
-                      $('#answerPk').val(response.data.questions[currentPage - 1].pk);
-                      if(answerDict['f_' + pk1]) {
-                          $('#answerF').val(answerDict['f_' + pk1]);
-                      }
-                      $('#choiceBox').hide();
-                      hasPrevious = currentPage > 1;
-                      hasNext = currentPage < questionNum
-                  }
+                removeChecked();
+                clearInputData();
+                currentPage = currentPage + 1;
+                var nextQItem = response.data.questions[currentPage - 1];
+                if(nextQItem.qtype === 'choice') {
+                    $('#choiceBox').show();
+                    showQuestionTxt(currentPage, nextQItem, answerDict);
+                    $('#fullinBox').hide();
+                    hasPrevious = currentPage > 1;
+                    hasNext = currentPage < questionNum
+                }else{
+                    var pk1 = nextQItem.pk;
+                    $('#fullinBox').show();
+                    $('#question').html(nextQItem.question.replace('##', '______'));
+                    $('#answerPk').val(nextQItem.pk);
+                    if(answerDict['f_' + pk1]) {
+                        $('#answerF').val(answerDict['f_' + pk1]);
+                    }
+                    $('#choiceBox').hide();
+                    hasPrevious = currentPage > 1;
+                    hasNext = currentPage < questionNum
+                }
               }else{
                   alert('没有题目了');
               }
@@ -270,24 +216,42 @@
           //   answerDict["c_"+tdata[1]] = $(this).val();
           //   console.log(answerDict);
           // })
-          // .on('click', '.choiceItemCheckbox', function (e) {
-          //   console.log($(this).attr("id"));
-          //   var tdata = $(this).attr("id").split("_");
-          //   var tCheckAnswer = answerDict["c_"+tdata[1]];
-          //   if(tCheckAnswer.indexOf($(this).val()) !== -1) {
-
-          //   }
-          //   if(answerDict["c_"+tdata[1]] == "") {
-          //     answerDict["c_"+tdata[1]] = $(this).val()
-          //   } else {
-          //     answerDict["c_"+tdata[1]] += "|" + $(this).val();
-          //   }
-          //   console.log(answerDict);
-          // });
       });
 
     function clearInputData() {
         $('#answerF').val('');
+    }
+    function showQuestionTxt(currentPage, qItem, answerDict) {
+      multiChoiceStr = "";
+      multiChoice = qItem.multiChoice;
+
+      var pk = qItem.pk;
+      questionPkArr[currentPage-1] = pk;
+
+      tItems = qItem.items.split("|");
+      if(!multiChoice) {
+        tHtml = buildRadioSelectHtml(tItems, pk, answerDict["c_" + pk]);
+      } else {
+        multiChoiceStr = "【多选题】"
+        tHtml = buildCheckboxSelectHtml(tItems, pk, answerDict["c_" + pk]);
+        
+      }
+      cstr = "<div id='choiceBox' class='checkbox' style='border: #31b0d5; font-size:15px;'>" + tHtml + "</div>"
+      qstr = "<p class='lead'><label style='font-size: 15px;'>第"+currentPage+"题：" + qItem.question + multiChoiceStr+"</label></p>";
+      if(1 == qItem.ctype) {
+        tstr = "<p><label style='font-size: 15px;'>【A1型题】</label></p>";
+        $("#questionTxt").html(tstr + qstr + cstr);
+      } else if(2 == qItem.ctype) {
+        tstr = "<p><label style='font-size: 15px;'>【A2型题】</label></p>";
+        $("#questionTxt").html(tstr + qstr + cstr);
+      } else if(3 == qItem.ctype) {
+        str = "【A3型题/"+qItem.group_question_count+"小题】" + qItem.group_question_txt;
+        tstr = "<p><label style='font-size: 15px;'>【A3型题/"+qItem.group_question_count+"小题】" + qItem.group_question_txt + "</label></p>";
+        $("#questionTxt").html(tstr + qstr + cstr);
+      } else if(4 == qItem.ctype) {
+        tstr = "<p><label style='font-size: 15px;'>【B型题/"+qItem.group_question_count+"小题】</label></p>";
+        $("#questionTxt").html(tstr + cstr + qstr);
+      }
     }
 
     function removeChecked() {
@@ -299,6 +263,7 @@
 
     function buildRadioSelectHtml(tItems, pk, selectArr="") {
       tHtml = "";
+      $("#questionPk").val("itemRadios_" + pk);
       var anArr = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q"]
       for (var i = 0; i < tItems.length; i++) {
         var sel = (i == selectArr[0])?"checked":"";
@@ -312,6 +277,7 @@
 
     function buildCheckboxSelectHtml(tItems, pk, selectArr="") {
       tHtml = "";
+      $("#questionPk").val("itemCheckboxs_" + pk);
       var anArr = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q"]
       for (var i = 0; i < tItems.length; i++) {
         var sel = "";

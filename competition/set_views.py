@@ -22,8 +22,11 @@ def banks(request):
                         'bank_type': bank.get_bank_type_display(), 
                         'kind_num': bank.kind_num, 
                         'total_question_num': bank.total_question_num,
-                        'choice_num': bank.choice_num,
-                        'fillinblank_num': bank.fillinblank_num,
+                        'A1_choice_num': bank.A1_choice_num,
+                        'A2_choice_num': bank.A2_choice_num,
+                        'A3_choice_num': bank.A3_choice_num,
+                        'B_choice_num': bank.B_choice_num,
+                        'G_fillinblank_num': bank.G_fillinblank_num,
                         'partin_num': bank.partin_num,
                         })
     # return json_response(200, 'OK', {'banks': [{'bank_name': b[0], 'bank_id': b[1], 'kind_num': b[2], 'total_question_num': b[3] + b[4]} for b in banks]})
@@ -31,6 +34,19 @@ def banks(request):
     
     return json_response(*SetError.BankTypeError)
 
+def get_a_bank(request):
+    bank_id = request.GET.get('bank_id', '')
+
+    bank = BankInfo.objects.filter(bank_id=bank_id).first()
+
+    return json_response(200, 'OK', {'bank_name': bank.bank_name, 
+                                    'bank_id': bank.bank_id,
+                                    'kind_num': bank.kind_num, 
+                                    'A1_choice_num': bank.A1_choice_num,
+                                    'A2_choice_num': bank.A2_choice_num,
+                                    'A3_choice_num': bank.A3_choice_num,
+                                    'B_choice_num': bank.B_choice_num,
+                                    'G_fillinblank_num': bank.G_fillinblank_num})
 
 def bank_detail(request, bank_id):
     try:
@@ -57,8 +73,16 @@ def set_bank(request):
     uid = request.POST.get('uid', '')
     bank_id = request.POST.get('bank_id', '')
     kind_name = request.POST.get('kind_name', '')
-    sponsor_name = request.POST.get('sponsor_name', '')
+    sponsor_name = int(request.POST.get('sponsor_name', 0))
     question_num = int(request.POST.get('question_num', 1))
+    A1_choice_num = int(request.POST.get('A1_choice_num', 0))
+    A2_choice_num = int(request.POST.get('A2_choice_num', 0))
+    A3_choice_num = int(request.POST.get('A3_choice_num', 0))
+    B_choice_num = int(request.POST.get('B_choice_num', 0))
+    # G_fillinblank_num = int(request.POST.get('G_fillinblank_num', 0))
+    # EG_fillinblank_num = int(request.POST.get('EG_fillinblank_num', 0))
+    # S_fillinblank_num = int(request.POST.get('S_fillinblank_num', 0))
+    # A_fillinblank_num = int(request.POST.get('A_fillinblank_num', 0))
     total_score = int(request.POST.get('total_score', 100))
     cop_startat = request.POST.get('cop_startat')
     cop_finishat = request.POST.get('cop_finishat')
@@ -119,11 +143,24 @@ def set_bank(request):
         'kind_type': bank_info.bank_type,
         'total_score': total_score,
         'question_num': question_num,
+        'A1_choice_num': A1_choice_num,
+        'A2_choice_num': A2_choice_num,
+        'A3_choice_num': A3_choice_num,
+        'B_choice_num': B_choice_num,
+        # 'G_fillinblank_num': G_fillinblank_num,
+        # 'EG_fillinblank_num': EG_fillinblank_num,
+        # 'S_fillinblank_num': S_fillinblank_num,
+        # 'A_fillinblank_num': A_fillinblank_num,
         'cop_startat': cop_startat,
         'period_time': period or 0,
         'is_open': is_open,
         'cop_finishat': cop_finishat
     }
+
+    print(account_id)
+    print(app_info.app_id)
+    print(bank_id)
+    print(kind_values)
     kind_info, kind_created = CompetitionKindInfo.objects.select_for_update().get_or_create(
         account_id=account_id,
         app_id=app_info.app_id,
@@ -158,6 +195,10 @@ def game_list_data(request):
                         'kind_type': kind.get_kind_type_display(),
                         'total_score': kind.total_score,
                         'question_num': kind.question_num,
+                        'A1_choice_num': kind.A1_choice_num,
+                        'A2_choice_num': kind.A2_choice_num,
+                        'A3_choice_num': kind.A3_choice_num,
+                        'B_choice_num': kind.B_choice_num,
                         'cop_startat': copStartat,
                         'period': kind.period_time,
                         'cop_finishat': copFinishat,

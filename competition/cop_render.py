@@ -13,13 +13,13 @@ from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.lib.pagesizes import A4
-from reportlab.platypus import Paragraph, SimpleDocTemplate, PageBreak, Table
+from reportlab.platypus import Paragraph, SimpleDocTemplate, PageBreak, Table, Spacer
 from reportlab.lib import  colors
 from reportlab.lib.units import mm, inch
-from reportlab.lib.enums import TA_RIGHT
+from reportlab.lib.enums import TA_CENTER
 
 from account.models import Profile
-from competition.models import BankInfo, CompetitionKindInfo, CompetitionQAInfo, ChoiceInfo
+from competition.models import BankInfo, CompetitionKindInfo, CompetitionQAInfo, ChoiceInfo, QuestionGroupInfo
 from utils.decorators import check_copstatus, check_login
 from utils.errors import (BankInfoNotFound, CompetitionNotFound,
                           ProfileNotFound, QuestionLogNotFound,
@@ -65,6 +65,7 @@ def home(request):
         'user_info': profile.data,
         'kind_info': kind_info.data,
         'bank_info': bank_info.data,
+        'sponsorName': kind_info.get_sponsor_name_display(),
         'is_show_userinfo': 'true' if is_show_userinfo else 'false',
         'userinfo_has_enterd': 'true' if get_enter_userinfo(kind_id, uid) else 'false',
         'userinfo_fields': json.dumps(form_fields) if form_fields else '{}',
@@ -284,30 +285,67 @@ def qa_info_page(request):
     os.environ["TZ"] = "UTC"
     finished_time = datetime.datetime.fromtimestamp(qa_info.finished_stamp / 1e3).strftime("%Y年%m月%d")
 
-    # print(answerslogrecord)
-
-    for x in answerslogrecord:
+    A1QAdata = []
+    A2QAdata = []
+    A3QAdata = []
+    BQAdata = []
+    BQuestionArr = []
+    selectLabel = ["A", "B", "C", "D", "E", "F", "G", "H", "I"]
+    for index, x in enumerate(answerslogrecord):
+        print(x)
         questionInfo = x.split("|")[0]
-        answerInfo = x.split("|")[1]
-
+        answerInfo = int(x.split("|")[1])
         questionType = questionInfo.split("_")[0]
         questionPk = questionInfo.split("_")[1]
+        corrStr = "【错误】"
+        colorStr = "red"
         # questionAnswerItem = []
         if "c" == questionType:
             choiceItem = ChoiceInfo.objects.get(id=questionPk)
-            selectItems = choiceItem.select_items.split("|")
-            questionAnswerData.append({"question": choiceItem.question, "selectItems": selectItems, "answerInfo": answerInfo, "questionPk": questionPk})
+            if questionPk in correctQuestionPks:
+                corrStr = "【正确】"
+                colorStr = "blue"
+            
+            selectItemsArr = choiceItem.select_items.split("|")
+            selectItems = []
+            for itemIndex, selectItem in enumerate(selectItemsArr):
+                selectItems.append(selectLabel[itemIndex]+"."+ selectItem)
 
-    # print(questionAnswerData)
+            if 1 == choiceItem.ctype:
+                questionTxt = choiceItem.question + "(" + selectLabel[answerInfo] +")"
+                A1QAdata.append({"typeStr":"【A1】", "corrStr": corrStr, "colorStr": colorStr, "itemOrder": index+1, "questionTxt": questionTxt, "selectItems": selectItems})
+            elif 2 == choiceItem.ctype:
+                questionTxt = choiceItem.question + "(" + selectLabel[answerInfo] +")"
+                A2QAdata.append({"typeStr":"【A2】", "corrStr": corrStr, "colorStr": colorStr, "itemOrder": index+1, "questionTxt": questionTxt, "selectItems": selectItems})
+            elif 3 == choiceItem.ctype:
+                questionGroupInfo = QuestionGroupInfo.objects.get(id=choiceItem.question_group_id)
+                questionTxt = choiceItem.question + "(" + selectLabel[answerInfo] +")"
+                if 0 == choiceItem.question_group_order:
+                    A3QAdata.append({"typeStr":"【A3】", "corrStr": corrStr, "colorStr": colorStr, "itemOrder": index+1, "groupQuestionTxt": questionGroupInfo.group_question_txt, "questionTxt": questionTxt, "selectItems": selectItems})
+                else:
+                    A3QAdata.append({"corrStr": corrStr, "colorStr": colorStr, "itemOrder": index+1, "questionTxt": questionTxt, "selectItems": selectItems})
+            elif 4 == choiceItem.ctype:
+                BQuestionArr.append({"corrStr": corrStr, "colorStr": colorStr, "itemOrder": index+1, "questionTxt": choiceItem.question + "(" + selectLabel[answerInfo] + ")"})
+                questionGroupInfo = QuestionGroupInfo.objects.get(id=choiceItem.question_group_id)
+                if questionGroupInfo.group_question_count == len(BQuestionArr):
+                    BQAdata.append({"BQuestionArr": BQuestionArr, "selectItems": selectItems, "typeStr":"【B】"})
+                    BQuestionArr = []
+    # questionAnswerData.append({"A1QAdata": A1QAdata, "A2QAdata": A2QAdata, "A3QAdata": A3QAdata, "BQAdata": BQAdata})
+
     return render(request, 'competition/qa_info_page.html', {
         'user_info': profile.data,
         'user': profile,
         'qa_info': qa_info.detail,
         'kind_info': kind_info.data,
         'finished_time': finished_time,
-        'questionAnswerData': questionAnswerData,
-        'correctQuestionPks': correctQuestionPks,
-        'selectLabel': ["A", "B", "C", "D", "E", "F", "G", "H", "I"]
+        'A1QAdata': A1QAdata,
+        'A2QAdata': A2QAdata,
+        'A2QANum': len(A2QAdata),
+        'A3QAdata': A3QAdata,
+        'A3QANum': len(A3QAdata),
+        'BQAdata': BQAdata,
+        'BQANum': len(BQAdata),
+
     })
 
 @check_login
@@ -499,7 +537,54 @@ def exportpdf(request):
             selectItems = choiceItem.select_items.split("|")
             questionAnswerData.append({"question": choiceItem.question, "selectItems": selectItems, "answerInfo": answerInfo, "questionPk": questionPk})
 
+    A1QAdata = []
+    A2QAdata = []
+    A3QAdata = []
+    BQAdata = []
+    BQuestionArr = []
+    selectLabel = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "未答"]
+    for index, x in enumerate(answerslogrecord):
+        questionInfo = x.split("|")[0]
+        if "" == x.split("|")[1]:
+            answerInfo = 9
+        else:
+            answerInfo = int(x.split("|")[1])
+        questionType = questionInfo.split("_")[0]
+        questionPk = questionInfo.split("_")[1]
+        corrStr = "【错误】"
+        colorStr = "red"
 
+        if "c" == questionType:
+            choiceItem = ChoiceInfo.objects.get(id=questionPk)
+            if questionPk in correctQuestionPks:
+                corrStr = "【正确】"
+                colorStr = "blue"
+            
+            selectItemsArr = choiceItem.select_items.split("|")
+            selectItems = []
+            for itemIndex, selectItem in enumerate(selectItemsArr):
+                selectItems.append(selectLabel[itemIndex]+"."+ selectItem)
+
+            if 1 == choiceItem.ctype:
+                questionTxt = choiceItem.question + "(" + selectLabel[answerInfo] +")"
+                A1QAdata.append({"typeStr":"【A1】", "corrStr": corrStr, "colorStr": colorStr, "itemOrder": index+1, "questionTxt": questionTxt, "selectItems": selectItems})
+            elif 2 == choiceItem.ctype:
+                questionTxt = choiceItem.question + "(" + selectLabel[answerInfo] +")"
+                A2QAdata.append({"typeStr":"【A2】", "corrStr": corrStr, "colorStr": colorStr, "itemOrder": index+1, "questionTxt": questionTxt, "selectItems": selectItems})
+            elif 3 == choiceItem.ctype:
+                questionGroupInfo = QuestionGroupInfo.objects.get(id=choiceItem.question_group_id)
+                questionTxt = choiceItem.question + "(" + selectLabel[answerInfo] +")"
+                if 0 == choiceItem.question_group_order:
+                    A3QAdata.append({"typeStr":"【A3】", "corrStr": corrStr, "colorStr": colorStr, "groupOrder": choiceItem.question_group_order, "itemOrder": index+1, "groupQuestionTxt": questionGroupInfo.group_question_txt, "questionTxt": questionTxt, "selectItems": selectItems})
+                else:
+                    A3QAdata.append({"corrStr": corrStr, "colorStr": colorStr, "itemOrder": index+1, "groupOrder": choiceItem.question_group_order,  "questionTxt": questionTxt, "selectItems": selectItems})
+            elif 4 == choiceItem.ctype:
+                BQuestionArr.append({"corrStr": corrStr, "colorStr": colorStr, "itemOrder": index+1, "questionTxt": choiceItem.question + "(" + selectLabel[answerInfo] + ")"})
+                questionGroupInfo = QuestionGroupInfo.objects.get(id=choiceItem.question_group_id)
+                if questionGroupInfo.group_question_count == len(BQuestionArr):
+                    BQAdata.append({"BQuestionArr": BQuestionArr, "selectItems": selectItems, "typeStr":"【B】"})
+                    BQuestionArr = []
+    
     pdfmetrics.registerFont(TTFont('stsong', os.path.join(settings.STATIC_ROOT,'font/stsong.ttf')))
     pdfmetrics.registerFont(TTFont('mshei', os.path.join(settings.STATIC_ROOT,'font/mshei.ttf')))
 
@@ -511,6 +596,8 @@ def exportpdf(request):
     # p.save()
     flowables = []
     sample_style_sheet=getSampleStyleSheet()
+
+
     # print(sample_style_sheet.list())
     title_style = sample_style_sheet['Title']
     title_style.fontName = 'mshei'
@@ -522,7 +609,9 @@ def exportpdf(request):
     body_text_style = sample_style_sheet['BodyText']
     body_text_style.fontName = 'stsong'
 
-    body_text_right_style = ParagraphStyle(name='right', parent=body_text_style, alignment=TA_RIGHT)
+    body_text_right_style = ParagraphStyle(name='Normal_CENTER', parent=body_text_style, alignment=TA_CENTER)
+
+    body_text_right_style.fontName = 'mshei'
     
     paragraph_title = Paragraph("感染科出科测试", title_style)
     flowables.append(paragraph_title)
@@ -537,25 +626,15 @@ def exportpdf(request):
     paragraph_desc = Paragraph(descStr, body_text_style)
     flowables.append(paragraph_desc)
 
-    selectLabel = ["A", "B", "C", "D", "E", "F", "G", "H", "I"]
+    flowables.append(Spacer(0,0.3*inch))
 
-    num = 1
-    for qaItem in questionAnswerData:
-        # print(qaItem["answerInfo"])
-        # print(type(qaItem["answerInfo"]))
-        # break
-        answers = qaItem["answerInfo"].split(",")
-        result = ""
-        for answer in answers:
-          result += selectLabel[int(answer)]
+    A1_title = Paragraph("A1型题", body_text_right_style)
+    flowables.append(A1_title)
 
-        if qaItem["questionPk"] in correctQuestionPks:
-            qStr = "【正确】"+str(num)+" ." + qaItem["question"]+"（"+result+"）"
-        else:
-            qStr = "【错误】"+str(num)+" ." + qaItem["question"]+"（"+result+"）"
+    for qaItem in A1QAdata:
+        qStr = qaItem["corrStr"] + str(qaItem["itemOrder"]) + ". " + qaItem["questionTxt"]
         paragraph_q_item = Paragraph(qStr, body_text_style)
         flowables.append(paragraph_q_item)
-        num += 1
         m = 0
         tbl_data = []
         tdata = []
@@ -577,9 +656,9 @@ def exportpdf(request):
             if 0 == m % vnum and 0 != m:
                 tbl_data.append(tdata)
                 tdata = []
-                tdata.append(Paragraph(selectLabel[m]+". "+ selectItem, body_text_style))
+                tdata.append(Paragraph(selectItem, body_text_style))
             else:
-                tdata.append(Paragraph(selectLabel[m]+". "+ selectItem, body_text_style))
+                tdata.append(Paragraph(selectItem, body_text_style))
             m += 1
         if len(tdata) > 0:
             tbl_data.append(tdata)
@@ -587,8 +666,139 @@ def exportpdf(request):
             
         tbl = Table(tbl_data)
         flowables.append(tbl)
-            
 
+    flowables.append(Spacer(0,0.3*inch))
+
+    if len(A2QAdata) > 0:
+        A2_title = Paragraph("A2型题", body_text_right_style)
+        flowables.append(A2_title)
+
+    for qaItem in A2QAdata:
+        qStr = qaItem["corrStr"] + str(qaItem["itemOrder"]) + ". " + qaItem["questionTxt"]
+        paragraph_q_item = Paragraph(qStr, body_text_style)
+        flowables.append(paragraph_q_item)
+        m = 0
+        tbl_data = []
+        tdata = []
+
+        vnum = 1
+        for selectItem in qaItem["selectItems"]:
+            if 8 > len(selectItem):
+                vnum = 3
+            elif 14 > len(selectItem):
+                vnum = 2
+            else:
+                vnum = 1
+                break
+        for selectItem in qaItem["selectItems"]:
+            
+            # aStr = selectItem
+            # paragraph_a_item = Paragraph(aStr, body_text_style)
+            # flowables.append(paragraph_a_item)
+            if 0 == m % vnum and 0 != m:
+                tbl_data.append(tdata)
+                tdata = []
+                tdata.append(Paragraph(selectItem, body_text_style))
+            else:
+                tdata.append(Paragraph(selectItem, body_text_style))
+            m += 1
+        if len(tdata) > 0:
+            tbl_data.append(tdata)
+            tdata = []
+            
+        tbl = Table(tbl_data)
+        flowables.append(tbl)
+    
+    if len(A3QAdata) > 0:
+        A3_title = Paragraph("A3型题", body_text_right_style)
+        flowables.append(A3_title)
+
+    for qaItem in A3QAdata:
+        if 0 == qaItem["groupOrder"]:
+            flowables.append(Spacer(0,0.2*inch))
+            paragraph_group_item = Paragraph(qaItem["groupQuestionTxt"], body_text_style)
+            flowables.append(paragraph_group_item)
+
+        qStr = qaItem["corrStr"] + str(qaItem["itemOrder"]) + ". " + qaItem["questionTxt"]
+        paragraph_q_item = Paragraph(qStr, body_text_style)
+        flowables.append(paragraph_q_item)
+        m = 0
+        tbl_data = []
+        tdata = []
+
+        vnum = 1
+        for selectItem in qaItem["selectItems"]:
+            if 8 > len(selectItem):
+                vnum = 3
+            elif 14 > len(selectItem):
+                vnum = 2
+            else:
+                vnum = 1
+                break
+        for selectItem in qaItem["selectItems"]:
+            
+            # aStr = selectItem
+            # paragraph_a_item = Paragraph(aStr, body_text_style)
+            # flowables.append(paragraph_a_item)
+            if 0 == m % vnum and 0 != m:
+                tbl_data.append(tdata)
+                tdata = []
+                tdata.append(Paragraph(selectItem, body_text_style))
+            else:
+                tdata.append(Paragraph(selectItem, body_text_style))
+            m += 1
+        if len(tdata) > 0:
+            tbl_data.append(tdata)
+            tdata = []
+            
+        tbl = Table(tbl_data)
+        flowables.append(tbl)
+    
+    flowables.append(Spacer(0,0.3*inch))
+
+    if len(BQAdata) > 0:
+        B_title = Paragraph("B型题", body_text_right_style)
+        flowables.append(B_title)
+    
+    for qaItem in BQAdata:
+        m = 0
+        tbl_data = []
+        tdata = []
+
+        vnum = 1
+        for selectItem in qaItem["selectItems"]:
+            if 8 > len(selectItem):
+                vnum = 3
+            elif 14 > len(selectItem):
+                vnum = 2
+            else:
+                vnum = 1
+                break
+        for selectItem in qaItem["selectItems"]:
+            
+            # aStr = selectItem
+            # paragraph_a_item = Paragraph(aStr, body_text_style)
+            # flowables.append(paragraph_a_item)
+            if 0 == m % vnum and 0 != m:
+                tbl_data.append(tdata)
+                tdata = []
+                tdata.append(Paragraph(selectItem, body_text_style))
+            else:
+                tdata.append(Paragraph(selectItem, body_text_style))
+            m += 1
+        if len(tdata) > 0:
+            tbl_data.append(tdata)
+            tdata = []
+        flowables.append(Spacer(0,0.2*inch))
+        tbl = Table(tbl_data)
+        flowables.append(tbl)
+
+        for BQuestion in qaItem["BQuestionArr"]:
+            qStr = BQuestion["corrStr"] + str(BQuestion["itemOrder"]) + ". " + BQuestion["questionTxt"]
+            paragraph_q_item = Paragraph(qStr, body_text_style)
+            flowables.append(paragraph_q_item)
+            
+    flowables.append(Spacer(0,1*inch))
     paragraph_sign = Paragraph("阅卷老师签名：___________", heading3_style)
     flowables.append(paragraph_sign)
     
@@ -602,9 +812,60 @@ def exportpdf(request):
         leftMargin=0.5*inch,
         rightMargin=0.5*inch,
         bottomMargin=0.5*inch)
-    pdf.multiBuild(flowables)
+    pdf.multiBuild(flowables, onFirstPage=_header_footer, onLaterPages=_header_footer, canvasmaker=NumberedCanvas)
 
     # FileResponse sets the Content-Disposition header so that browsers
     # present the option to save the file.
     pdf_buffer.seek(0)
     return FileResponse(pdf_buffer, as_attachment=True, filename=filename_time+"_"+profile.displayname+'医生出科考试.pdf')
+
+def _header_footer(canvas, doc):
+    sample_style_sheet=getSampleStyleSheet()
+    # print(sample_style_sheet.list())
+    title_style = sample_style_sheet['BodyText']
+    title_style.fontName = 'stsong'
+
+    body_text_right_style = ParagraphStyle(name='Normal_CENTER', parent=title_style, alignment=TA_CENTER)
+
+    # Save the state of our canvas so we can draw on it
+    canvas.saveState()
+    # styles = getSampleStyleSheet()
+    # text_style = styles['BodyText']
+    # text_style.fontName = 'stsong'
+    # Header
+    header = Paragraph("", body_text_right_style)
+    w, h = header.wrap(doc.width, doc.topMargin)
+    
+    header.drawOn(canvas, doc.leftMargin, doc.height + doc.topMargin + h)
+
+    # # Footer
+    # footer = Paragraph('某某医生 2020年12月1日参加的感染科出科考试试卷', body_text_right_style)
+    # w, h = footer.wrap(doc.width, doc.bottomMargin)
+    # footer.drawOn(canvas, doc.leftMargin, h)
+
+    # Release the canvas
+    canvas.restoreState()
+
+class NumberedCanvas(canvas.Canvas):
+    def __init__(self, *args, **kwargs):
+        canvas.Canvas.__init__(self, *args, **kwargs)
+        self._saved_page_states = []
+
+    def showPage(self):
+        self._saved_page_states.append(dict(self.__dict__))
+        self._startPage()
+
+    def save(self):
+        """add page info to each page (page x of y)"""
+        num_pages = len(self._saved_page_states)
+        for state in self._saved_page_states:
+            self.__dict__.update(state)
+            self.draw_page_number(num_pages)
+            canvas.Canvas.showPage(self)
+        canvas.Canvas.save(self)
+ 
+    def draw_page_number(self, page_count):
+        # Change the position of this to wherever you want the page number to be
+        self.setFont('stsong', 8)
+        self.drawRightString(110 * mm, 5 * mm,
+                             "第 %d 共 %d" % (self._pageNumber, page_count))

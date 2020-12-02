@@ -12,7 +12,7 @@ from django.views.decorators.csrf import csrf_exempt
 
 from account.models import Profile, UserInfo
 from competition.models import (BankInfo, ChoiceInfo, CompetitionKindInfo,
-                                CompetitionQAInfo, FillInBlankInfo)
+                                CompetitionQAInfo, FillInBlankInfo, QuestionGroupInfo)
 from TimeConvert import TimeConvert as tc
 
 from utils.check_utils import check_correct_num
@@ -54,18 +54,66 @@ def get_questions(request):
         profile = Profile.objects.get(uid=uid)
     except Profile.DoesNotExist:  # 未获取到，返回错误码200001
         return json_response(*ProfileError.ProfileNotFound)
-    qc = ChoiceInfo.objects.filter(bank_id=kind_info.bank_id) # 选择题
+    A1qc = ChoiceInfo.objects.filter(bank_id=kind_info.bank_id).filter(ctype=1) # A1选择题
+    A2qc = ChoiceInfo.objects.filter(bank_id=kind_info.bank_id).filter(ctype=2) # A2选择题
+    
+    A1questions = []
+    for i in A1qc.iterator():
+        A1questions.append(i.data)
+    A1qs = random.sample(A1questions, kind_info.A1_choice_num)
+
+    A2questions = []
+    for i in A2qc.iterator():
+        A2questions.append(i.data)
+
+    print(len(A2questions))
+    print(kind_info.A2_choice_num)
+    A2qs = random.sample(A2questions, kind_info.A2_choice_num)
+
+    A3QuestionGroup = QuestionGroupInfo.objects.filter(bank_id=kind_info.bank_id).filter(question_group_type=1) # A3选择题
+    BQuestionGroup = QuestionGroupInfo.objects.filter(bank_id=kind_info.bank_id).filter(question_group_type=2) # B选择题
+    
+    A3QuestionGroups = []
+    for i in A3QuestionGroup.iterator():
+        A3QuestionGroups.append(i.data)
+    A3QuestionGroups = random.sample(A3QuestionGroups, kind_info.A3_choice_num)
+
+    BQuestionGroups = []
+    for i in BQuestionGroup.iterator():
+        BQuestionGroups.append(i.data)
+    BQuestionGroups = random.sample(BQuestionGroups, kind_info.B_choice_num)
+
+    A3qs = []
+    for i in A3QuestionGroups:
+        print(i)
+        A3chioces = ChoiceInfo.objects.filter(question_group_id=i["pk"])
+        for j in A3chioces.iterator():
+            A3data = j.data
+            A3data.update({"group_question_txt":i["group_question_txt"]})
+            A3data.update({"group_question_count":i["group_question_count"]})
+            A3qs.append(A3data)
+
+    Bqs = []
+    for i in BQuestionGroups:
+        Bchioces = ChoiceInfo.objects.filter(question_group_id=i["pk"])
+        for j in Bchioces.iterator():
+            Bdata = j.data
+            Bdata.update({"group_question_count":i["group_question_count"]})
+            Bqs.append(Bdata)
+
+
     qf = FillInBlankInfo.objects.filter(bank_id=kind_info.bank_id)  # 填空题
-    questions = []  # 将两种题型放到同一个列表中
-    for i in qc.iterator():
-        questions.append(i.data)
-    for i in qf.iterator():
-        questions.append(i.data)
+    qs = A1qs + A2qs + A3qs + Bqs  # 将两种题型放到同一个列表中
+    # for i in qc.iterator():
+    #     questions.append(i.data)
+
+    # for i in qf.iterator():
+    #     questions.append(i.data)
     question_num = kind_info.question_num  # 出题数
     q_count = bank_info.total_question_num  # 总题数
     if q_count < question_num:  # 出题数大于总题数，返回错误码100005
         return json_response(CompetitionError.QuestionNotSufficient)
-    qs = random.sample(questions, question_num)  # 随机分配题目
+    # qs = random.sample(questions, question_num)  # 随机分配题目
     qa_info = CompetitionQAInfo.objects.select_for_update().create(  # 创建答题log数据
         kind_id=kind_id,
         uid=uid,
@@ -123,6 +171,7 @@ def submit_answer(request):
         return json_response(*CompetitionError.QuestionNotFound)
 
     answer = answer.rstrip('#').split('#')  # 处理答案数据
+    # print(answer)
     total, correct, wrong, correct_list, wrong_list= check_correct_num(answer)  # 检查答题情况
     
     # print(total)
@@ -143,8 +192,8 @@ def submit_answer(request):
     qa_info.finished_stamp = stop_stamp
     qa_info.expend_time = stop_stamp - qa_info.started_stamp
     qa_info.finished = True
-    qa_info.correct_num = correct if total == qa_info.total_num else 0
-    qa_info.incorrect_num = wrong if total == qa_info.total_num else qa_info.total_num
+    qa_info.correct_num = correct# if total == qa_info.total_num else 0
+    qa_info.incorrect_num = wrong #if total == qa_info.total_num else qa_info.total_num
     qa_info.save()  # 保存答题log
     if qa_info.correct_num == kind_info.question_num:  # 得分处理
         score = kind_info.total_score
@@ -306,7 +355,7 @@ def qa_history_data(request):
                 "kind_name" : kind_info.data["kind_name"], 
                 "kind_id": kind_info.data["kind_id"], 
                 "qa_id": qainfo.data["qa_id"], 
-                "sponsor_name": kind_info.data["sponsor_name"], 
+                "sponsor_name": kind_info.get_sponsor_name_display(), 
                 "total_num": qainfo.detail["total_num"], 
                 "correct_num": qainfo.detail["correct_num"],
                 "incorrect_num": qainfo.detail["incorrect_num"],

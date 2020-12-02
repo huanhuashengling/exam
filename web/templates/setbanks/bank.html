@@ -1,4 +1,4 @@
-{% extends 'base.html' %}
+{% extends 'admin_base.html' %}
 {% block title %}我要出题{% endblock %}
 {% block content %}
 <style>
@@ -64,7 +64,7 @@
     <div class="span4">
             <div class="alert alert-success">
                 <strong>创建成功!</strong><br />
-                <p>本次创建{{ created.choice_num }}道选择题和{{ created.fillinblank_num }}道填空题</p><br />
+                <p>本次创建{{ created.A1_choice_num }}道A1型选择题,{{ created.A2_choice_num }}道A2型选择题,{{ created.A3_choice_num }}道A3型选择题,{{ created.B_choice_num }}道B型选择题和{{ created.G_fillinblank_num }}道填空题</p><br />
                 <a href="/bs/set{% if request.session.uid %}?uid={{ request.session.uid }}{% else %}{% endif %}"><strong>点我</strong></a>继续创建
             </div>
         </div>

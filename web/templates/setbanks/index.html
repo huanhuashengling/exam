@@ -4,15 +4,15 @@
 {% block content %}
 <div class="container">
     <div class="alert alert-info" style="margin-top: 20px;">
-        <h5>导入题库</h5>
+        <h5>导入题库(文件名即为题库名)</h5>
         <form id="uploadFileForm" method="post" action="/bs/set/bank/upbank" enctype="multipart/form-data">{% csrf_token %}
             <div class="row">
-            <div class="col-2">
+            <!--<div class="col-2">
                 <a id="tDownload" href="/bs/set/bank/tdownload?uid={{ user_info.uid }}" class="btn btn-success">下载题库模板</a>
             </div>
             <div class="col-2">
                 <input id="bankName" name="bank_name" type="text" class="form-control" placeholder="输入题库名称" />
-            </div>
+            </div>-->
             <div class="col-3">
                 <select class="form-control">
                     <option>选择科室</option>
@@ -55,12 +55,21 @@
                 题库名称
             </th>
             <th data-field="total_question_num" data-sortable="true">
-                题目数量
+                题量
             </th>
-            <th data-field="choice_num" data-sortable="true">
-                选择题
+            <th data-field="A1_choice_num" data-sortable="true">
+                A1型
             </th>
-            <!-- <th data-field="fillinblank_num" data-sortable="true">
+            <th data-field="A2_choice_num" data-sortable="true">
+                A2型
+            </th>
+            <th data-field="A3_choice_num" data-sortable="true">
+                A3型
+            </th>
+            <th data-field="B_choice_num" data-sortable="true">
+                B型
+            </th>
+            <!-- <th data-field="G_fillinblank_num" data-sortable="true">
                 填空题
             </th> -->
             <th data-field="kind_num" data-sortable="true">

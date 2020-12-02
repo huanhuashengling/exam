@@ -1,38 +1,32 @@
 {% extends 'admin_base.html' %}
 {% load staticfiles %}
-{% block title %}配置比赛{% endblock %}
+{% block title %}创建测试{% endblock %}
 {% block content %}
 <style>
 
 </style>
  <!-- style="background: url(/static/images/form-bg.jpg) no-repeat center top;" -->
 <div class="container">
-    <h5 class="text-center">创建测试</h5>
+    <div class="alert alert-danger">
+        <h5 class="text-center">创建测试</h5>
+        <p>1. 首先选择题库，将提示题库中各种题型的数量，然后填写测试名称以及选择测试类型</p>
+        <p>2. 修改不同题型配比的数量，总题数将改变，其中A3型、B型题默认每道题3个小题</p>
+    </div>
         <div class="row">
             <div class="form-group col row">
                 <label for="bank_id" class="col-sm-3 text-right">选择题库</label>
                 <div class="col-sm-9">
-                <select class="form-control" id="bank_id">
+                <select class="form-control" id="bankId">
+                    <option value="" >请选择题库</option>
                     {% for b in banks %}
-                    <option value="{{ b.bank_id }}">
-                    {{ b.bank_name|truncatechars:15 }}  ({{ b.total_question_num }}题)
+                    <option value="{{ b.bank_id }}" >
+                    {{ b.bank_name|truncatechars:15 }}  ({{ b.total_question_num }}题) （A1型{{b.A1_choice_num}}题 | A2型{{b.A2_choice_num}}题 | A3型{{b.A3_choice_num}}题 | B型{{b.B_choice_num}}题）
                     </option>
                     {% endfor %}
                 </select>
                 </div>
             </div>
-            <div class="form-group col row">
-                <label for="sponsorName" class="col-sm-3 text-right">出题科室</label>
-                <div class="col-sm-9">
-                    <select class="form-control" id="sponsorName">
-                        <option value="0">感染科</option>
-                        <option value="1">内科</option>
-                        <option value="2">外科</option>
-                        <option value="3">儿科</option>
-                        <option value="4">妇科</option>
-                    </select>
-                </div>
-            </div>
+            <input type="hidden" name="sponsorName" value="0">
         </div>
         <div class="row">
             <div class="form-group col row">
@@ -53,9 +47,35 @@
         </div>
         <div class="row">
             <div class="form-group col row">
-                <label for="questionNum" class="col-sm-3 text-right">出题数量</label>
+                <label for="A1ChoiceNum" class="col-sm-6 text-right">A1型题数</label>
+                <div class="col-sm-6">
+                    <input id="A1ChoiceNum" type="number" class="form-control" value="0" min="0" max="0" />
+                </div>
+            </div>
+            <div class="form-group col row">
+                <label for="A2ChoiceNum" class="col-sm-6 text-right">A2型题数</label>
+                <div class="col-sm-6">
+                    <input id="A2ChoiceNum" type="number" class="form-control" value="0" min="0" max="0" />
+                </div>
+            </div>
+            <div class="form-group col row">
+                <label for="A3ChoiceNum" class="col-sm-6 text-right">A3型题数</label>
+                <div class="col-sm-6">
+                    <input id="A3ChoiceNum" type="number" class="form-control" value="0" min="0" max="0" />
+                </div>
+            </div>
+            <div class="form-group col row">
+                <label for="BChoiceNum" class="col-sm-6 text-right">B型题数</label>
+                <div class="col-sm-6">
+                    <input id="BChoiceNum" type="number" class="form-control" value="0" min="0" max="0" />
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="form-group col row">
+                <label for="questionNum" class="col-sm-3 text-right">出题数量约</label>
                 <div class="col-sm-9">
-                    <input id="questionNum" type="number" class="form-control" value="10" />
+                    <input id="questionNum" type="txt" class="form-control" value="" readonly="" />
                 </div>
             </div>
             <div class="form-group col row">
@@ -108,6 +128,44 @@
         data: {csrfmiddlewaretoken: '{{ csrf_token }}' },
     });
     $(document).ready(function () {
+        $("#bankId").change(function(e) {
+            $.ajax({
+                url: '/api/get_a_bank',
+                type: 'get',
+                data: {
+                    'bank_id': $("#bankId").val(),
+                },
+                dataType: 'json',
+                success: function (res) {
+                    $("#A1ChoiceNum").attr({"max": res.data.A1_choice_num});
+                    $("#A2ChoiceNum").attr({"max": res.data.A2_choice_num});
+                    $("#A3ChoiceNum").attr({"max": res.data.A3_choice_num});
+                    $("#BChoiceNum").attr({"max": res.data.B_choice_num});
+                    $("#A1ChoiceNum").val("0");
+                    $("#A2ChoiceNum").val("0");
+                    $("#A3ChoiceNum").val("0");
+                    $("#BChoiceNum").val("0");
+                }
+            })
+        });
+
+        $("#A1ChoiceNum").change(function(e) {
+            $("#questionNum").val(parseInt($("#A1ChoiceNum").val()) + parseInt($("#A2ChoiceNum").val()) + parseInt($("#A3ChoiceNum").val()) * 3 + parseInt($("#BChoiceNum").val()) * 3);
+        });
+
+        $("#A2ChoiceNum").change(function(e) {
+            $("#questionNum").val(parseInt($("#A1ChoiceNum").val()) + parseInt($("#A2ChoiceNum").val()) + parseInt($("#A3ChoiceNum").val()) * 3 + parseInt($("#BChoiceNum").val()) * 3);
+        });
+
+        $("#A3ChoiceNum").change(function(e) {
+            $("#questionNum").val(parseInt($("#A1ChoiceNum").val()) + parseInt($("#A2ChoiceNum").val()) + parseInt($("#A3ChoiceNum").val()) * 3 + parseInt($("#BChoiceNum").val()) * 3);
+        });
+
+        $("#BChoiceNum").change(function(e) {
+            $("#questionNum").val(parseInt($("#A1ChoiceNum").val()) + parseInt($("#A2ChoiceNum").val()) + parseInt($("#A3ChoiceNum").val()) * 3 + parseInt($("#BChoiceNum").val()) * 3);
+        });
+
+
         var curTime = CurentTime();
         var expiredTime = ExpiredTime();
         $('#copStartAt').val(curTime);
@@ -118,7 +176,7 @@
         var responseTypes = {{ bank_types|safe }};
 
         $('#create_btn').click(function () {
-            var choicedBank = $("#bank_id").val();
+            var choicedBank = $("#bankId").val();
             if(!choicedBank) {
                 alert('请选择一个题库');
                 return false;
@@ -137,10 +195,6 @@
             }
 
             var sponsorName = $('#sponsorName').val();
-            if(!sponsorName){
-                alert('请输入科室名称');
-                return false;
-            }
 
             var questionNum = $('#questionNum').val();
             if(!questionNum){
@@ -197,6 +251,10 @@
                     'kind_type': kindType,
                     'sponsor_name': sponsorName,
                     'question_num': questionNum,
+                    'A1_choice_num': $("#A1ChoiceNum").val(),
+                    'A2_choice_num': $("#A2ChoiceNum").val(),
+                    'A3_choice_num': $("#A3ChoiceNum").val(),
+                    'B_choice_num': $("#BChoiceNum").val(),
                     'total_score': totalScore,
                     'cop_startat': startedAt,
                     'cop_finishat': finishedAt,

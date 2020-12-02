@@ -43,7 +43,14 @@ class CompetitionKindInfo(CreateUpdateMixin):
 
     total_score = models.IntegerField(_(u'总分数'), default=0, help_text=u'总分数')
     question_num = models.IntegerField(_(u'题目个数'), default=0, help_text=u'出题数量')
-
+    A1_choice_num = models.IntegerField(_(u'A1型选择题数'), default=0, help_text=u'A1型选择题数')
+    A2_choice_num = models.IntegerField(_(u'A2型选择题数'), default=0, help_text=u'A2型选择题数')
+    A3_choice_num = models.IntegerField(_(u'A3型选择题数'), default=0, help_text=u'A3型选择题数')
+    B_choice_num = models.IntegerField(_(u'B型选择题数'), default=0, help_text=u'B型选择题数')
+    G_fillinblank_num = models.IntegerField(_(u'名词解释题数'), default=0, help_text=u'名词解释题数')
+    EG_fillinblank_num = models.IntegerField(_(u'英语名词解释题数'), default=0, help_text=u'英语名词解释题数')
+    S_fillinblank_num = models.IntegerField(_(u'简答题数'), default=0, help_text=u'简答题数')
+    A_fillinblank_num = models.IntegerField(_(u'综合分析题数'), default=0, help_text=u'综合分析题数')
     # 周期相关
     cop_startat = models.DateTimeField(_(u'测试开始时间'), default=timezone.now, help_text=_(u'测试开始时间'))
     period_time = models.IntegerField(_(u'答题时间'), default=60, help_text=u'答题时间(min)')
@@ -71,6 +78,14 @@ class CompetitionKindInfo(CreateUpdateMixin):
             'kind_name': self.kind_name,
             'total_score': self.total_score,
             'question_num': self.question_num,
+            'A1_choice_num': self.A1_choice_num,
+            'A2_choice_num': self.A2_choice_num,
+            'A3_choice_num': self.A3_choice_num,
+            'B_choice_num': self.B_choice_num,
+            'G_fillinblank_num': self.G_fillinblank_num,
+            'EG_fillinblank_num': self.EG_fillinblank_num,
+            'S_fillinblank_num': self.S_fillinblank_num,
+            'A_fillinblank_num': self.A_fillinblank_num,
             'total_partin_num': self.total_partin_num,
             'cop_startat': self.cop_startat,
             'cop_finishat': self.cop_finishat,
@@ -84,7 +99,6 @@ class BankInfo(CreateUpdateMixin):
     """
     题库信息类
     """
-
     INFECTION = 0 #感染科
     INTERNAL = 1 #内科
     SURGICAL = 2 #外科
@@ -104,8 +118,14 @@ class BankInfo(CreateUpdateMixin):
     account_id = models.CharField(_(u'商家id'), max_length=32, blank=True, null=True, help_text=u'商家账户唯一标识', db_index=True)
     bank_name = models.CharField(_(u'题库名称'), max_length=40, blank=True, null=True, help_text=u'题库名称')
 
-    choice_num = models.IntegerField(_(u'选择题数'), default=0, help_text=u'选择题数')
-    fillinblank_num = models.IntegerField(_(u'填空题数'), default=0, help_text=u'填空题数')
+    A1_choice_num = models.IntegerField(_(u'A1型选择题数'), default=0, help_text=u'A1型选择题数')
+    A2_choice_num = models.IntegerField(_(u'A2型选择题数'), default=0, help_text=u'A2型选择题数')
+    A3_choice_num = models.IntegerField(_(u'A3型选择题数'), default=0, help_text=u'A3型选择题数')
+    B_choice_num = models.IntegerField(_(u'B型选择题数'), default=0, help_text=u'B型选择题数')
+    G_fillinblank_num = models.IntegerField(_(u'名词解释题数'), default=0, help_text=u'名词解释题数')
+    EG_fillinblank_num = models.IntegerField(_(u'英语名词解释题数'), default=0, help_text=u'英语名词解释题数')
+    S_fillinblank_num = models.IntegerField(_(u'简答题数'), default=0, help_text=u'简答题数')
+    A_fillinblank_num = models.IntegerField(_(u'综合分析题数'), default=0, help_text=u'综合分析题数')
     bank_type = models.IntegerField(_(u'题库类型'), default=INFECTION, choices=BANK_TYPES, help_text=u'题库类型')
     kind_num = models.IntegerField(_(u'测试使用次数'), default=0, help_text=u'测试使用次数')
     partin_num = models.IntegerField(_(u'总答题人数'), default=0, help_text=u'总答题人数')
@@ -119,15 +139,21 @@ class BankInfo(CreateUpdateMixin):
 
     @property
     def total_question_num(self):
-        return self.choice_num + self.fillinblank_num
+        return self.A1_choice_num + self.A2_choice_num + self.A3_choice_num + self.B_choice_num + self.G_fillinblank_num + self.EG_fillinblank_num + self.S_fillinblank_num + self.A_fillinblank_num
 
     @property
     def data(self):
         return {
             'bank_id': self.bank_id,
             'bank_name': self.bank_name,
-            'choice_num': self.choice_num,
-            'fillinblank_num': self.fillinblank_num,
+            'A1_choice_num': self.A1_choice_num,
+            'A2_choice_num': self.A2_choice_num,
+            'A3_choice_num': self.A3_choice_num,
+            'B_choice_num': self.B_choice_num,
+            'G_fillinblank_num': self.G_fillinblank_num,
+            'EG_fillinblank_num': self.EG_fillinblank_num,
+            'S_fillinblank_num': self.S_fillinblank_num,
+            'A_fillinblank_num': self.A_fillinblank_num,
             'bank_type': dict(self.BANK_TYPES)[self.bank_type],
             'kind_num': self.kind_num,
             'partin_num': self.partin_num,
@@ -135,30 +161,37 @@ class BankInfo(CreateUpdateMixin):
         }
 
 
-class ChoiceInfo(CreateUpdateMixin, MediaMixin):
-    """
-    选择题信息类
-    """
-
+class ChoiceInfo(CreateUpdateMixin):
     QUESTION_TYPE = 'choice'
 
-    TXT = 1
-    IMG = 2
-    AUDIO = 3
+    A1 = 1
+    A2 = 2
+    A3 = 3
+    B = 4
+    # C = 5
+    # MULTI = 6
+    
 
-    CONTENT_TYPE = (
-        (TXT, u'文本'),
-        (IMG, u'图片'),
-        (AUDIO, u'音频'),
+    CHOICE_TYPE = (
+        (A1, u'概念单选'),
+        (A2, u'分析单选'),
+        (A3, u'共题干分析单选'),
+        (B, u'共答案单选'),
+        # (C, u'共答案单选'),
+        # (MULTI, u'多选题'),
     )
 
     bank_id = models.CharField(_(u'题库id'), max_length=32, blank=True, null=True, help_text=u'题库唯一标识', db_index=True)
     subject_id = models.CharField(_(u'科目id'), max_length=32, blank=True, null=True, help_text=u'科目唯一标识', db_index=True)
-    ctype = models.IntegerField(_(u'题目类型'), choices=CONTENT_TYPE, default=TXT, help_text=u'题目类型')
+    ctype = models.IntegerField(_(u'选择题类型'), choices=CHOICE_TYPE, default=A1, help_text=u'选择题类型')
     question = models.CharField(_(u'问题'), max_length=1000, blank=True, null=True, help_text=u'题目')
     answer = models.CharField(_(u'答案'), max_length=255, blank=True, null=True, help_text=u'答案')
     select_items = models.CharField(_(u'选项'), max_length=2000, blank=True, null=True, help_text=u'选项文本')
-    source = models.CharField(_(u'出处'), max_length=255, blank=True, null=True, help_text=u'出处')
+    
+    source = models.CharField(_(u'出题处'), max_length=255, blank=True, null=True, help_text=u'出提处')
+    expound = models.CharField(_(u'解析'), max_length=1000, blank=True, null=True, help_text=u'解析')
+    question_group_id = models.CharField(_(u'题组id'), max_length=32, blank=True, null=True, help_text=u'题组', db_index=True)
+    question_group_order = models.IntegerField(_(u'题组中序号'), default=0, help_text=u'题组中序号')
 
     class Meta:
         verbose_name = _(u'选择题')
@@ -169,16 +202,6 @@ class ChoiceInfo(CreateUpdateMixin, MediaMixin):
 
     @property
     def items(self):
-        # tmp = []
-        # if self.item1:
-        #     tmp.append(self.item1)
-        # if self.item2:
-        #     tmp.append(self.item2)
-        # if self.item3:
-        #     tmp.append(self.item3)
-        # if self.item4:
-        #     tmp.append(self.item4)
-        # return tmp
         return self.select_items
 
     @property
@@ -191,7 +214,9 @@ class ChoiceInfo(CreateUpdateMixin, MediaMixin):
             'question': self.question,
             'items': self.select_items,
             'source': self.source,
-            'media': self.media,
+            'expound': self.expound,
+            'question_group_id': self.question_group_id,
+            'question_group_order': self.question_group_order,
         }
 
     @property
@@ -205,33 +230,79 @@ class ChoiceInfo(CreateUpdateMixin, MediaMixin):
             'answer': self.answer,
             'items': self.select_items,
             'source': self.source,
-            'media': self.media,
+            'expound': self.expound,
+            'question_group_id': self.question_group_id,
+            'question_group_order': self.question_group_order,
         }
 
+class QuestionGroupInfo(CreateUpdateMixin):
 
-class FillInBlankInfo(CreateUpdateMixin, MediaMixin):
+    QUESTION_TYPE = 'question_group'
+
+    A3 = 1
+    B = 2
+    ANALYSIS = 3
+
+    QUESTION_GROUP_TYPE = (
+        (A3, u'共题干分析单选'),
+        (B, u'共答案单选'),
+        (ANALYSIS, u'案例分析题'),
+    )
+
+    bank_id = models.CharField(_(u'题库id'), max_length=32, blank=True, null=True, help_text=u'题库唯一标识', db_index=True)
+    group_question_txt = models.CharField(_(u'组题干'), max_length=1000, blank=True, null=True, help_text=u'组题干')
+    group_question_count = models.IntegerField(_(u'题组中题数'), default=0, help_text=u'题组中题数')
+    group_question_code = models.CharField(_(u'题组编号'), max_length=100, blank=True, null=True, help_text=u'题组编号')
+    question_group_type = models.IntegerField(_(u'组题类型'), choices=QUESTION_GROUP_TYPE, default=A3, help_text=u'组题类型')
+
+    class Meta:
+        verbose_name = _(u'题组')
+        verbose_name_plural = _(u'题组')
+
+    def __unicode__(self):
+        return str(self.pk)
+
+    @property
+    def data(self):
+        return {
+            'pk': self.pk,
+            'qtype': self.QUESTION_TYPE,
+            'bank_id': self.bank_id,
+            'question_group_type': self.question_group_type,
+            'group_question_txt': self.group_question_txt,
+            'group_question_code': self.group_question_code,
+            'group_question_count': self.group_question_count,
+        }
+
+class FillInBlankInfo(CreateUpdateMixin):
     """
     填空题信息类
     """
 
     QUESTION_TYPE = 'fillinblank'
 
-    TXT = 1
-    IMG = 2
-    AUDIO = 3
 
-    CONTENT_TYPE = (
-        (TXT, u'文本'),
-        (IMG, u'图片'),
-        (AUDIO, u'音频'),
+    GLOSSARY = 1
+    EGLOSSARY = 2
+    SHORT = 3
+    ANALYSIS = 4
+
+    FILLBLANK_TYPE = (
+        (GLOSSARY, u'名词解释'),
+        (EGLOSSARY, u'英语名词解释'),
+        (SHORT, u'简答题'),
+        (ANALYSIS, u'案例分析题'),
     )
 
     bank_id = models.CharField(_(u'题库id'), max_length=32, blank=True, null=True, help_text=u'题库唯一标识', db_index=True)
     subject_id = models.CharField(_(u'科目id'), max_length=32, blank=True, null=True, help_text=u'科目唯一标识', db_index=True)
-    ctype = models.IntegerField(_(u'题目类型'), choices=CONTENT_TYPE, default=TXT, help_text=u'题目类型')
+    ftype = models.IntegerField(_(u'填空类型'), choices=FILLBLANK_TYPE, default=GLOSSARY, help_text=u'填空类型')
     question = models.CharField(_(u'问题'), max_length=1000, blank=True, null=True, help_text=u'题目')
     answer = models.CharField(_(u'答案'), max_length=255, blank=True, null=True, help_text=u'答案')
-    source = models.CharField(_(u'出处'), max_length=255, blank=True, null=True, help_text=u'出处')
+    
+    source = models.CharField(_(u'出题处'), max_length=255, blank=True, null=True, help_text=u'出题处')
+    question_group_id = models.CharField(_(u'题组id'), max_length=32, blank=True, null=True, help_text=u'题组', db_index=True)
+    question_group_order = models.IntegerField(_(u'题组中序号'), default=0, help_text=u'题组中序号')
 
     class Meta:
         verbose_name = _(u'填空题')
@@ -245,7 +316,7 @@ class FillInBlankInfo(CreateUpdateMixin, MediaMixin):
         return {
             'pk': self.pk,
             'bank_id': self.bank_id,
-            'ctype': self.ctype,
+            'ftype': self.ftype,
             'question': self.question,
             'qtype': self.QUESTION_TYPE,
             'source': self.source
@@ -256,7 +327,7 @@ class FillInBlankInfo(CreateUpdateMixin, MediaMixin):
         return {
             'pk': self.pk,
             'bank_id': self.bank_id,
-            'ctype': self.ctype,
+            'ftype': self.ftype,
             'question': self.question,
             'qtype': self.QUESTION_TYPE,
             'answer': self.answer,

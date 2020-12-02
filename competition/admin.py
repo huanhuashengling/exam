@@ -31,10 +31,10 @@ class BankInfoAdmin(admin.ModelAdmin):
     题库后台配置
     """
 
-    list_display = ('bank_id', 'bank_type', 'kind_num', 'choice_num', 'fillinblank_num', 'partin_num')
+    list_display = ('bank_id', 'bank_type', 'kind_num', 'A1_choice_num', 'A2_choice_num', 'A3_choice_num', 'B_choice_num', 'G_fillinblank_num', 'partin_num')
     list_filter = ('bank_type', 'bank_id',)
     search_fields = ('bank_id',)
-    readonly_fields = ('bank_id', 'choice_num', 'fillinblank_num', 'kind_num', 'partin_num')
+    readonly_fields = ('bank_id', 'A1_choice_num', 'A2_choice_num', 'A3_choice_num', 'B_choice_num', 'G_fillinblank_num', 'kind_num', 'partin_num')
 
     def save_model(self, request, obj, form, change):
         obj.choice_num = ChoiceInfo.objects.filter(bank_id=obj.bank_id).count()
