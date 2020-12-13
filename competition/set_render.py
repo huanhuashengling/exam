@@ -164,7 +164,7 @@ def upload_bank(request):
     parentpath = os.path.join(os.path.dirname(__file__), os.path.pardir)
     # today_bank_repo = os.path.join(os.path.join(parentpath, "backup/"), get_today_string())  # 保存文件目录以当天时间为准
     today_bank_repo = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'backup' + "/" + get_today_string())
-    print(today_bank_repo)
+    # print(today_bank_repo)
     # print(parentpath)
     # print(os.path.join(parentpath, settings.BANK_REPO))
     # return render(request, 'err.html', {"parentpath":  parentpath})
@@ -192,7 +192,7 @@ def upload_bank(request):
 def set_game(request):
     uid = request.GET.get('uid', '')
 
-    print("set_game"+ uid)
+    # print("set_game"+ uid)
     try:
         profile = Profile.objects.get(uid=uid)
     except Profile.DoesNotExist:

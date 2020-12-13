@@ -9,8 +9,8 @@
 <div class="container">
     <div class="alert alert-danger">
         <h5 class="text-center">创建测试</h5>
-        <p>1. 首先选择题库，将提示题库中各种题型的数量，然后填写测试名称以及选择测试类型</p>
-        <p>2. 修改不同题型配比的数量，总题数将改变，其中A3型、B型题默认每道题3个小题</p>
+        <p>1. 首先选择题库，根据题库中各种题型的数提示，合理设置各题型数量，其中A3,B型题在题库中可能只有两个小题。</p>
+        <p>2. 先设置出题总数，其中A3、B型题按每道题3小题计数。实际出题时，A1 A2型题将平均补齐直到与总题数一致。</p>
     </div>
         <div class="row">
             <div class="form-group col row">
@@ -44,16 +44,38 @@
                 </select>
                 </div>
             </div>
+
         </div>
         <div class="row">
             <div class="form-group col row">
-                <label for="A1ChoiceNum" class="col-sm-6 text-right">A1型题数</label>
+                <label for="totalScore" class="col-sm-3 text-right">总分数</label>
+                <div class="col-sm-9">
+                    <input id="totalScore" type="number" class="form-control" value="100" />
+                </div>
+            </div>
+            <div class="form-group col row">
+                <label for="maxQuestionNum" class="col-sm-3 text-right">出题总数</label>
+                <div class="col-sm-9">
+                    <input id="maxQuestionNum" type="txt" class="form-control" value="" />
+                </div>
+            </div>
+            
+            <div class="form-group col row">
+                <label for="questionNum" class="col-sm-3 text-right">实际题数</label>
+                <div class="col-sm-9">
+                    <input id="questionNum" type="txt" class="form-control" value="" readonly="" />
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="form-group col row">
+                <label for="A1ChoiceNum" class="col-sm-6 text-right">A1型题数约</label>
                 <div class="col-sm-6">
                     <input id="A1ChoiceNum" type="number" class="form-control" value="0" min="0" max="0" />
                 </div>
             </div>
             <div class="form-group col row">
-                <label for="A2ChoiceNum" class="col-sm-6 text-right">A2型题数</label>
+                <label for="A2ChoiceNum" class="col-sm-6 text-right">A2型题数约</label>
                 <div class="col-sm-6">
                     <input id="A2ChoiceNum" type="number" class="form-control" value="0" min="0" max="0" />
                 </div>
@@ -68,20 +90,6 @@
                 <label for="BChoiceNum" class="col-sm-6 text-right">B型题数</label>
                 <div class="col-sm-6">
                     <input id="BChoiceNum" type="number" class="form-control" value="0" min="0" max="0" />
-                </div>
-            </div>
-        </div>
-        <div class="row">
-            <div class="form-group col row">
-                <label for="questionNum" class="col-sm-3 text-right">出题数量约</label>
-                <div class="col-sm-9">
-                    <input id="questionNum" type="txt" class="form-control" value="" readonly="" />
-                </div>
-            </div>
-            <div class="form-group col row">
-                <label for="totalScore" class="col-sm-3 text-right">总分数</label>
-                <div class="col-sm-9">
-                    <input id="totalScore" type="number" class="form-control" value="100" />
                 </div>
             </div>
         </div>
@@ -195,12 +203,18 @@
             }
 
             var sponsorName = $('#sponsorName').val();
-
             var questionNum = $('#questionNum').val();
             if(!questionNum){
                 alert('请设置出题数量');
                 return false;
             }
+
+            var maxQuestionNum = $('#maxQuestionNum').val();
+            if (questionNum != maxQuestionNum) {
+                alert('您设置出题数与实际题数不一致！');
+                return false;
+            }
+
             var totalScore = $('#totalScore').val();
             if(!totalScore) {
                 alert('请设置测试总分');

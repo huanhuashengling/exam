@@ -292,7 +292,7 @@ def qa_info_page(request):
     BQuestionArr = []
     selectLabel = ["A", "B", "C", "D", "E", "F", "G", "H", "I"]
     for index, x in enumerate(answerslogrecord):
-        print(x)
+        # print(x)
         questionInfo = x.split("|")[0]
         answerInfo = int(x.split("|")[1])
         questionType = questionInfo.split("_")[0]

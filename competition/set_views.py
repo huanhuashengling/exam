@@ -157,10 +157,10 @@ def set_bank(request):
         'cop_finishat': cop_finishat
     }
 
-    print(account_id)
-    print(app_info.app_id)
-    print(bank_id)
-    print(kind_values)
+    # print(account_id)
+    # print(app_info.app_id)
+    # print(bank_id)
+    # print(kind_values)
     kind_info, kind_created = CompetitionKindInfo.objects.select_for_update().get_or_create(
         account_id=account_id,
         app_id=app_info.app_id,

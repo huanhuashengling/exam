@@ -54,21 +54,7 @@ def get_questions(request):
         profile = Profile.objects.get(uid=uid)
     except Profile.DoesNotExist:  # 未获取到，返回错误码200001
         return json_response(*ProfileError.ProfileNotFound)
-    A1qc = ChoiceInfo.objects.filter(bank_id=kind_info.bank_id).filter(ctype=1) # A1选择题
-    A2qc = ChoiceInfo.objects.filter(bank_id=kind_info.bank_id).filter(ctype=2) # A2选择题
     
-    A1questions = []
-    for i in A1qc.iterator():
-        A1questions.append(i.data)
-    A1qs = random.sample(A1questions, kind_info.A1_choice_num)
-
-    A2questions = []
-    for i in A2qc.iterator():
-        A2questions.append(i.data)
-
-    print(len(A2questions))
-    print(kind_info.A2_choice_num)
-    A2qs = random.sample(A2questions, kind_info.A2_choice_num)
 
     A3QuestionGroup = QuestionGroupInfo.objects.filter(bank_id=kind_info.bank_id).filter(question_group_type=1) # A3选择题
     BQuestionGroup = QuestionGroupInfo.objects.filter(bank_id=kind_info.bank_id).filter(question_group_type=2) # B选择题
@@ -83,26 +69,53 @@ def get_questions(request):
         BQuestionGroups.append(i.data)
     BQuestionGroups = random.sample(BQuestionGroups, kind_info.B_choice_num)
 
+    A3QuestionNum = 0
     A3qs = []
     for i in A3QuestionGroups:
-        print(i)
         A3chioces = ChoiceInfo.objects.filter(question_group_id=i["pk"])
         for j in A3chioces.iterator():
+            A3QuestionNum += 1
             A3data = j.data
             A3data.update({"group_question_txt":i["group_question_txt"]})
             A3data.update({"group_question_count":i["group_question_count"]})
             A3qs.append(A3data)
 
+    BQuestionNum = 0
     Bqs = []
     for i in BQuestionGroups:
         Bchioces = ChoiceInfo.objects.filter(question_group_id=i["pk"])
         for j in Bchioces.iterator():
+            BQuestionNum += 1
             Bdata = j.data
             Bdata.update({"group_question_count":i["group_question_count"]})
             Bqs.append(Bdata)
 
+    actualQuestionNum = kind_info.A1_choice_num + kind_info.A2_choice_num + A3QuestionNum + BQuestionNum
 
-    qf = FillInBlankInfo.objects.filter(bank_id=kind_info.bank_id)  # 填空题
+    newA1ChoiceNum = kind_info.A1_choice_num
+    newA2ChoiceNum = kind_info.A2_choice_num
+    if actualQuestionNum < kind_info.question_num:
+        diff = kind_info.question_num - actualQuestionNum
+        newA1ChoiceNum = newA1ChoiceNum + diff//2
+        newA2ChoiceNum = newA2ChoiceNum + diff//2
+        newA1ChoiceNum = newA1ChoiceNum + diff%2
+        
+    # qf = FillInBlankInfo.objects.filter(bank_id=kind_info.bank_id)  # 填空题
+
+
+    A1qc = ChoiceInfo.objects.filter(bank_id=kind_info.bank_id).filter(ctype=1) # A1选择题
+    A2qc = ChoiceInfo.objects.filter(bank_id=kind_info.bank_id).filter(ctype=2) # A2选择题
+    
+    A1questions = []
+    for i in A1qc.iterator():
+        A1questions.append(i.data)
+    A1qs = random.sample(A1questions, newA1ChoiceNum)
+
+    A2questions = []
+    for i in A2qc.iterator():
+        A2questions.append(i.data)
+    A2qs = random.sample(A2questions, newA2ChoiceNum)
+
     qs = A1qs + A2qs + A3qs + Bqs  # 将两种题型放到同一个列表中
     # for i in qc.iterator():
     #     questions.append(i.data)
