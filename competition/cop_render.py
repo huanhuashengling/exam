@@ -817,7 +817,10 @@ def exportpdf(request):
     # FileResponse sets the Content-Disposition header so that browsers
     # present the option to save the file.
     pdf_buffer.seek(0)
-    return FileResponse(pdf_buffer, as_attachment=True, filename=filename_time+"_"+profile.displayname+'医生出科考试.pdf')
+    traineeType = profile.get_trainee_type_display()[0:2]
+    if "住院" == traineeType:
+        traineeType = "住培"
+    return FileResponse(pdf_buffer, as_attachment=True, filename=traineeType+"_"+filename_time+"_"+profile.displayname+'出科考试.pdf')
 
 def _header_footer(canvas, doc):
     sample_style_sheet=getSampleStyleSheet()
