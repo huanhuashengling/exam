@@ -179,7 +179,7 @@ def set_bank(request):
 
 def game_list_data(request):
     kindData = []
-    kinds = CompetitionKindInfo.objects.all()
+    kinds = CompetitionKindInfo.objects.all().order_by('-created_at')
     for kind in kinds:
         copStartat = kind.cop_startat.strftime("%Y/%m/%d")
         copFinishat = kind.cop_finishat.strftime("%Y/%m/%d")

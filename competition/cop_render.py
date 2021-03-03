@@ -139,6 +139,7 @@ def test_list(request, s='hot'):
         # 筛选条件: 完成时间大于当前时间;根据参与人数降序排序;根据创建时间降序排序;筛选10个
         kinds = CompetitionKindInfo.objects.filter(
             cop_finishat__gt=datetime.datetime.now(tz=datetime.timezone.utc),
+            is_open=1,
         ).order_by('-total_partin_num').order_by('-created_at')[:10]
 
     elif s == 'infection':
