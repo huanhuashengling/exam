@@ -36,12 +36,14 @@ urlpatterns = [
     path('deactive_normal_user', views.deactive_normal_user, name='deactive_normal_user'),
     path('normal_user_list_data', views.normal_user_list_data, name='normal_user_list_data'),
     path('reset_password', views.reset_password, name='reset_password'),
+    path('file_download', views.file_download, name='file_download'),
 ]
 
 urlpatterns += [
     path('bs/', include(('competition.urls','competition'), namespace='bs')),  # 比赛
     path('api/', include(('api.urls','api'), namespace='api')),  # 接口
     path('biz/', include(('business.urls','business'), namespace='biz')),  # 机构
+    path('materials/', include('materials.urls')),  #资料下载
 ]
 
 urlpatterns += [

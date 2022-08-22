@@ -1,8 +1,10 @@
 from django.shortcuts import render
 from django.contrib.auth.models import User
 from account.models import Profile
+from materials.models import Document
 import json
 from utils.response import json_response
+
 
 def normal_user_list(request):
     
@@ -115,3 +117,25 @@ def reset_password(request):
         return json_response(200, 'OK', {})
     else:
         return json_response(*UserError.PasswordError)
+
+def file_download(request):
+    
+    uid = request.session.get('uid', '')
+
+    documentData = []
+    try:
+        documents = Document.objects.all()
+        for document in documents:
+            documentData.append({'doc_name': document.doc_name, 
+                        'file_type': document.file_type, 
+                        'upload_date': document.upload_date.strftime("%Y-%m-%d %H:%M"), 
+                        'download_url': "\\materials\\download?docId=" + str(document.id),
+                        })
+    except Document.DoesNotExist:
+        documents = None
+
+    return render(request, 'web/file_list.html', {
+        'documents': documentData,
+    })
+
+

@@ -27,7 +27,7 @@ SECRET_KEY = 'n@dmhs9)21$mzj7an@_89q_fusqws@p+qy(np0vmcdmgk7c$@i'
 DEBUG = True
 TEMPLATE_DEBUG = True
 
-ALLOWED_HOSTS = ['http://127.0.0.1:8000/']
+ALLOWED_HOSTS = ['http://127.0.0.1:8000/', '127.0.0.1']
 
 
 # Application definition
@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'account',
     'business',
     'competition',
+    'materials',
 ]
 
 MIDDLEWARE = [
@@ -106,7 +107,6 @@ REDIS = {
     }
 }
 
-
 # Password validation
 # https://docs.djangoproject.com/en/1.11/ref/settings/#auth-password-validators
 
@@ -149,6 +149,9 @@ STATIC_URL = '/static/'
 STATICFILES_DIRS = (
     os.path.join(WEB_DIR, 'static'),
 )
+
+UPLOADS_URL = '/uploads/'
+UPLOADS_DIR = os.path.join(WEB_DIR, 'static', 'uploads')
 
 STATIC_ROOT = os.path.join(BASE_DIR, 'collect_static')
 

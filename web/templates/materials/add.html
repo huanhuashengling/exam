@@ -1,0 +1,34 @@
+{% extends 'admin_base.html' %}
+{% load staticfiles %}
+{% block title %}上传资料{% endblock %}
+{% block content %}
+<style>
+
+</style>
+ <!-- style="background: url(/static/images/form-bg.jpg) no-repeat center top;" -->
+<div class="container">
+	    <div class="alert alert-danger">
+	        <h5 class="text-center">上传资料</h5>
+	    </div>
+	    <form action="/materials/doc_upload" method="post" enctype="multipart/form-data">{% csrf_token %}
+	    <div class="file-loading">
+		  <input type="file" id="input-doc" name="files" accept=".jpg,.gif,.png,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.pdf" multiple>
+		</div>
+		  <!-- <input type="submit" class="button" value="Upload Image" name="submit"> -->
+		</form>
+</div>
+{% endblock %}
+
+{% block js %} 
+<script type="text/javascript">
+    $.ajaxSetup({
+        data: {csrfmiddlewaretoken: '{{ csrf_token }}' },
+    });
+    $(document).ready(function () {
+    	$("#input-doc").fileinput({
+	        enableResumableUpload: true,
+        	initialPreviewAsData: true,
+	    });
+    });
+</script>
+{% endblock %}

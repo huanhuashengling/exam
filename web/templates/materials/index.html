@@ -1,0 +1,251 @@
+{% extends 'admin_base.html' %}
+{% load staticfiles %}
+{% block title %}资料管理{% endblock %}
+{% block content %}
+<div class="container">
+<div class="row">
+    <div id="toolbar">
+      <a class="btn btn-success" href="/materials/add_document?uid={{ request.session.uid }}">添加资料</a>
+    </div>
+    <table id="document_list" class="table table-condensed table-responsive">
+        <thead>
+            <tr>
+                <th data-field="">
+                    序号
+                </th>
+                <th data-field="doc_name" data-sortable="true">
+                    资料名称
+                </th>
+                <th data-field="file_type" data-sortable="true">
+                    文档类型
+                </th>
+                <th data-field="upload_date" data-sortable="true">
+                    上传日期
+                </th>
+                <th data-field="download_count" data-sortable="true">
+                    下载次数
+                </th>
+              <th data-field="uid" data-formatter="actionCol" data-events="actionEvents">
+                  操作
+              </th>
+            </tr>
+        </thead>
+    </table>
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="editGameModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="editGameModalLabel">调整的测试设置</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form class="form-reset">
+            <input type="hidden" id="kind_id">
+            <div class="form-group row">
+                <label for="kindName" class="col-4 text-right">测试名称:</label>
+                <input type="text" class="form-control col-7" id="kindName">
+            </div>
+            <div class="form-group row">
+                <label for="kindType" class="col-4 text-right">测试类型:</label>
+                <select class="form-control col-7" id="kindType">
+                    <option value="0">日常练习</option>
+                    <option value="1">出科测试</option>
+                </select>
+            </div>
+            <div class="form-group row">
+                <label for="questionNum" class="col-4 text-right">出题数量</label>
+                <input id="questionNum" type="number" class="form-control col-7" />
+            </div>
+            <div class="form-group row">
+                <label for="totalScore" class="col-4 text-right">总分数</label>
+                <input id="totalScore" type="number" class="form-control col-7" />
+            </div>
+            <div class="form-group row">
+                <label for="copFinishAt" class="col-4 text-right">过期时间</label>
+                    <input id="copFinishAt" type="date" class="form-control col-7">
+            </div>
+            <div class="form-group row">
+                <label for="period" class="col-4 text-right">测试时长</label>
+                  <input id="period" type="text" class="form-control col-7" placeholder="完成测试时长，单位为分钟(min)" />
+            </div>
+            <div class="form-group row">
+                <label for="isOpen" class="col-4 text-right">是否开放</label>
+                  <input id="isOpen" type="checkbox" checked="" />
+            </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">返回</button>
+        <button type="button" class="btn btn-primary" id="update_btn">确认修改</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="alertModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="alertModalLabel">设置修改成功！</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">确定</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+</div>
+{% endblock %}
+
+{% block js %} 
+<script>
+    $(document).ready(function () {
+        $.ajaxSetup({
+            data: {csrfmiddlewaretoken: '{{ csrf_token }}' },
+        });
+
+        $('#document_list').bootstrapTable({
+            method: 'get', 
+            dataType: "json",
+            search: "true",
+            url: "/api/admin_get_documents",
+            pagination:"true",
+            pageList: [10, 20, 50, 100], 
+            pageSize: 10,
+            pageNumber: 1,
+            toolbar:"#toolbar",
+            // showExport: true,          //是否显示导出
+            showColumns: "true",           
+            // exportDataType: "basic",              //basic', 'all', 'selected'.
+            queryParams: function(params) {
+                var temp = {
+                    csrfmiddlewaretoken: '{{ csrf_token }}'
+                };
+                return temp;
+            },
+            // clickToSelect: true,
+            columns: [{  
+                        title: '序号',
+                        formatter: function (value, row, index) {  
+                            return (index+1).toString();  
+                        }  
+                    }],
+            responseHandler: function (res) {
+                // fixedScroll = res.data.documents.fixedScroll;
+                fixedScroll = res.data.documents.fixedScroll ? res.data.documents.fixedScroll : false;
+                // console.log(res.data.documents);
+                return res.data.documents;
+            },
+        });
+
+        $("#update_btn").click(function(e) {
+            var kindName = $('#kindName').val();
+            if(!kindName) {
+                alert('请输入测试名称');
+                return false;
+            }
+
+            var kindType = $('#kindType').val();
+            if(!kindType) {
+                alert('请输入测试名称');
+                return false;
+            }
+
+            var questionNum = $('#questionNum').val();
+            if(!questionNum){
+                alert('请设置出题数量');
+                return false;
+            }
+            var totalScore = $('#totalScore').val();
+            if(!totalScore) {
+                alert('请设置测试总分');
+                return false;
+            }
+
+            var finishedAt = $('#copFinishAt').val();
+            if(!finishedAt) {
+                alert('请设置测试失效时间');
+                return false;
+            }
+            // $('#switch-success').is(':checked')
+            var isOpen = $('#isOpen').is(':checked');
+
+            var period = $('#period').val();
+
+            var kindId = $('#kind_id').val();
+            var uid = '{{ request.session.uid }}';
+            var data = {'is_open': isOpen,
+                    'uid': uid,
+                    'kind_id': kindId,
+                    'kind_name': kindName,
+                    'kind_type': kindType,
+                    'question_num': questionNum,
+                    'total_score': totalScore,
+                    'cop_finishat': finishedAt,
+                    'period': period,
+                };
+            $.ajax({
+                url: '/api/update_competition_kind_info',
+                type: 'post',
+                data: data,
+                dataType: 'json',
+                success: function (res) {
+                    // console.log(res)
+                    if(res.status === 200) {
+                      $("#editGameModal").modal("hide");
+                      $('#game_list').bootstrapTable("refresh");
+                    }
+                }
+            })
+        });
+    })
+
+    function timeFormatter(value, row, index) {
+        return [
+            row.period+'(min)'
+        ].join('');
+    }
+
+    function actionCol(value, row, index) {
+        return [
+            "<button class='btn btn-primary btn-sm edit-btn'>编辑</button> "+
+            "<button class='btn btn-danger btn-sm delete-btn'>删除</button> "
+        ].join('');
+    }
+
+    window.actionEvents = {
+        'click .edit-btn': function(e, value, row, index) {
+
+        },
+        'click .delete-btn': function(e, value, row, index) {
+            if(confirm("确定删除该条记录吗（文档将一并清除）？"))
+            {
+                $.ajax({
+                    url: '/materials/doc_delete',
+                    type: 'post',
+                    data: {docId: row.id},
+                    dataType: 'json',
+                    success: function (res) {
+                        console.log(res)
+                        if(res.status === 200) {
+                            alert("删除成功！")
+                        //   $("#editGameModal").modal("hide");
+                          $('#document_list').bootstrapTable("refresh");
+                        }
+                    }
+                })
+            }
+        },
+    }
+</script>
+{% endblock %}

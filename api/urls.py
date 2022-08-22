@@ -5,6 +5,7 @@ from django.conf.urls import url
 from account import login_views, login_render
 from competition import game_views, set_views, rank_views
 from business import biz_views
+from materials import doc_views
 from django.urls import path,re_path
 
 # account
@@ -40,6 +41,12 @@ urlpatterns += [
 # rank
 urlpatterns += [
     path('myrank', rank_views.get_my_rank, name='my_rank'),
+]
+
+
+# doc
+urlpatterns += [
+    path('admin_get_documents', doc_views.documents, name='admin_get_documents'),
 ]
 
 # bussiness

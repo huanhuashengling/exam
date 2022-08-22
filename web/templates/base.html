@@ -61,6 +61,9 @@
               <li class="nav-item">
                 <a class="nav-link" href="/bs/rank{% if request.session.uid %}?uid={{ request.session.uid }}{% else %}{% endif %}">测试历史</a>
               </li>
+              <li class="nav-item">
+                <a class="nav-link" href="/file_download{% if request.session.uid %}?uid={{ request.session.uid }}{% else %}{% endif %}" tabindex="-1">资料下载</a>
+              </li>
               <!-- <li class="nav-item">
                 <a class="nav-link" href="/biz{% if request.session.uid %}?uid={{ request.session.uid }}{% else %}{% endif %}" tabindex="-1">个人数据</a>
               </li> -->

@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+{% block title %}资料下载{% endblock %}
+{% block content %}
+    <div class="main-content container">
+
+    <div class="inner-content">
+      <div class="alert">点击链接进行下载</div>
+      {% for document in documents %}
+      <div class="card" style="margin-bottom: 20px;">
+        <div class="card-body">
+        	<a href="{{ document.download_url }} ">{{ document.doc_name }}</a>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+</div>
+{% endblock %}
